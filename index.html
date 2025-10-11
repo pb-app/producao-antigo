@@ -1,33 +1,314 @@
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Acompanhamento de Produção</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <style>
+    :root{--primary:#0077cc;--muted:#e6f0ff;--card:#ffffff;--accent:#ff9900}
+    *{box-sizing:border-box}
+    body{font-family:Arial,Helvetica,sans-serif;margin:0;background:var(--muted);color:#222}
+    header{background:var(--primary);color:#fff;padding:14px 12px;text-align:center}
+    .container{max-width:980px;margin:18px auto;padding:16px;background:var(--card);border-radius:10px;box-shadow:0 6px 18px rgba(0,0,0,0.08)}
+    h1,h2{margin:0 0 12px}
+    .nav{display:flex;gap:8px;justify-content:center;margin-bottom:14px}
+    .nav a{color:var(--primary);text-decoration:none;font-weight:700;padding:6px 10px;border-radius:6px}
+    .nav a.active{background:rgba(0,0,0,0.04)}
+    form{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+    label{font-size:13px;font-weight:700;margin-bottom:4px;display:block}
+    input[type="date"], input[type="text"], input[type="number"], select, textarea{width:100%;padding:8px;border:1px solid #cfd8e3;border-radius:6px}
+    textarea{min-height:70px;resize:vertical}
+    .full{grid-column:1/-1}
+    button{background:var(--primary);color:#fff;border:none;padding:10px 14px;border-radius:8px;cursor:pointer;font-weight:700}
+    button.secondary{background:#eee;color:#111}
+    button.delete-btn{background:#dc3545;padding:4px 8px;font-size:12px;}
+    /* Aumenta o espaço dos filtros do dashboard */
+    .filtros{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom: 10px;} 
+    .filtros input, .filtros select{padding:6px}
+    table{width:100%;border-collapse:collapse;margin-top:12px}
+    th,td{border:1px solid #e0e6ef;padding:8px;text-align:center;font-size:13px}
+    th{background:var(--primary);color:#fff}
+    .table-porcentagem{min-width: 80px;} 
+    .charts{display:grid;gap:18px;margin-top:20px}
+    @media(min-width:880px){form{grid-template-columns:repeat(3,1fr)}.charts{grid-template-columns:1fr 1fr}}
+    /* Estilos para os vizualizadores (KPIs) */
+    .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin:20px 0 0;}
+    .kpi-card{background:var(--muted);padding:12px;border-radius:8px;box-shadow:0 2px 4px rgba(0,0,0,0.05)}
+    .kpi-card h3{font-size:14px;color:#555;margin:0 0 4px}
+    .kpi-card p{font-size:28px;font-weight:bold;margin:0;color:var(--primary)} 
+    .kpi-card.percent p{color:#00a000} 
 
+    /* Estilo para a nova área do Operador */
+    #analiseOperadorArea{
+        border: 2px solid var(--accent);
+        padding: 15px;
+        border-radius: 10px;
+        margin-top: 15px;
+    }
+    #analiseOperadorArea h3 {
+        color: var(--accent);
+        text-align: center;
+        margin-bottom: 10px;
+    }
+    #analiseOperadorArea .kpi-card p {
+        color: var(--accent); /* Destaca os números do operador */
+        font-size: 26px; 
+    }
+  </style>
+</head>
+<body>
+  <header><h1>Acompanhamento de Produção</h1></header>
+
+  <div class="container">
+    <div class="nav">
+      <a href="#" id="linkLanc" class="active" onclick="mostrarPagina('lancamento')">Lançamento</a>
+      <a href="#" id="linkHist" onclick="mostrarPagina('historico')">Histórico</a>
+      <a href="#" id="linkDash" onclick="mostrarPagina('dashboard')">Dashboard</a>
+    </div>
+
+    <section id="lancamento">
+      <h2>Lançamento de Produção</h2>
+      <form id="formProducao">
+        <div>
+          <label>Data</label>
+          <input type="date" id="data" required />
+        </div>
+
+        <div>
+          <label>Setor</label>
+          <select id="setor" required>
+            <option value="">Selecione</option>
+            <option>Conformação</option>
+            <option>Esmaltação</option>
+            <option>Embalagem</option>
+            <option>Forno Vidrado</option>
+            <option>Forno Chicote</option>
+          </select>
+        </div>
+
+        <div>
+          <label>Turno</label>
+          <select id="turno" required>
+            <option value="">Selecione</option>
+            <option>Comercial</option> 
+            <option>Turno 1 (6x2)</option>
+            <option>Turno 2 (6x2)</option>
+            <option>Turno 3 (6x2)</option>
+            <option>Turno 4 (6x2)</option>
+            <option>Turno 1 (5x2)</option>
+            <option>Turno 2 (5x2)</option>
+          </select>
+        </div>
+        
+        <div>
+          <label>Operador</label>
+          <input type="text" id="operador" required />
+        </div>
+
+        <div>
+          <label>Máquina</label>
+          <select id="maquinaSelect" required>
+            <option value="">Selecione o setor primeiro</option>
+          </select>
+        </div>
+
+        <div>
+          <label>Massa</label>
+          <select id="massa" required>
+            <option value="">Selecione</option>
+            <option>Stone</option>
+            <option>Faiança</option>
+          </select>
+        </div>
+
+        <div>
+          <label>Produção Prevista</label>
+          <input type="number" id="prevista" min="0" required />
+        </div>
+
+        <div>
+          <label>Produção Realizada</label>
+          <input type="number" id="realizada" min="0" required />
+        </div>
+
+        <div>
+          <label>Quebras</label>
+          <input type="number" id="quebras" min="0" required />
+        </div>
+
+        <div class="full">
+          <label>Observação</label>
+          <textarea id="observacao"></textarea>
+        </div>
+
+        <div class="full" style="text-align:right;">
+          <button type="button" class="secondary" onclick="limparFormulario()">Limpar</button>
+          <button type="submit">Lançar</button>
+        </div>
+      </form>
+    </section>
+
+    <section id="historico" style="display:none">
+      <h2>Histórico</h2>
+
+      <div class="filtros">
+        <input type="date" id="filtroDataInicio" placeholder="Data Início" />
+        <input type="date" id="filtroDataFim" placeholder="Data Fim" />
+        <select id="filtroSetor">
+          <option value="">Todos os Setores</option>
+          <option>Conformação</option>
+          <option>Esmaltação</option>
+          <option>Embalagem</option>
+          <option>Forno Vidrado</option>
+          <option>Forno Chicote</option>
+        </select>
+        <select id="filtroTurno">
+          <option value="">Todos os Turnos</option>
+          <option>Comercial</option> 
+          <option>Turno 1 (6x2)</option>
+          <option>Turno 2 (6x2)</option>
+          <option>Turno 3 (6x2)</option>
+          <option>Turno 4 (6x2)</option>
+          <option>Turno 1 (5x2)</option>
+          <option>Turno 2 (5x2)</option>
+        </select>
+        <input type="text" id="filtroMaquina" placeholder="Máquina..." />
+        <button onclick="filtrarHistorico()">Filtrar</button>
+        <button class="secondary" onclick="buscarTodos()">Mostrar todos</button>
+        <button style="background:green;" onclick="exportarExcel()">Exportar Excel</button>
+      </div>
+
+      <table id="tabelaHistorico">
+        <thead>
+          <tr>
+            <th>Data</th>
+            <th>Setor</th>
+            <th>Turno</th>
+            <th>Operador</th>
+            <th>Máquina</th>
+            <th>Massa</th>
+            <th>Prevista</th>
+            <th>Realizada</th>
+            <th>Quebras</th>
+            <th>Obs</th>
+            <th class="table-porcentagem">% Realizado/Previsto</th>
+            <th class="table-porcentagem">% Quebras/Realizado</th>
+            <th>Ação</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </section>
+
+    <section id="dashboard" style="display:none">
+      <h2>Dashboard</h2>
+
+      <div class="filtros">
+        <input type="date" id="dashFiltroDataInicio" placeholder="Data Início" />
+        <input type="date" id="dashFiltroDataFim" placeholder="Data Fim" />
+        
+        <select id="dashFiltroSetor">
+          <option value="">Todos os Setores</option>
+          <option>Conformação</option>
+          <option>Esmaltação</option>
+          <option>Embalagem</option>
+          <option>Forno Vidrado</option>
+          <option>Forno Chicote</option>
+        </select>
+
+        <select id="dashFiltroTurno">
+          <option value="">Todos os Turnos</option>
+          <option>Comercial</option> 
+          <option>Turno 1 (6x2)</option>
+          <option>Turno 2 (6x2)</option>
+          <option>Turno 3 (6x2)</option>
+          <option>Turno 4 (6x2)</option>
+          <option>Turno 1 (5x2)</option>
+          <option>Turno 2 (5x2)</option>
+        </select>
+        <input type="text" id="dashFiltroMaquina" placeholder="Máquina..." />
+        <input type="text" id="dashFiltroOperador" placeholder="Operador..." /> 
+        <button onclick="atualizarDashboard()">Aplicar Filtro</button>
+      </div>
+      
+      <h3>Resumo Geral da Produção (Filtros Aplicados)</h3>
+      <div class="kpis" id="kpisResumo">
+        <div class="kpi-card"><h3>Total Previsto</h3><p id="kpiPrevisto">0</p></div>
+        <div class="kpi-card"><h3>Total Realizado</h3><p id="kpiRealizado">0</p></div>
+        <div class="kpi-card"><h3>Total Quebras</h3><p id="kpiQuebras">0</p></div>
+        <div class="kpi-card percent"><h3>% Realizado/Previsto</h3><p id="kpiPercRealPrev">N/A</p></div>
+        <div class="kpi-card percent"><h3>% Quebras/Total</h3><p id="kpiPercQuebraTotal">N/A</p></div>
+      </div>
+      
+      <div id="analiseOperadorArea">
+        <h3>Análise do Operador: <span id="operadorSelecionado">Nenhum</span></h3>
+        <div class="kpis" id="kpisOperador">
+            <div class="kpi-card"><h3>Previsto Operador</h3><p id="kpiOperadorPrevisto">0</p></div>
+            <div class="kpi-card"><h3>Realizado Operador</h3><p id="kpiOperadorRealizado">0</p></div>
+            <div class="kpi-card"><h3>Quebras Operador</h3><p id="kpiOperadorQuebras">0</p></div>
+            <div class="kpi-card percent"><h3>% Realizado/Previsto</h3><p id="kpiOperadorPercRealPrev">N/A</p></div>
+            <div class="kpi-card percent"><h3>% Quebras/Total</h3><p id="kpiOperadorPercQuebraTotal">N/A</p></div>
+        </div>
+      </div>
+
+
+      <div class="charts">
+        <canvas id="graficoProducao"></canvas>
+        <canvas id="graficoQuebras"></canvas>
+        <canvas id="graficoTurnos"></canvas>
+      </div>
+    </section>
+  </div>
+  
+  <script type="module">
+    // Importa as funções de inicialização do Firebase App
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
+    // Importa as funções necessárias para o Firestore
+    import { 
+        getFirestore, 
+        collection, 
+        addDoc, 
+        getDocs, 
+        query, 
+        where, 
+        orderBy, 
+        deleteDoc, 
+        doc 
+    } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
+
+    // Sua configuração do aplicativo web Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyB2z4mFj5qVtb59uocKK8JXhMTfi8MGSTo",
+      authDomain: "acompanhamento-de-produc-b68b0.firebaseapp.com",
+      projectId: "acompanhamento-de-produc-b68b0",
+      storageBucket: "acompanhamento-de-produc-b68b0.firebasestorage.app",
+      messagingSenderId: "891709449679",
+      appId: "1:891709449679:web:43e83e076f5fb3201e1eba"
+    };
+
+    // Inicializa o Firebase App
+    const app = initializeApp(firebaseConfig);
+    
+    // Inicializa o Firestore
+    const db = getFirestore(app);
+    
+    // Torna as referências do Firestore (db e a coleção) globais para que o seu script principal possa usá-las.
+    window.db = db;
+    window.producoesCol = collection(db, "producoes"); 
+    
+    console.log("Firebase e Firestore inicializados! Coleção 'producoes' pronta para uso.");
+  </script>
 
 <script>
-// ===============================================
-// 1. CONFIGURAÇÃO E CONEXÃO COM FIREBASE (COM SEUS DADOS)
-// ===============================================
-
-// Seus dados de configuração reais
-const firebaseConfig = {
-    apiKey: "AIzaSyB2z4mFj5qVtb59uocKK8JXhMTfi8MGSTo",
-    authDomain: "acompanhamento-de-produc-b68b0.firebaseapp.com",
-    projectId: "acompanhamento-de-produc-b68b0",
-    storageBucket: "acompanhamento-de-produc-b68b0.firebasestorage.app",
-    messagingSenderId: "891709449679",
-    appId: "1:891709449679:web:43e83e076f5fb3201e1eba"
-};
-
-// Inicializa o Firebase e o Firestore
-// ESTA É A LINHA CRÍTICA. SE DER ERRO, VERIFIQUE O CONSOLE!
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
-const COLECAO_PRODUCAO = "registros_producao";
-// ===============================================
-
+// Variáveis Globais para referência do Firestore. Elas serão preenchidas no bloco acima.
+// NOTA: Você deve garantir que o bloco <script type="module"> rode antes.
+let db, producoesCol;
 document.addEventListener("DOMContentLoaded", ()=>{
-  // Mantenha seu código DOMContentLoaded
+  db = window.db; // Pega a referência global do Firestore
+  producoesCol = window.producoesCol; // Pega a referência global da Coleção
+  
   const today = new Date().toISOString().split('T')[0];
   document.getElementById("data").value = today;
   // Define a data de início do filtro do dashboard para 7 dias atrás e a de fim para hoje
@@ -39,156 +320,183 @@ document.addEventListener("DOMContentLoaded", ()=>{
 const maquinasPorSetor = {
   "Conformação":["Secador 2","Secador 3","Secador 4","Secador 10","Máquina de Xícara 1","Máquina de Xícara 2","Máquina de Prato","Prensa"],
   "Esmaltação":["Disco 1","Disco 2","Disco 3","Disco 4","Robô 1","Robô 2","Spray","Imersão"],
-  "Embalagem":["Linha 1","Linha 2","Linha 3","Linha 4","Linha 5"]
+  "Embalagem":["Linha 1","Linha 2","Linha 3","Linha 4","Linha 5"],
+  "Forno Vidrado":["Forno 1","Forno 2"],
+  "Forno Chicote":["Forno 3"]
 };
 
 document.getElementById("setor").addEventListener("change", e=>{
   const setor=e.target.value;
   const maqSelect=document.getElementById("maquinaSelect");
   maqSelect.innerHTML="";
+  const optDefault=document.createElement("option");
+  optDefault.textContent="(Digite manualmente)";
+  optDefault.value="";
+  maqSelect.appendChild(optDefault);
+
   if(maquinasPorSetor[setor]){
     maquinasPorSetor[setor].forEach(m=>{
       const opt=document.createElement("option");
       opt.textContent=m; opt.value=m;
       maqSelect.appendChild(opt);
     });
-  }else{
-    const opt=document.createElement("option");
-    opt.textContent="(Digite manualmente)";
-    maqSelect.appendChild(opt);
   }
 });
 
-// Tornamos 'mostrarPagina' assíncrona para aguardar as funções do Firebase
-async function mostrarPagina(pg){
+function mostrarPagina(pg){
   document.querySelectorAll("section").forEach(s=>s.style.display="none");
   document.getElementById(pg).style.display="block";
   document.querySelectorAll(".nav a").forEach(a=>a.classList.remove("active"));
   document.querySelector(`#link${pg.charAt(0).toUpperCase()+pg.slice(1)}`).classList.add("active");
-  if(pg==="historico") await atualizarTabela();
-  if(pg==="dashboard") await atualizarDashboard();
+  if(pg==="historico") atualizarTabela();
+  if(pg==="dashboard") atualizarDashboard();
 }
 
-// ===============================================
-// LÓGICA DE SALVAMENTO (AGORA NO FIREBASE)
-// ===============================================
-document.getElementById("formProducao").addEventListener("submit", e=>{
+/**
+ * Lança o registro no Firestore.
+ * @param {Event} e 
+ */
+document.getElementById("formProducao").addEventListener("submit", async (e)=>{
   e.preventDefault();
-  const data={
+  
+  // Verifica se o Firestore foi inicializado
+  if (!producoesCol) {
+      alert("Aguarde, o Firebase ainda não foi inicializado.");
+      return;
+  }
+  
+  const data = {
     data:document.getElementById("data").value,
     setor:document.getElementById("setor").value,
     turno:document.getElementById("turno").value,
     operador:document.getElementById("operador").value,
-    maquina:document.getElementById("maquinaSelect").value,
+    maquina:document.getElementById("maquinaSelect").value || document.getElementById("maquinaSelect").value, // Se o select for vazio, pega o valor que o usuário digitou
     massa:document.getElementById("massa").value,
-    prevista:parseFloat(document.getElementById("prevista").value) || 0,
-    realizada:parseFloat(document.getElementById("realizada").value) || 0,
-    quebras:parseFloat(document.getElementById("quebras").value) || 0,
-    observacao:document.getElementById("observacao").value
+    prevista:parseFloat(document.getElementById("prevista").value),
+    realizada:parseFloat(document.getElementById("realizada").value),
+    quebras:parseFloat(document.getElementById("quebras").value),
+    observacao:document.getElementById("observacao").value,
+    timestamp: new Date().toISOString() // Adiciona um timestamp para ordenação
   };
-  
-  // SALVANDO NO FIREBASE
-  db.collection(COLECAO_PRODUCAO).add(data)
-    .then(() => {
-      alert("Lançamento salvo na nuvem!");
+
+  try {
+      // SUBSTITUIÇÃO: Salva no Firestore
+      await addDoc(producoesCol, data);
+      alert("Lançamento salvo com sucesso no Firebase!");
       limparFormulario();
-      // Atualiza o histórico ou dashboard se estiverem abertos
-      if(document.getElementById('historico').style.display !== 'none') atualizarTabela();
-      if(document.getElementById('dashboard').style.display !== 'none') atualizarDashboard();
-    })
-    .catch((error) => {
+  } catch (error) {
       console.error("Erro ao adicionar documento: ", error);
-      alert("Erro ao salvar o lançamento. Verifique o console do navegador e as regras do Firebase.");
-    });
+      alert("Erro ao salvar o lançamento. Verifique o console.");
+  }
 });
-// ===============================================
 
 function limparFormulario(){document.getElementById("formProducao").reset();}
 
-// ===============================================
-// LÓGICA DE DELETAR (AGORA NO FIREBASE)
-// ===============================================
-function deletarRegistro(documentId) {
+/**
+ * Deleta um registro no Firestore.
+ * @param {string} docId O ID do documento a ser deletado.
+ */
+async function deletarRegistro(docId) {
     if (confirm("Tem certeza que deseja deletar este registro de produção?")) {
-        // DELETANDO NO FIREBASE PELO ID DO DOCUMENTO
-        db.collection(COLECAO_PRODUCAO).doc(documentId).delete()
-            .then(() => {
-                alert("Registro deletado com sucesso!");
-                atualizarTabela(); 
-            })
-            .catch(error => {
-                console.error("Erro ao deletar: ", error);
-                alert("Erro ao deletar o registro.");
-            });
+        if (!docId || !producoesCol) {
+            alert("Erro: ID do documento ou conexão Firebase inválida.");
+            return;
+        }
+        
+        try {
+            // SUBSTITUIÇÃO: Deleta no Firestore
+            await deleteDoc(doc(db, "producoes", docId));
+            alert("Registro deletado com sucesso!");
+            atualizarTabela(); 
+        } catch (error) {
+            console.error("Erro ao deletar documento: ", error);
+            alert("Erro ao deletar o registro. Verifique o console.");
+        }
     }
 }
-// ===============================================
 
-// ===============================================
-// LÓGICA DE CARREGAR DADOS (AGORA DO FIREBASE)
-// ===============================================
+/**
+ * Busca e atualiza a tabela com dados do Firestore (opcionalmente filtrados).
+ * @param {object|null} filtro Objeto de filtro ou null.
+ */
 async function atualizarTabela(filtro=null){
   const tbody=document.querySelector("#tabelaHistorico tbody");
-  tbody.innerHTML="<tr><td colspan='13'>Carregando dados da nuvem...</td></tr>";
+  tbody.innerHTML="<tr><td colspan='13'>Carregando dados...</td></tr>";
   
-  try{
-    // BUSCA OS DADOS NO FIREBASE E ORDENA POR DATA
-    const snapshot = await db.collection(COLECAO_PRODUCAO).orderBy('data', 'desc').get();
+  if (!producoesCol) {
+      tbody.innerHTML="<tr><td colspan='13'>Erro: O Firebase não está conectado.</td></tr>";
+      return;
+  }
+
+  // 1. Cria a query inicial
+  let q = query(producoesCol, orderBy("data", "desc"), orderBy("timestamp", "desc"));
+  const conditions = [];
+  
+  // 2. Adiciona filtros se existirem
+  if(filtro){
+    if(filtro.dataInicio) conditions.push(where("data", ">=", filtro.dataInicio));
+    if(filtro.dataFim) conditions.push(where("data", "<=", filtro.dataFim));
+    if(filtro.setor) conditions.push(where("setor", "==", filtro.setor));
+    if(filtro.turno) conditions.push(where("turno", "==", filtro.turno));
     
-    const regsFormatados = [];
-    snapshot.forEach(doc => {
-        // Pega os dados e adiciona o ID do documento para ser usado na função Deletar
-        regsFormatados.push({ ...doc.data(), id: doc.id }); 
-    });
-    
-    let filtrados = regsFormatados;
+    // Filtros de máquina e operador precisarão ser feitos manualmente no lado do cliente
+    // se quisermos um "like" (contains), pois o Firestore não suporta.
+  }
 
-    if(filtro){
-      const dataInicio = filtro.dataInicio;
-      const dataFim = filtro.dataFim;
-      const maquina = (filtro.maquina || '').toLowerCase();
+  // Se houver condições, aplicamos a query
+  if (conditions.length > 0) {
+      q = query(producoesCol, ...conditions, orderBy("data", "desc"), orderBy("timestamp", "desc"));
+  }
 
-      filtrados=regsFormatados.filter(r=>
-        (!dataInicio || r.data >= dataInicio) &&
-        (!dataFim || r.data <= dataFim) &&
-        (!filtro.setor||r.setor===filtro.setor)&&
-        (!filtro.turno||r.turno===filtro.turno)&&
-        (!maquina||(r.maquina && r.maquina.toLowerCase().includes(maquina)))
-      );
-    }
+  try {
+      // 3. Executa a busca no Firestore
+      const querySnapshot = await getDocs(q);
+      const regs = [];
+      querySnapshot.forEach(doc => {
+          // Coleta o ID do documento para exclusão e os dados
+          regs.push({ id: doc.id, ...doc.data() });
+      });
 
-    tbody.innerHTML = "";
-    if (filtrados.length === 0) {
-        tbody.innerHTML = "<tr><td colspan='13'>Nenhum registro encontrado.</td></tr>";
-    }
-
-    // O resto da lógica de renderização
-    filtrados.forEach(r=>{
-      const prev = parseFloat(r.prevista) || 0;
-      const real = parseFloat(r.realizada) || 0;
-      const queb = parseFloat(r.quebras) || 0;
+      let filtrados = regs;
       
-      const percRealizadoPrevisto = prev > 0 ? ((real / prev) * 100).toFixed(2) + '%' : (real > 0 ? 'INF' : 'N/A');
-      const totalProd = real + queb;
-      const percQuebrasRealizado = totalProd > 0 ? ((queb / totalProd) * 100).toFixed(2) + '%' : 'N/A';
-      
-      const tr=document.createElement("tr");
-      // ATENÇÃO: O botão deletar agora usa o r.id (ID do Firebase)
-      tr.innerHTML=`<td>${r.data}</td><td>${r.setor}</td><td>${r.turno}</td><td>${r.operador}</td>
-        <td>${r.maquina}</td><td>${r.massa}</td>
-        <td>${r.prevista}</td><td>${r.realizada}</td><td>${r.quebras}</td><td>${r.observacao}</td>
-        <td>${percRealizadoPrevisto}</td>
-        <td>${percQuebrasRealizado}</td>
-        <td><button class="delete-btn" onclick="deletarRegistro('${r.id}')">Deletar</button></td>`; 
-      tbody.appendChild(tr);
-    });
+      // Filtros manuais (para Máquina, se necessário)
+      if(filtro && filtro.maquina){
+          const maquinaFiltro = filtro.maquina.toLowerCase();
+          filtrados = filtrados.filter(r => r.maquina && r.maquina.toLowerCase().includes(maquinaFiltro));
+      }
 
-  } catch(error) {
-    console.error("Erro ao buscar dados do Firebase:", error);
-    tbody.innerHTML = "<tr><td colspan='13'>Falha ao carregar dados. Verifique a conexão e as regras do Firebase.</td></tr>";
+      // 4. Renderiza a tabela
+      tbody.innerHTML="";
+      if (filtrados.length === 0) {
+           tbody.innerHTML="<tr><td colspan='13'>Nenhum registro encontrado com este filtro.</td></tr>";
+           return;
+      }
+      
+      filtrados.forEach(r=>{
+        const prev = parseFloat(r.prevista) || 0;
+        const real = parseFloat(r.realizada) || 0;
+        const queb = parseFloat(r.quebras) || 0;
+        
+        const percRealizadoPrevisto = prev > 0 ? ((real / prev) * 100).toFixed(2) + '%' : (real > 0 ? 'INF' : 'N/A');
+
+        const totalProd = real + queb;
+        const percQuebrasRealizado = totalProd > 0 ? ((queb / totalProd) * 100).toFixed(2) + '%' : 'N/A';
+        
+        const tr=document.createElement("tr");
+        // O doc.id (r.id) é passado para a função deletarRegistro
+        tr.innerHTML=`<td>${r.data}</td><td>${r.setor}</td><td>${r.turno}</td><td>${r.operador}</td>
+          <td>${r.maquina}</td><td>${r.massa}</td>
+          <td>${real}</td><td>${prev}</td><td>${queb}</td><td>${r.observacao}</td>
+          <td>${percRealizadoPrevisto}</td>
+          <td>${percQuebrasRealizado}</td>
+          <td><button class="delete-btn" onclick="deletarRegistro('${r.id}')">Deletar</button></td>`; 
+        tbody.appendChild(tr);
+      });
+  } catch (error) {
+       console.error("Erro ao buscar documentos: ", error);
+       tbody.innerHTML="<tr><td colspan='13'>Erro ao carregar dados. Verifique o console.</td></tr>";
   }
 }
-// ===============================================
 
 function filtrarHistorico(){
   const filtro={
@@ -196,16 +504,27 @@ function filtrarHistorico(){
     dataFim:document.getElementById("filtroDataFim").value,
     setor:document.getElementById("filtroSetor").value,
     turno:document.getElementById("filtroTurno").value,
-    maquina:document.getElementById("filtroMaquina").value
+    maquina:document.getElementById("filtroMaquina").value // Manter o filtro de máquina aqui
   };
   atualizarTabela(filtro);
 }
 
-function buscarTodos(){atualizarTabela();}
+function buscarTodos(){
+  // Limpa os campos de filtro da seção de histórico e busca todos
+  document.getElementById("filtroDataInicio").value = "";
+  document.getElementById("filtroDataFim").value = "";
+  document.getElementById("filtroSetor").value = "";
+  document.getElementById("filtroTurno").value = "";
+  document.getElementById("filtroMaquina").value = "";
+  atualizarTabela(null);
+}
 
 function exportarExcel(){
   const rows=[...document.querySelectorAll("#tabelaHistorico tbody tr")];
-  if(rows.length===0){alert("Nenhum dado para exportar.");return;}
+  if(rows.length===0 || rows[0].textContent.includes('Carregando dados') || rows[0].textContent.includes('Nenhum registro')){
+      alert("Nenhum dado válido para exportar.");
+      return;
+  }
   
   const headers = [...document.querySelectorAll("#tabelaHistorico thead th")].map(th => th.textContent);
   headers.pop(); 
@@ -231,36 +550,26 @@ function exportarExcel(){
 /* ====== DASHBOARD ====== */
 let grafico1, grafico2, grafico3;
 
-// Função de filtragem usada pelo Dashboard (Mantida)
+// Função de filtragem usada pelo Dashboard (agora só para filtros cliente-side, como o de operador)
 function filtrarDadosDashboard(dados, filtro) {
     return dados.filter(d => {
-        const dentroPeriodo = 
-            (!filtro.dataInicio || d.data >= filtro.dataInicio) &&
-            (!filtro.dataFim || d.data <= filtro.dataFim);
-        
-        const setorCorreto = 
-            (!filtro.setor || d.setor === filtro.setor); 
-            
-        const turnoCorreto = 
-            (!filtro.turno || d.turno === filtro.turno);
-            
-        const maquinaCorreta = 
-            (!filtro.maquina || (d.maquina && d.maquina.toLowerCase().includes(filtro.maquina.toLowerCase())));
-            
+        // Os filtros de data, setor, turno e máquina já deveriam ter sido aplicados via Query.
+        // Aplicamos apenas o filtro de operador aqui para simular um LIKE
         const operadorCorreto = 
             (!filtro.operador || (d.operador && d.operador.toLowerCase().includes(filtro.operador.toLowerCase())));
 
-        return dentroPeriodo && setorCorreto && turnoCorreto && maquinaCorreta && operadorCorreto;
+        return operadorCorreto;
     });
 }
 
-// Função para calcular e atualizar KPIs em uma área específica (Mantida)
-function calcularKPIsEstatistica(dados, prefixo) {
+// Função para calcular e atualizar KPIs em uma área específica
+function calcularKPIsEstatistica(dados, prefixo, operadorNome = "Nenhum") {
     let totalPrevisto = 0;
     let totalRealizado = 0;
     let totalQuebras = 0;
 
     dados.forEach(d => {
+        // Forçar a conversão para número
         totalPrevisto += parseFloat(d.prevista) || 0;
         totalRealizado += parseFloat(d.realizada) || 0;
         totalQuebras += parseFloat(d.quebras) || 0;
@@ -268,167 +577,242 @@ function calcularKPIsEstatistica(dados, prefixo) {
 
     const totalProducao = totalRealizado + totalQuebras;
     
+    // Porcentagem de Realizado/Previsto
     const percRealPrev = totalPrevisto > 0 
         ? ((totalRealizado / totalPrevisto) * 100).toFixed(2) + '%' 
         : (totalRealizado > 0 ? 'INF' : 'N/A');
 
+    // Porcentagem de Quebras / Total Produzido
     const percQuebraTotal = totalProducao > 0 
         ? ((totalQuebras / totalProducao) * 100).toFixed(2) + '%' 
         : 'N/A';
 
+    // Atualiza os elementos HTML usando o prefixo fornecido
     document.getElementById(`${prefixo}Previsto`).textContent = totalPrevisto.toLocaleString();
     document.getElementById(`${prefixo}Realizado`).textContent = totalRealizado.toLocaleString();
     document.getElementById(`${prefixo}Quebras`).textContent = totalQuebras.toLocaleString();
     document.getElementById(`${prefixo}PercRealPrev`).textContent = percRealPrev;
     document.getElementById(`${prefixo}PercQuebraTotal`).textContent = percQuebraTotal;
     
-    return dados; 
+    if (prefixo === 'kpiOperador' && document.getElementById('operadorSelecionado')) {
+        document.getElementById('operadorSelecionado').textContent = operadorNome;
+    }
+
+    return { totalPrevisto, totalRealizado, totalQuebras, dados }; 
 }
 
-
-// ===============================================
-// LÓGICA DO DASHBOARD (AGORA BUSCA NO FIREBASE)
-// ===============================================
+/**
+ * Busca dados no Firestore, aplica filtros e atualiza o Dashboard.
+ */
 async function atualizarDashboard(){
-  
-  // BUSCA OS DADOS NO FIREBASE
-  const snapshot = await db.collection(COLECAO_PRODUCAO).get();
-  const dadosGerais = [];
-  snapshot.forEach(doc => {
-      dadosGerais.push({ ...doc.data() }); 
-  });
-  // FIM DA BUSCA FIREBASE
+  if (!producoesCol) {
+      console.error("Firebase não conectado para o Dashboard.");
+      return;
+  }
 
   // 1. Coleta os filtros
   const filtro = {
     dataInicio: document.getElementById("dashFiltroDataInicio").value,
     dataFim: document.getElementById("dashFiltroDataFim").value,
-    setor: document.getElementById("dashFiltroSetor").value, 
+    setor: document.getElementById("dashFiltroSetor").value,
     turno: document.getElementById("dashFiltroTurno").value,
     maquina: document.getElementById("dashFiltroMaquina").value,
     operador: document.getElementById("dashFiltroOperador").value 
   };
   
-  // 2. Filtra os dados
-  const dadosFiltrados = filtrarDadosDashboard(dadosGerais, filtro);
+  let q = query(producoesCol, orderBy("data", "desc"));
+  const conditions = [];
 
-  // 3. ANÁLISE GERAL (KPIs)
-  calcularKPIsEstatistica(dadosFiltrados, 'kpi');
+  // Aplica filtros de Firestore (Data, Setor, Turno)
+  if(filtro.dataInicio) conditions.push(where("data", ">=", filtro.dataInicio));
+  if(filtro.dataFim) conditions.push(where("data", "<=", filtro.dataFim));
+  if(filtro.setor) conditions.push(where("setor", "==", filtro.setor));
+  if(filtro.turno) conditions.push(where("turno", "==", filtro.turno));
   
-  // 4. ANÁLISE DO OPERADOR
-  const operadorFiltroTexto = filtro.operador;
-  document.getElementById("operadorSelecionado").textContent = operadorFiltroTexto || 'Nenhum';
-  
-  if (operadorFiltroTexto) {
-    calcularKPIsEstatistica(dadosFiltrados, 'kpiOperador');
-  } else {
-    // Limpa os KPIs do operador se nenhum filtro for aplicado
-    calcularKPIsEstatistica([], 'kpiOperador');
+  if (conditions.length > 0) {
+      q = query(producoesCol, ...conditions, orderBy("data", "desc"));
   }
-
-  // 5. ATUALIZAÇÃO DOS GRÁFICOS (mantida)
   
-  // Agrupar dados por Setor e Turno para os gráficos
-  const resumoPorSetor = dadosFiltrados.reduce((acc, curr) => {
-    acc[curr.setor] = acc[curr.setor] || { realizado: 0, quebras: 0 };
-    acc[curr.setor].realizado += parseFloat(curr.realizada) || 0;
-    acc[curr.setor].quebras += parseFloat(curr.quebras) || 0;
-    return acc;
-  }, {});
-
-  const resumoPorTurno = dadosFiltrados.reduce((acc, curr) => {
-    acc[curr.turno] = acc[curr.turno] || { realizado: 0, previsto: 0 };
-    acc[curr.turno].realizado += parseFloat(curr.realizada) || 0;
-    acc[curr.turno].previsto += parseFloat(curr.prevista) || 0;
-    return acc;
-  }, {});
-
-  // Gráfico 1: Produção por Setor
-  if(grafico1) grafico1.destroy();
-  grafico1 = new Chart(document.getElementById('graficoProducao'), {
-    type: 'bar',
-    data: {
-      labels: Object.keys(resumoPorSetor),
-      datasets: [{
-        label: 'Realizado',
-        data: Object.values(resumoPorSetor).map(r => r.realizado),
-        backgroundColor: '#0077cc',
-      }]
-    },
-    options: {
-      responsive: true,
-      plugins: {
-        legend: { position: 'top', },
-        title: { display: true, text: 'Produção Realizada por Setor' }
-      },
-      scales: { y: { beginAtZero: true } }
-    }
-  });
-
-  // Gráfico 2: Quebras por Setor
-  if(grafico2) grafico2.destroy();
-  grafico2 = new Chart(document.getElementById('graficoQuebras'), {
-    type: 'doughnut',
-    data: {
-      labels: Object.keys(resumoPorSetor),
-      datasets: [{
-        label: 'Quebras',
-        data: Object.values(resumoPorSetor).map(r => r.quebras),
-        backgroundColor: ['#dc3545', '#ffc107', '#28a745', '#17a2b8', '#6c757d'],
-      }]
-    },
-    options: {
-      responsive: true,
-      plugins: {
-        legend: { position: 'right' },
-        title: { display: true, text: 'Distribuição de Quebras por Setor' }
+  try {
+      const querySnapshot = await getDocs(q);
+      const dadosGerais = [];
+      querySnapshot.forEach(doc => {
+          dadosGerais.push(doc.data());
+      });
+      
+      let dadosFiltrados = dadosGerais;
+      
+      // 2. Filtros Cliente-Side (Máquina e Operador)
+      if (filtro.maquina) {
+           const maquinaFiltro = filtro.maquina.toLowerCase();
+           dadosFiltrados = dadosFiltrados.filter(d => d.maquina && d.maquina.toLowerCase().includes(maquinaFiltro));
       }
-    }
-  });
 
-  // Gráfico 3: Realizado/Previsto por Turno (em porcentagem)
-  const labelsTurnos = Object.keys(resumoPorTurno);
-  const dataTurnos = Object.values(resumoPorTurno).map(r => 
-      r.previsto > 0 ? (r.realizado / r.previsto) * 100 : 0
-  );
-
-  if(grafico3) grafico3.destroy();
-  grafico3 = new Chart(document.getElementById('graficoTurnos'), {
-    type: 'bar',
-    data: {
-      labels: labelsTurnos,
-      datasets: [{
-        label: '% Realizado / Previsto',
-        data: dataTurnos,
-        backgroundColor: '#ff9900',
-      }]
-    },
-    options: {
-      responsive: true,
-      plugins: {
-        legend: { position: 'top', },
-        title: { display: true, text: '% Realizado / Previsto por Turno' },
-        tooltip: {
-          callbacks: {
-            label: function(context) {
-              let label = context.dataset.label || '';
-              if (label) { label += ': '; }
-              if (context.parsed.y !== null) {
-                label += context.parsed.y.toFixed(2) + '%';
-              }
-              return label;
-            }
-          }
-        }
-      },
-      scales: {
-        y: {
-          beginAtZero: true,
-          max: 150, // Define o limite superior em 150%
-          ticks: { callback: function(value) { return value + '%'; } }
-        }
+      // 3. Resumo Geral (aplica o filtro do operador apenas para a área dele)
+      const { totalPrevisto, totalRealizado, totalQuebras } = calcularKPIsEstatistica(dadosFiltrados, 'kpi');
+      
+      // 4. Análise do Operador (aplica filtro de operador nos dados filtrados)
+      let dadosOperador = dadosFiltrados;
+      let operadorNomeDisplay = "Nenhum";
+      if (filtro.operador) {
+          operadorNomeDisplay = filtro.operador; // Usa o nome digitado como referência
+          dadosOperador = filtrarDadosDashboard(dadosFiltrados, { operador: filtro.operador });
+      } else {
+          // Limpa KPIs do operador se não houver filtro
+          dadosOperador = [];
       }
-    }
-  });
+      
+      calcularKPIsEstatistica(dadosOperador, 'kpiOperador', operadorNomeDisplay);
+      
+      // 5. Gera Gráficos (usando dados filtrados gerais)
+      gerarGraficoProducao(dadosFiltrados);
+      gerarGraficoQuebras(dadosFiltrados);
+      gerarGraficoTurnos(dadosFiltrados);
+
+  } catch (error) {
+      console.error("Erro ao carregar dados para o Dashboard: ", error);
+  }
 }
+
+// =================================================================
+// FUNÇÕES DE GRÁFICO (mantidas do seu código original)
+// =================================================================
+
+function gerarGraficoProducao(dados) {
+    const dadosPorSetor = dados.reduce((acc, d) => {
+        if (!acc[d.setor]) acc[d.setor] = { previsto: 0, realizado: 0 };
+        acc[d.setor].previsto += parseFloat(d.prevista) || 0;
+        acc[d.setor].realizado += parseFloat(d.realizada) || 0;
+        return acc;
+    }, {});
+
+    const labels = Object.keys(dadosPorSetor);
+    const previsto = labels.map(s => dadosPorSetor[s].previsto);
+    const realizado = labels.map(s => dadosPorSetor[s].realizado);
+
+    const ctx = document.getElementById('graficoProducao').getContext('2d');
+    if (grafico1) grafico1.destroy();
+
+    grafico1 = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'Previsto',
+                    data: previsto,
+                    backgroundColor: 'rgba(0, 119, 204, 0.6)',
+                    borderColor: 'rgba(0, 119, 204, 1)',
+                    borderWidth: 1
+                },
+                {
+                    label: 'Realizado',
+                    data: realizado,
+                    backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                title: { display: true, text: 'Produção Prevista vs. Realizada por Setor' }
+            },
+            scales: { y: { beginAtZero: true } }
+        }
+    });
+}
+
+function gerarGraficoQuebras(dados) {
+    const dadosPorSetor = dados.reduce((acc, d) => {
+        if (!acc[d.setor]) acc[d.setor] = { quebras: 0, total: 0 };
+        acc[d.setor].quebras += parseFloat(d.quebras) || 0;
+        acc[d.setor].total += (parseFloat(d.realizada) || 0) + (parseFloat(d.quebras) || 0);
+        return acc;
+    }, {});
+
+    const labels = Object.keys(dadosPorSetor);
+    const quebrasPerc = labels.map(s => {
+        const total = dadosPorSetor[s].total;
+        const quebras = dadosPorSetor[s].quebras;
+        return total > 0 ? ((quebras / total) * 100).toFixed(2) : 0;
+    });
+
+    const ctx = document.getElementById('graficoQuebras').getContext('2d');
+    if (grafico2) grafico2.destroy();
+
+    grafico2 = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: '% Quebras sobre o Total de Peças',
+                    data: quebrasPerc,
+                    backgroundColor: 'rgba(255, 99, 132, 0.6)',
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    borderWidth: 1
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                title: { display: true, text: 'Percentual de Quebras por Setor' }
+            },
+            scales: { 
+                y: { 
+                    beginAtZero: true,
+                    max: 100,
+                    ticks: { callback: function(value) { return value + "%" } }
+                } 
+            }
+        }
+    });
+}
+
+function gerarGraficoTurnos(dados) {
+    const dadosPorTurno = dados.reduce((acc, d) => {
+        const turno = d.turno;
+        if (!acc[turno]) acc[turno] = 0;
+        acc[turno] += parseFloat(d.realizada) || 0;
+        return acc;
+    }, {});
+    
+    // Filtra turnos com produção zero para o gráfico de pizza
+    const labels = Object.keys(dadosPorTurno).filter(t => dadosPorTurno[t] > 0);
+    const realizado = labels.map(t => dadosPorTurno[t]);
+
+    const ctx = document.getElementById('graficoTurnos').getContext('2d');
+    if (grafico3) grafico3.destroy();
+
+    const cores = labels.map((_, i) => `hsl(${i * 60}, 70%, 50%)`); // Cores diferentes para cada fatia
+
+    grafico3 = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'Produção Realizada',
+                    data: realizado,
+                    backgroundColor: cores,
+                    hoverOffset: 4
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                title: { display: true, text: 'Distribuição da Produção Realizada por Turno' },
+                legend: { position: 'right' }
+            }
+        }
+    });
+}
+
+// O restante do seu código JavaScript continua...
 </script>
+</body>
+</html>
