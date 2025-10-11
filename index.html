@@ -13,7 +13,7 @@
     header{background:var(--primary);color:#fff;padding:14px 12px;text-align:center}
     .container{max-width:980px;margin:18px auto;padding:16px;background:var(--card);border-radius:10px;box-shadow:0 6px 18px rgba(0,0,0,0.08)}
     h1,h2{margin:0 0 12px}
-    .nav{display:flex;gap:8px;justify-content:center;margin-bottom:14px;flex-wrap:wrap}
+    .nav{display:flex;gap:8px;justify-content:center;margin-bottom:14px}
     .nav a{color:var(--primary);text-decoration:none;font-weight:700;padding:6px 10px;border-radius:6px}
     .nav a.active{background:rgba(0,0,0,0.04)}
     form{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
@@ -24,19 +24,38 @@
     button{background:var(--primary);color:#fff;border:none;padding:10px 14px;border-radius:8px;cursor:pointer;font-weight:700}
     button.secondary{background:#eee;color:#111}
     button.delete-btn{background:#dc3545;padding:4px 8px;font-size:12px;}
-    .filtros{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:10px;} 
+    /* Aumenta o espaço dos filtros do dashboard */
+    .filtros{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom: 10px;} 
     .filtros input, .filtros select{padding:6px}
     table{width:100%;border-collapse:collapse;margin-top:12px}
     th,td{border:1px solid #e0e6ef;padding:8px;text-align:center;font-size:13px}
     th{background:var(--primary);color:#fff}
+    .table-porcentagem{min-width: 80px;} 
     .charts{display:grid;gap:18px;margin-top:20px}
     @media(min-width:880px){form{grid-template-columns:repeat(3,1fr)}.charts{grid-template-columns:1fr 1fr}}
+    /* Estilos para os vizualizadores (KPIs) */
     .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin:20px 0 0;}
     .kpi-card{background:var(--muted);padding:12px;border-radius:8px;box-shadow:0 2px 4px rgba(0,0,0,0.05)}
     .kpi-card h3{font-size:14px;color:#555;margin:0 0 4px}
     .kpi-card p{font-size:28px;font-weight:bold;margin:0;color:var(--primary)} 
-    #analiseOperadorArea{border:2px solid var(--accent);padding:15px;border-radius:10px;margin-top:15px;}
-    #analiseOperadorArea h3{color:var(--accent);text-align:center;margin-bottom:10px;}
+    .kpi-card.percent p{color:#00a000} 
+
+    /* Estilo para a nova área do Operador */
+    #analiseOperadorArea{
+        border: 2px solid var(--accent);
+        padding: 15px;
+        border-radius: 10px;
+        margin-top: 15px;
+    }
+    #analiseOperadorArea h3 {
+        color: var(--accent);
+        text-align: center;
+        margin-bottom: 10px;
+    }
+    #analiseOperadorArea .kpi-card p {
+        color: var(--accent); /* Destaca os números do operador */
+        font-size: 26px; 
+    }
   </style>
 </head>
 <body>
@@ -47,52 +66,15 @@
       <a href="#" id="linkLanc" class="active" onclick="mostrarPagina('lancamento')">Lançamento</a>
       <a href="#" id="linkHist" onclick="mostrarPagina('historico')">Histórico</a>
       <a href="#" id="linkDash" onclick="mostrarPagina('dashboard')">Dashboard</a>
-      <a href="#" id="linkOperadores" onclick="mostrarPagina('cadastroOperadores')">Operadores</a>
     </div>
 
-    <!-- ================= CADASTRO DE OPERADORES ================= -->
-    <section id="cadastroOperadores" style="display:none">
-      <h2>Cadastro de Operadores</h2>
-      <form id="formOperador">
-        <div>
-          <label>Nome do Operador</label>
-          <input type="text" id="nomeOperador" required>
-        </div>
-        <div>
-          <label>Setor</label>
-          <select id="setorOperador" required>
-            <option value="">Selecione</option>
-            <option>Conformação</option>
-            <option>Esmaltação</option>
-            <option>Embalagem</option>
-            <option>Forno Vidrado</option>
-            <option>Forno Chicote</option>
-          </select>
-        </div>
-        <div>
-          <label>Data de Cadastro</label>
-          <input type="date" id="dataCadastroOperador" required>
-        </div>
-        <div class="full" style="text-align:right;">
-          <button type="button" class="secondary" onclick="document.getElementById('formOperador').reset()">Limpar</button>
-          <button type="submit">Cadastrar</button>
-        </div>
-      </form>
-
-      <h3>Operadores Cadastrados</h3>
-      <table id="tabelaOperadores">
-        <thead>
-          <tr><th>Nome</th><th>Setor</th><th>Data Cadastro</th></tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-    </section>
-
-    <!-- ================= LANÇAMENTO ================= -->
     <section id="lancamento">
       <h2>Lançamento de Produção</h2>
       <form id="formProducao">
-        <div><label>Data</label><input type="date" id="data" required /></div>
+        <div>
+          <label>Data</label>
+          <input type="date" id="data" required />
+        </div>
 
         <div>
           <label>Setor</label>
@@ -115,14 +97,14 @@
             <option>Turno 2 (6x2)</option>
             <option>Turno 3 (6x2)</option>
             <option>Turno 4 (6x2)</option>
+            <option>Turno 1 (5x2)</option>
+            <option>Turno 2 (5x2)</option>
           </select>
         </div>
-
+        
         <div>
           <label>Operador</label>
-          <select id="operadorSelect" required>
-            <option value="">Selecione o setor primeiro</option>
-          </select>
+          <input type="text" id="operador" required />
         </div>
 
         <div>
@@ -132,7 +114,8 @@
           </select>
         </div>
 
-        <div><label>Massa</label>
+        <div>
+          <label>Massa</label>
           <select id="massa" required>
             <option value="">Selecione</option>
             <option>Stone</option>
@@ -140,10 +123,25 @@
           </select>
         </div>
 
-        <div><label>Produção Prevista</label><input type="number" id="prevista" min="0" required></div>
-        <div><label>Produção Realizada</label><input type="number" id="realizada" min="0" required></div>
-        <div><label>Quebras</label><input type="number" id="quebras" min="0" required></div>
-        <div class="full"><label>Observação</label><textarea id="observacao"></textarea></div>
+        <div>
+          <label>Produção Prevista</label>
+          <input type="number" id="prevista" min="0" required />
+        </div>
+
+        <div>
+          <label>Produção Realizada</label>
+          <input type="number" id="realizada" min="0" required />
+        </div>
+
+        <div>
+          <label>Quebras</label>
+          <input type="number" id="quebras" min="0" required />
+        </div>
+
+        <div class="full">
+          <label>Observação</label>
+          <textarea id="observacao"></textarea>
+        </div>
 
         <div class="full" style="text-align:right;">
           <button type="button" class="secondary" onclick="limparFormulario()">Limpar</button>
@@ -152,16 +150,135 @@
       </form>
     </section>
 
-    <!-- HISTÓRICO e DASHBOARD continuam iguais -->
-    <section id="historico" style="display:none"><h2>Histórico</h2>...</section>
-    <section id="dashboard" style="display:none"><h2>Dashboard</h2>...</section>
+    <section id="historico" style="display:none">
+      <h2>Histórico</h2>
+
+      <div class="filtros">
+        <input type="date" id="filtroDataInicio" placeholder="Data Início" />
+        <input type="date" id="filtroDataFim" placeholder="Data Fim" />
+        <select id="filtroSetor">
+          <option value="">Todos os Setores</option>
+          <option>Conformação</option>
+          <option>Esmaltação</option>
+          <option>Embalagem</option>
+          <option>Forno Vidrado</option>
+          <option>Forno Chicote</option>
+        </select>
+        <select id="filtroTurno">
+          <option value="">Todos os Turnos</option>
+          <option>Comercial</option> 
+          <option>Turno 1 (6x2)</option>
+          <option>Turno 2 (6x2)</option>
+          <option>Turno 3 (6x2)</option>
+          <option>Turno 4 (6x2)</option>
+          <option>Turno 1 (5x2)</option>
+          <option>Turno 2 (5x2)</option>
+        </select>
+        <input type="text" id="filtroMaquina" placeholder="Máquina..." />
+        <button onclick="filtrarHistorico()">Filtrar</button>
+        <button class="secondary" onclick="buscarTodos()">Mostrar todos</button>
+        <button style="background:green;" onclick="exportarExcel()">Exportar Excel</button>
+      </div>
+
+      <table id="tabelaHistorico">
+        <thead>
+          <tr>
+            <th>Data</th>
+            <th>Setor</th>
+            <th>Turno</th>
+            <th>Operador</th>
+            <th>Máquina</th>
+            <th>Massa</th>
+            <th>Prevista</th>
+            <th>Realizada</th>
+            <th>Quebras</th>
+            <th>Obs</th>
+            <th class="table-porcentagem">% Realizado/Previsto</th>
+            <th class="table-porcentagem">% Quebras/Realizado</th>
+            <th>Ação</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </section>
+
+    <section id="dashboard" style="display:none">
+      <h2>Dashboard</h2>
+
+      <div class="filtros">
+        <input type="date" id="dashFiltroDataInicio" placeholder="Data Início" />
+        <input type="date" id="dashFiltroDataFim" placeholder="Data Fim" />
+        
+        <select id="dashFiltroSetor">
+          <option value="">Todos os Setores</option>
+          <option>Conformação</option>
+          <option>Esmaltação</option>
+          <option>Embalagem</option>
+          <option>Forno Vidrado</option>
+          <option>Forno Chicote</option>
+        </select>
+
+        <select id="dashFiltroTurno">
+          <option value="">Todos os Turnos</option>
+          <option>Comercial</option> 
+          <option>Turno 1 (6x2)</option>
+          <option>Turno 2 (6x2)</option>
+          <option>Turno 3 (6x2)</option>
+          <option>Turno 4 (6x2)</option>
+          <option>Turno 1 (5x2)</option>
+          <option>Turno 2 (5x2)</option>
+        </select>
+        <input type="text" id="dashFiltroMaquina" placeholder="Máquina..." />
+        <input type="text" id="dashFiltroOperador" placeholder="Operador..." /> 
+        <button onclick="atualizarDashboard()">Aplicar Filtro</button>
+      </div>
+      
+      <h3>Resumo Geral da Produção (Filtros Aplicados)</h3>
+      <div class="kpis" id="kpisResumo">
+        <div class="kpi-card"><h3>Total Previsto</h3><p id="kpiPrevisto">0</p></div>
+        <div class="kpi-card"><h3>Total Realizado</h3><p id="kpiRealizado">0</p></div>
+        <div class="kpi-card"><h3>Total Quebras</h3><p id="kpiQuebras">0</p></div>
+        <div class="kpi-card percent"><h3>% Realizado/Previsto</h3><p id="kpiPercRealPrev">N/A</p></div>
+        <div class="kpi-card percent"><h3>% Quebras/Total</h3><p id="kpiPercQuebraTotal">N/A</p></div>
+      </div>
+      
+      <div id="analiseOperadorArea">
+        <h3>Análise do Operador: <span id="operadorSelecionado">Nenhum</span></h3>
+        <div class="kpis" id="kpisOperador">
+            <div class="kpi-card"><h3>Previsto Operador</h3><p id="kpiOperadorPrevisto">0</p></div>
+            <div class="kpi-card"><h3>Realizado Operador</h3><p id="kpiOperadorRealizado">0</p></div>
+            <div class="kpi-card"><h3>Quebras Operador</h3><p id="kpiOperadorQuebras">0</p></div>
+            <div class="kpi-card percent"><h3>% Realizado/Previsto</h3><p id="kpiOperadorPercRealPrev">N/A</p></div>
+            <div class="kpi-card percent"><h3>% Quebras/Total</h3><p id="kpiOperadorPercQuebraTotal">N/A</p></div>
+        </div>
+      </div>
+
+
+      <div class="charts">
+        <canvas id="graficoProducao"></canvas>
+        <canvas id="graficoQuebras"></canvas>
+        <canvas id="graficoTurnos"></canvas>
+      </div>
+    </section>
   </div>
 
-  <!-- ========== FIREBASE ========== -->
   <script type="module">
+    // Importa as funções de inicialização do Firebase App
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
-    import { getFirestore, collection, addDoc, getDocs, query, where, orderBy } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
+    // Importa as funções necessárias para o Firestore
+    import { 
+        getFirestore, 
+        collection, 
+        addDoc, 
+        getDocs, 
+        query, 
+        where, 
+        orderBy, 
+        deleteDoc, 
+        doc 
+    } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
 
+    // Sua configuração do aplicativo web Firebase 
     const firebaseConfig = {
       apiKey: "AIzaSyB2z4mFj5qVtb59uocKK8JXhMTfi8MGSTo",
       authDomain: "acompanhamento-de-produc-b68b0.firebaseapp.com",
@@ -171,81 +288,552 @@
       appId: "1:891709449679:web:43e83e076f5fb3201e1eba"
     };
 
+    // Inicializa o Firebase App
     const app = initializeApp(firebaseConfig);
+    
+    // Inicializa o Firestore
     const db = getFirestore(app);
+    
+    // Torna as referências e funções do Firestore globais (window.funcao)
     window.db = db;
-    window.colProducoes = collection(db, "producoes");
-    window.colOperadores = collection(db, "operadores");
-    window.addDoc = addDoc;
-    window.getDocs = getDocs;
-    window.query = query;
-    window.where = where;
-    window.orderBy = orderBy;
+    window.producoesCol = collection(db, "producoes"); 
+    window.addDoc = addDoc;        
+    window.getDocs = getDocs;      
+    window.query = query;          
+    window.where = where;          
+    window.orderBy = orderBy;      
+    window.deleteDoc = deleteDoc;  
+    window.doc = doc;              
+    
+    console.log("Firebase e Firestore inicializados!");
   </script>
 
-  <script>
-    document.addEventListener("DOMContentLoaded", ()=>{
-      document.getElementById("dataCadastroOperador").value = new Date().toISOString().split('T')[0];
+<script>
+// Variáveis globais para as referências do Firebase (preenchidas no DOMContentLoaded)
+let db, producoesCol;
+
+document.addEventListener("DOMContentLoaded", ()=>{
+  db = window.db; 
+  producoesCol = window.producoesCol; 
+  
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById("data").value = today;
+  const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+  document.getElementById("dashFiltroDataInicio").value = sevenDaysAgo;
+  document.getElementById("dashFiltroDataFim").value = today;
+});
+
+const maquinasPorSetor = {
+  "Conformação":["Secador 2","Secador 3","Secador 4","Secador 10","Máquina de Xícara 1","Máquina de Xícara 2","Máquina de Prato","Prensa"],
+  "Esmaltação":["Disco 1","Disco 2","Disco 3","Disco 4","Robô 1","Robô 2","Spray","Imersão"],
+  "Embalagem":["Linha 1","Linha 2","Linha 3","Linha 4","Linha 5"],
+  "Forno Vidrado":["Forno 1","Forno 2"],
+  "Forno Chicote":["Forno 3"]
+};
+
+document.getElementById("setor").addEventListener("change", e=>{
+  const setor=e.target.value;
+  const maqSelect=document.getElementById("maquinaSelect");
+  maqSelect.innerHTML="";
+  
+  const optDefault=document.createElement("option");
+  optDefault.textContent="(Selecione ou Digite)";
+  optDefault.value="";
+  maqSelect.appendChild(optDefault);
+
+  if(maquinasPorSetor[setor]){
+    maquinasPorSetor[setor].forEach(m=>{
+      const opt=document.createElement("option");
+      opt.textContent=m; opt.value=m;
+      maqSelect.appendChild(opt);
     });
+  }
+});
 
-    function mostrarPagina(p){
-      document.querySelectorAll("section").forEach(s=>s.style.display="none");
-      document.getElementById(p).style.display="block";
-      document.querySelectorAll(".nav a").forEach(a=>a.classList.remove("active"));
-      document.querySelector(`#link${p.charAt(0).toUpperCase()+p.slice(1)}`).classList.add("active");
-      if(p==="cadastroOperadores") carregarOperadores();
+function mostrarPagina(pg){
+  document.querySelectorAll("section").forEach(s=>s.style.display="none");
+  document.getElementById(pg).style.display="block";
+  document.querySelectorAll(".nav a").forEach(a=>a.classList.remove("active"));
+  document.querySelector(`#link${pg.charAt(0).toUpperCase()+pg.slice(1)}`).classList.add("active");
+  if(pg==="historico") atualizarTabela();
+  if(pg==="dashboard") atualizarDashboard();
+}
+
+/**
+ * Lança o registro no Firestore. 
+ */
+document.getElementById("formProducao").addEventListener("submit", async (e)=>{
+  e.preventDefault();
+  
+  if (!producoesCol || !window.addDoc) { 
+      alert("Aguarde, o Firebase ainda não foi inicializado corretamente.");
+      return;
+  }
+  
+  const data = {
+    data:document.getElementById("data").value,
+    setor:document.getElementById("setor").value,
+    turno:document.getElementById("turno").value,
+    operador:document.getElementById("operador").value,
+    maquina:document.getElementById("maquinaSelect").value, 
+    massa:document.getElementById("massa").value,
+    prevista:parseFloat(document.getElementById("prevista").value),
+    realizada:parseFloat(document.getElementById("realizada").value),
+    quebras:parseFloat(document.getElementById("quebras").value),
+    observacao:document.getElementById("observacao").value,
+    timestamp: new Date().toISOString()
+  };
+
+  try {
+      await window.addDoc(producoesCol, data);
+      alert("Lançamento salvo com sucesso no Firebase!");
+      limparFormulario();
+  } catch (error) {
+      console.error("Erro ao adicionar documento: ", error);
+      alert("Erro ao salvar o lançamento. Verifique o console."); 
+  }
+});
+
+function limparFormulario(){document.getElementById("formProducao").reset();}
+
+/**
+ * Deleta um registro no Firestore. 
+ * @param {string} docId O ID do documento a ser deletado.
+ */
+function deletarRegistro(docId) {
+    if (confirm("Tem certeza que deseja deletar este registro de produção?")) {
+        
+        if (!docId || !producoesCol || !window.deleteDoc || !window.doc) {
+            alert("Erro: ID do documento ou conexão Firebase inválida.");
+            return;
+        }
+        
+        try {
+            window.deleteDoc(window.doc(db, "producoes", docId))
+                .then(() => {
+                    alert("Registro deletado com sucesso!");
+                    atualizarTabela(); 
+                })
+                .catch(error => {
+                    console.error("Erro ao deletar documento: ", error);
+                    alert("Erro ao deletar o registro. Verifique o console.");
+                });
+            
+        } catch (error) {
+            console.error("Erro de execução na deleção: ", error);
+            alert("Erro ao deletar o registro. Verifique o console.");
+        }
     }
+}
 
-    // ======= CADASTRO DE OPERADOR =======
-    async function carregarOperadores(){
-      const tbody = document.querySelector("#tabelaOperadores tbody");
-      tbody.innerHTML = "<tr><td colspan='3'>Carregando...</td></tr>";
-      const snapshot = await window.getDocs(window.colOperadores);
-      tbody.innerHTML = "";
-      snapshot.forEach(doc=>{
-        const d = doc.data();
-        const tr = document.createElement("tr");
-        tr.innerHTML = `<td>${d.nome}</td><td>${d.setor}</td><td>${d.dataCadastro}</td>`;
-        tbody.appendChild(tr);
+/**
+ * Busca e atualiza a tabela com dados do Firestore (opcionalmente filtrados). 
+ * * CORREÇÃO APLICADA: Usa apenas filtros de Data no Firestore e aplica Setor/Turno/Máquina 
+ * localmente para evitar a necessidade de criar índices compostos complexos no Firebase.
+ * * @param {object|null} filtro Objeto de filtro ou null.
+ */
+async function atualizarTabela(filtro=null){
+  const tbody=document.querySelector("#tabelaHistorico tbody");
+  tbody.innerHTML="<tr><td colspan='13'>Carregando dados...</td></tr>";
+  
+  if (!producoesCol || !window.getDocs || !window.query) {
+      tbody.innerHTML="<tr><td colspan='13'>Erro: O Firebase não está conectado.</td></tr>";
+      return;
+  }
+
+  // 1. Cria a query para o Firestore (apenas filtros de Data)
+  const conditions = [];
+  
+  if(filtro){
+    if(filtro.dataInicio) conditions.push(window.where("data", ">=", filtro.dataInicio));
+    if(filtro.dataFim) conditions.push(window.where("data", "<=", filtro.dataFim));
+  }
+  
+  let q;
+  if (conditions.length > 0) {
+      // Ordena por data (o campo filtrado) e, depois, por timestamp
+      q = window.query(producoesCol, ...conditions, window.orderBy("data", "desc"), window.orderBy("timestamp", "desc"));
+  } else {
+      // Busca todos, ordenado por data e timestamp
+      q = window.query(producoesCol, window.orderBy("data", "desc"), window.orderBy("timestamp", "desc"));
+  }
+
+
+  try {
+      // 2. Executa a busca no Firestore
+      const querySnapshot = await window.getDocs(q);
+      const regs = [];
+      querySnapshot.forEach(doc => {
+          regs.push({ id: doc.id, ...doc.data() });
       });
-    }
 
-    document.getElementById("formOperador").addEventListener("submit", async (e)=>{
-      e.preventDefault();
-      const nome = document.getElementById("nomeOperador").value.trim();
-      const setor = document.getElementById("setorOperador").value;
-      const dataCadastro = document.getElementById("dataCadastroOperador").value;
-
-      if(!nome || !setor) return alert("Preencha todos os campos!");
-
-      await window.addDoc(window.colOperadores, {nome, setor, dataCadastro});
-      alert("Operador cadastrado com sucesso!");
-      e.target.reset();
-      carregarOperadores();
-    });
-
-    // ======= OPERADOR POR SETOR NO LANÇAMENTO =======
-    document.getElementById("setor").addEventListener("change", async (e)=>{
-      const setor = e.target.value;
-      const operadorSelect = document.getElementById("operadorSelect");
-      operadorSelect.innerHTML = "<option value=''>Carregando...</option>";
-
-      if(!setor){
-        operadorSelect.innerHTML = "<option value=''>Selecione o setor primeiro</option>";
-        return;
+      let filtrados = regs;
+      
+      // 3. Filtros Locais (Setor, Turno, Máquina)
+      if(filtro){
+          filtrados = filtrados.filter(r => 
+              (!filtro.setor || r.setor === filtro.setor) &&
+              (!filtro.turno || r.turno === filtro.turno) &&
+              (!filtro.maquina || (r.maquina && r.maquina.toLowerCase().includes(filtro.maquina.toLowerCase())))
+          );
       }
 
-      const q = window.query(window.colOperadores, window.where("setor","==",setor));
-      const snapshot = await window.getDocs(q);
-      operadorSelect.innerHTML = "<option value=''>Selecione</option>";
-      snapshot.forEach(doc=>{
-        const op = doc.data();
-        const opt = document.createElement("option");
-        opt.value = op.nome;
-        opt.textContent = op.nome;
-        operadorSelect.appendChild(opt);
+      // 4. Renderiza a tabela
+      tbody.innerHTML="";
+      if (filtrados.length === 0) {
+           tbody.innerHTML="<tr><td colspan='13'>Nenhum registro encontrado com este filtro.</td></tr>";
+           return;
+      }
+      
+      filtrados.forEach(r=>{
+        const prev = parseFloat(r.prevista) || 0;
+        const real = parseFloat(r.realizada) || 0;
+        const queb = parseFloat(r.quebras) || 0;
+        
+        const percRealizadoPrevisto = prev > 0 ? ((real / prev) * 100).toFixed(2) + '%' : (real > 0 ? 'INF' : 'N/A');
+
+        const totalProd = real + queb;
+        const percQuebrasRealizado = totalProd > 0 ? ((queb / totalProd) * 100).toFixed(2) + '%' : 'N/A';
+        
+        const tr=document.createElement("tr");
+        tr.innerHTML=`<td>${r.data}</td><td>${r.setor}</td><td>${r.turno}</td><td>${r.operador}</td>
+          <td>${r.maquina}</td><td>${r.massa}</td>
+          <td>${prev}</td><td>${real}</td><td>${queb}</td><td>${r.observacao}</td>
+          <td>${percRealizadoPrevisto}</td>
+          <td>${percQuebrasRealizado}</td>
+          <td><button class="delete-btn" onclick="deletarRegistro('${r.id}')">Deletar</button></td>`; 
+        tbody.appendChild(tr);
       });
+  } catch (error) {
+       console.error("Erro ao buscar documentos: ", error);
+       tbody.innerHTML="<tr><td colspan='13'>Erro ao carregar dados. Verifique o console.</td></tr>";
+  }
+}
+
+function filtrarHistorico(){
+  const filtro={
+    dataInicio:document.getElementById("filtroDataInicio").value,
+    dataFim:document.getElementById("filtroDataFim").value,
+    setor:document.getElementById("filtroSetor").value,
+    turno:document.getElementById("filtroTurno").value,
+    maquina:document.getElementById("filtroMaquina").value 
+  };
+  atualizarTabela(filtro);
+}
+
+function buscarTodos(){
+  document.getElementById("filtroDataInicio").value = "";
+  document.getElementById("filtroDataFim").value = "";
+  document.getElementById("filtroSetor").value = "";
+  document.getElementById("filtroTurno").value = "";
+  document.getElementById("filtroMaquina").value = "";
+  atualizarTabela(null);
+}
+
+function exportarExcel(){
+  const rows=[...document.querySelectorAll("#tabelaHistorico tbody tr")];
+  if(rows.length===0 || rows[0].textContent.includes('Carregando dados') || rows[0].textContent.includes('Nenhum registro')){
+      alert("Nenhum dado válido para exportar.");
+      return;
+  }
+  
+  const headers = [...document.querySelectorAll("#tabelaHistorico thead th")].map(th => th.textContent);
+  headers.pop(); 
+  
+  const data = [];
+  rows.forEach(r => {
+      const c = r.querySelectorAll("td");
+      const rowData = {};
+      
+      for (let i = 0; i < headers.length; i++) {
+          rowData[headers[i]] = c[i].textContent;
+      }
+      data.push(rowData);
+  });
+  
+  const ws=XLSX.utils.json_to_sheet(data);
+  const wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,ws,"Histórico");
+  const nome=`Historico_Filtrado_${new Date().toISOString().split('T')[0]}.xlsx`;
+  XLSX.writeFile(wb,nome);
+}
+
+/* ====== DASHBOARD ====== */
+let grafico1, grafico2, grafico3;
+
+// Função que aplica filtros client-side (setor, turno, máquina e operador) após a busca no Firestore
+function filtrarDadosDashboardLocal(dados, filtro) {
+    return dados.filter(d => {
+        // Filtro de Setor
+        const setorCorreto = (!filtro.setor || d.setor === filtro.setor);
+        // Filtro de Turno
+        const turnoCorreto = (!filtro.turno || d.turno === filtro.turno);
+        // Filtro de Máquina (LIKE)
+        const maquinaCorreta = 
+            (!filtro.maquina || (d.maquina && d.maquina.toLowerCase().includes(filtro.maquina.toLowerCase())));
+        // Filtro de Operador (LIKE)
+        const operadorCorreto = 
+            (!filtro.operador || (d.operador && d.operador.toLowerCase().includes(filtro.operador.toLowerCase())));
+
+        return setorCorreto && turnoCorreto && maquinaCorreta && operadorCorreto;
     });
-  </script>
+}
+
+// Função para calcular e atualizar KPIs em uma área específica
+function calcularKPIsEstatistica(dados, prefixo, operadorNome = "Nenhum") {
+    let totalPrevisto = 0;
+    let totalRealizado = 0;
+    let totalQuebras = 0;
+
+    dados.forEach(d => {
+        totalPrevisto += parseFloat(d.prevista) || 0;
+        totalRealizado += parseFloat(d.realizada) || 0;
+        totalQuebras += parseFloat(d.quebras) || 0;
+    });
+
+    const totalProducao = totalRealizado + totalQuebras;
+    
+    // Porcentagem de Realizado/Previsto
+    const percRealPrev = totalPrevisto > 0 
+        ? ((totalRealizado / totalPrevisto) * 100).toFixed(2) + '%' 
+        : (totalRealizado > 0 ? 'INF' : 'N/A');
+
+    // Porcentagem de Quebras / Total Produzido
+    const percQuebraTotal = totalProducao > 0 
+        ? ((totalQuebras / totalProducao) * 100).toFixed(2) + '%' 
+        : 'N/A';
+
+    // Atualiza os elementos HTML usando o prefixo fornecido
+    document.getElementById(`${prefixo}Previsto`).textContent = totalPrevisto.toLocaleString();
+    document.getElementById(`${prefixo}Realizado`).textContent = totalRealizado.toLocaleString();
+    document.getElementById(`${prefixo}Quebras`).textContent = totalQuebras.toLocaleString();
+    document.getElementById(`${prefixo}PercRealPrev`).textContent = percRealPrev;
+    document.getElementById(`${prefixo}PercQuebraTotal`).textContent = percQuebraTotal;
+    
+    if (prefixo === 'kpiOperador' && document.getElementById('operadorSelecionado')) {
+        document.getElementById('operadorSelecionado').textContent = operadorNome;
+    }
+
+    return dados; 
+}
+
+
+/**
+ * Busca dados no Firestore, aplica filtros e atualiza o Dashboard. 
+ */
+async function atualizarDashboard(){
+  if (!producoesCol || !window.getDocs || !window.query) {
+      console.error("Firebase não conectado para o Dashboard.");
+      return;
+  }
+
+  // 1. Coleta os filtros
+  const filtro = {
+    dataInicio: document.getElementById("dashFiltroDataInicio").value,
+    dataFim: document.getElementById("dashFiltroDataFim").value,
+    setor: document.getElementById("dashFiltroSetor").value,
+    turno: document.getElementById("dashFiltroTurno").value,
+    maquina: document.getElementById("dashFiltroMaquina").value,
+    operador: document.getElementById("dashFiltroOperador").value 
+  };
+  
+  // 2. Define a query do Firestore (Apenas Filtros de Data)
+  const conditions = [];
+
+  if(filtro.dataInicio) conditions.push(window.where("data", ">=", filtro.dataInicio));
+  if(filtro.dataFim) conditions.push(window.where("data", "<=", filtro.dataFim));
+  
+  let q;
+  if (conditions.length > 0) {
+      q = window.query(producoesCol, ...conditions, window.orderBy("data", "desc"));
+  } else {
+      q = window.query(producoesCol, window.orderBy("data", "desc"));
+  }
+  
+  try {
+      const querySnapshot = await window.getDocs(q);
+      const dadosGerais = [];
+      querySnapshot.forEach(doc => {
+          dadosGerais.push(doc.data());
+      });
+      
+      // 3. Filtros Cliente-Side (Setor, Turno, Máquina e Operador)
+      const dadosFiltradosGeral = filtrarDadosDashboardLocal(dadosGerais, filtro);
+      
+      // 4. ANÁLISE GERAL 
+      calcularKPIsEstatistica(dadosFiltradosGeral, 'kpi');
+      
+      // 5. ANÁLISE DO OPERADOR (Aplica filtros de data e operador no JS)
+      let dadosOperador = [];
+      let operadorNomeDisplay = "Nenhum";
+      if (filtro.operador) {
+          operadorNomeDisplay = filtro.operador;
+          // Para o KPI do Operador, ignoramos os filtros de Setor/Turno/Máquina para mostrar a performance geral dele
+          const filtroOperadorApenasData = { 
+              dataInicio: filtro.dataInicio, 
+              dataFim: filtro.dataFim, 
+              operador: filtro.operador 
+          };
+          // Reutiliza o filtro local, mas apenas com os filtros de data e operador
+          dadosOperador = filtrarDadosDashboardLocal(dadosGerais, filtroOperadorApenasData); 
+      }
+      
+      calcularKPIsEstatistica(dadosOperador, 'kpiOperador', operadorNomeDisplay);
+      
+      // 6. Gerar Gráficos (usando dados filtrados gerais)
+      if(dadosFiltradosGeral.length===0) {
+          if(grafico1) grafico1.destroy(); grafico1 = null;
+          if(grafico2) grafico2.destroy(); grafico2 = null;
+          if(grafico3) grafico3.destroy(); grafico3 = null;
+          return;
+      }
+
+      gerarGraficoProducao(dadosFiltradosGeral);
+      gerarGraficoQuebras(dadosFiltradosGeral);
+      gerarGraficoTurnos(dadosFiltradosGeral);
+
+  } catch (error) {
+      console.error("Erro ao carregar dados para o Dashboard: ", error);
+  }
+}
+
+// =================================================================
+// FUNÇÕES DE GRÁFICO (mantidas)
+// =================================================================
+
+function gerarGraficoProducao(dados) {
+    const dadosPorSetor = dados.reduce((acc, d) => {
+        if (!acc[d.setor]) acc[d.setor] = { previsto: 0, realizado: 0 };
+        acc[d.setor].previsto += parseFloat(d.prevista) || 0;
+        acc[d.setor].realizado += parseFloat(d.realizada) || 0;
+        return acc;
+    }, {});
+
+    const labels = Object.keys(dadosPorSetor);
+    const previsto = labels.map(s => dadosPorSetor[s].previsto);
+    const realizado = labels.map(s => dadosPorSetor[s].realizado);
+
+    const ctx = document.getElementById('graficoProducao').getContext('2d');
+    if (grafico1) grafico1.destroy();
+
+    grafico1 = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'Previsto',
+                    data: previsto,
+                    backgroundColor: 'rgba(0, 119, 204, 0.6)',
+                    borderColor: 'rgba(0, 119, 204, 1)',
+                    borderWidth: 1
+                },
+                {
+                    label: 'Realizado',
+                    data: realizado,
+                    backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                title: { display: true, text: 'Produção Prevista vs. Realizada por Setor' }
+            },
+            scales: { y: { beginAtZero: true } }
+        }
+    });
+}
+
+function gerarGraficoQuebras(dados) {
+    const dadosPorSetor = dados.reduce((acc, d) => {
+        if (!acc[d.setor]) acc[d.setor] = { quebras: 0, total: 0 };
+        acc[d.setor].quebras += parseFloat(d.quebras) || 0;
+        acc[d.setor].total += (parseFloat(d.realizada) || 0) + (parseFloat(d.quebras) || 0);
+        return acc;
+    }, {});
+
+    const labels = Object.keys(dadosPorSetor);
+    const quebrasPerc = labels.map(s => {
+        const total = dadosPorSetor[s].total;
+        const quebras = dadosPorSetor[s].quebras;
+        return total > 0 ? ((quebras / total) * 100).toFixed(2) : 0;
+    });
+
+    const ctx = document.getElementById('graficoQuebras').getContext('2d');
+    if (grafico2) grafico2.destroy();
+
+    grafico2 = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: '% Quebras sobre o Total de Peças',
+                    data: quebrasPerc,
+                    backgroundColor: 'rgba(255, 99, 132, 0.6)',
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    borderWidth: 1
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                title: { display: true, text: 'Percentual de Quebras por Setor' }
+            },
+            scales: { 
+                y: { 
+                    beginAtZero: true,
+                    max: 100,
+                    ticks: { callback: function(value) { return value + "%" } }
+                } 
+            }
+        }
+    });
+}
+
+function gerarGraficoTurnos(dados) {
+    const dadosPorTurno = dados.reduce((acc, d) => {
+        const turno = d.turno;
+        if (!acc[turno]) acc[turno] = 0;
+        acc[turno] += parseFloat(d.realizada) || 0;
+        return acc;
+    }, {});
+    
+    // Filtra turnos com produção zero para o gráfico de pizza
+    const labels = Object.keys(dadosPorTurno).filter(t => dadosPorTurno[t] > 0);
+    const realizado = labels.map(t => dadosPorTurno[t]);
+
+    const ctx = document.getElementById('graficoTurnos').getContext('2d');
+    if (grafico3) grafico3.destroy();
+
+    const cores = labels.map((_, i) => `hsl(${i * 60}, 70%, 50%)`); // Cores diferentes para cada fatia
+
+    grafico3 = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'Produção Realizada',
+                    data: realizado,
+                    backgroundColor: cores,
+                    hoverOffset: 4
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                title: { display: true, text: 'Distribuição da Produção Realizada por Turno' },
+                legend: { position: 'right' }
+            }
+        }
+    });
+}
+</script>
 </body>
 </html>
