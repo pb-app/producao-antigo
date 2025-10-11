@@ -278,7 +278,7 @@
         doc 
     } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
 
-    // Sua configuração do aplicativo web Firebase (MANTIDA)
+    // Sua configuração do aplicativo web Firebase 
     const firebaseConfig = {
       apiKey: "AIzaSyB2z4mFj5qVtb59uocKK8JXhMTfi8MGSTo",
       authDomain: "acompanhamento-de-produc-b68b0.firebaseapp.com",
@@ -294,10 +294,7 @@
     // Inicializa o Firestore
     const db = getFirestore(app);
     
-    // =========================================================
-    // CORREÇÃO: Torna as referências e funções do Firestore globais (window.funcao)
-    // Isso resolve o ReferenceError: addDoc is not defined
-    // =========================================================
+    // Torna as referências e funções do Firestore globais (window.funcao)
     window.db = db;
     window.producoesCol = collection(db, "producoes"); 
     window.addDoc = addDoc;        
@@ -316,11 +313,9 @@
 let db, producoesCol;
 
 document.addEventListener("DOMContentLoaded", ()=>{
-  // Pega as referências do escopo global criadas pelo módulo
   db = window.db; 
   producoesCol = window.producoesCol; 
   
-  // Define datas padrões
   const today = new Date().toISOString().split('T')[0];
   document.getElementById("data").value = today;
   const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
@@ -341,7 +336,6 @@ document.getElementById("setor").addEventListener("change", e=>{
   const maqSelect=document.getElementById("maquinaSelect");
   maqSelect.innerHTML="";
   
-  // Adiciona a opção de digitação manual
   const optDefault=document.createElement("option");
   optDefault.textContent="(Selecione ou Digite)";
   optDefault.value="";
@@ -366,12 +360,11 @@ function mostrarPagina(pg){
 }
 
 /**
- * Lança o registro no Firestore. (CORRIGIDO PARA FIREBASE)
+ * Lança o registro no Firestore. 
  */
 document.getElementById("formProducao").addEventListener("submit", async (e)=>{
   e.preventDefault();
   
-  // Verifica se o Firebase está pronto
   if (!producoesCol || !window.addDoc) { 
       alert("Aguarde, o Firebase ainda não foi inicializado corretamente.");
       return;
@@ -382,14 +375,13 @@ document.getElementById("formProducao").addEventListener("submit", async (e)=>{
     setor:document.getElementById("setor").value,
     turno:document.getElementById("turno").value,
     operador:document.getElementById("operador").value,
-    // Se o select for vazio, pega o valor que o usuário pode ter digitado
     maquina:document.getElementById("maquinaSelect").value, 
     massa:document.getElementById("massa").value,
     prevista:parseFloat(document.getElementById("prevista").value),
     realizada:parseFloat(document.getElementById("realizada").value),
     quebras:parseFloat(document.getElementById("quebras").value),
     observacao:document.getElementById("observacao").value,
-    timestamp: new Date().toISOString() // Adiciona um timestamp para ordenação
+    timestamp: new Date().toISOString()
   };
 
   try {
@@ -398,14 +390,14 @@ document.getElementById("formProducao").addEventListener("submit", async (e)=>{
       limparFormulario();
   } catch (error) {
       console.error("Erro ao adicionar documento: ", error);
-      alert("Erro ao salvar o lançamento. Verifique o console. (Pode ser erro de Permissão!)"); 
+      alert("Erro ao salvar o lançamento. Verifique o console."); 
   }
 });
 
 function limparFormulario(){document.getElementById("formProducao").reset();}
 
 /**
- * Deleta um registro no Firestore. (CORRIGIDO PARA FIREBASE)
+ * Deleta um registro no Firestore. 
  * @param {string} docId O ID do documento a ser deletado.
  */
 function deletarRegistro(docId) {
@@ -435,8 +427,10 @@ function deletarRegistro(docId) {
 }
 
 /**
- * Busca e atualiza a tabela com dados do Firestore (opcionalmente filtrados). (CORRIGIDO PARA FIREBASE)
- * @param {object|null} filtro Objeto de filtro ou null.
+ * Busca e atualiza a tabela com dados do Firestore (opcionalmente filtrados). 
+ * * CORREÇÃO APLICADA: Usa apenas filtros de Data no Firestore e aplica Setor/Turno/Máquina 
+ * localmente para evitar a necessidade de criar índices compostos complexos no Firebase.
+ * * @param {object|null} filtro Objeto de filtro ou null.
  */
 async function atualizarTabela(filtro=null){
   const tbody=document.querySelector("#tabelaHistorico tbody");
@@ -447,43 +441,41 @@ async function atualizarTabela(filtro=null){
       return;
   }
 
-  // 1. Cria a query inicial
+  // 1. Cria a query para o Firestore (apenas filtros de Data)
   const conditions = [];
   
-  // 2. Adiciona filtros de data/setor/turno para o Firestore (where clauses)
   if(filtro){
-    // Filtros de range de data DEVEM vir primeiro
     if(filtro.dataInicio) conditions.push(window.where("data", ">=", filtro.dataInicio));
     if(filtro.dataFim) conditions.push(window.where("data", "<=", filtro.dataFim));
-    if(filtro.setor) conditions.push(window.where("setor", "==", filtro.setor));
-    if(filtro.turno) conditions.push(window.where("turno", "==", filtro.turno));
   }
   
-  // Adiciona ordenação (sempre que usar where, a primeira ordem deve ser o campo filtrado)
-  // Como filtramos data e/ou setor/turno, usamos a data para a primeira ordem
   let q;
   if (conditions.length > 0) {
-      // Ordena por data e, depois, por timestamp
+      // Ordena por data (o campo filtrado) e, depois, por timestamp
       q = window.query(producoesCol, ...conditions, window.orderBy("data", "desc"), window.orderBy("timestamp", "desc"));
   } else {
+      // Busca todos, ordenado por data e timestamp
       q = window.query(producoesCol, window.orderBy("data", "desc"), window.orderBy("timestamp", "desc"));
   }
 
 
   try {
+      // 2. Executa a busca no Firestore
       const querySnapshot = await window.getDocs(q);
       const regs = [];
       querySnapshot.forEach(doc => {
-          // Coleta o ID do documento para exclusão e os dados
           regs.push({ id: doc.id, ...doc.data() });
       });
 
       let filtrados = regs;
       
-      // Filtros manuais para Máquina, que Firestore não permite LIKE
-      if(filtro && filtro.maquina){
-          const maquinaFiltro = filtro.maquina.toLowerCase();
-          filtrados = filtrados.filter(r => r.maquina && r.maquina.toLowerCase().includes(maquinaFiltro));
+      // 3. Filtros Locais (Setor, Turno, Máquina)
+      if(filtro){
+          filtrados = filtrados.filter(r => 
+              (!filtro.setor || r.setor === filtro.setor) &&
+              (!filtro.turno || r.turno === filtro.turno) &&
+              (!filtro.maquina || (r.maquina && r.maquina.toLowerCase().includes(filtro.maquina.toLowerCase())))
+          );
       }
 
       // 4. Renderiza a tabela
@@ -504,7 +496,6 @@ async function atualizarTabela(filtro=null){
         const percQuebrasRealizado = totalProd > 0 ? ((queb / totalProd) * 100).toFixed(2) + '%' : 'N/A';
         
         const tr=document.createElement("tr");
-        // O doc.id (r.id) é passado para a função deletarRegistro
         tr.innerHTML=`<td>${r.data}</td><td>${r.setor}</td><td>${r.turno}</td><td>${r.operador}</td>
           <td>${r.maquina}</td><td>${r.massa}</td>
           <td>${prev}</td><td>${real}</td><td>${queb}</td><td>${r.observacao}</td>
@@ -547,7 +538,7 @@ function exportarExcel(){
   }
   
   const headers = [...document.querySelectorAll("#tabelaHistorico thead th")].map(th => th.textContent);
-  headers.pop(); // Remove a coluna 'Ação'
+  headers.pop(); 
   
   const data = [];
   rows.forEach(r => {
@@ -570,18 +561,21 @@ function exportarExcel(){
 /* ====== DASHBOARD ====== */
 let grafico1, grafico2, grafico3;
 
-// Função que aplica filtros client-side (máquina e operador) após a busca no Firestore
+// Função que aplica filtros client-side (setor, turno, máquina e operador) após a busca no Firestore
 function filtrarDadosDashboardLocal(dados, filtro) {
     return dados.filter(d => {
+        // Filtro de Setor
+        const setorCorreto = (!filtro.setor || d.setor === filtro.setor);
+        // Filtro de Turno
+        const turnoCorreto = (!filtro.turno || d.turno === filtro.turno);
         // Filtro de Máquina (LIKE)
         const maquinaCorreta = 
             (!filtro.maquina || (d.maquina && d.maquina.toLowerCase().includes(filtro.maquina.toLowerCase())));
-            
         // Filtro de Operador (LIKE)
         const operadorCorreto = 
             (!filtro.operador || (d.operador && d.operador.toLowerCase().includes(filtro.operador.toLowerCase())));
 
-        return maquinaCorreta && operadorCorreto;
+        return setorCorreto && turnoCorreto && maquinaCorreta && operadorCorreto;
     });
 }
 
@@ -592,7 +586,6 @@ function calcularKPIsEstatistica(dados, prefixo, operadorNome = "Nenhum") {
     let totalQuebras = 0;
 
     dados.forEach(d => {
-        // Usar parseFloat para garantir que os dados do Firestore sejam tratados como números
         totalPrevisto += parseFloat(d.prevista) || 0;
         totalRealizado += parseFloat(d.realizada) || 0;
         totalQuebras += parseFloat(d.quebras) || 0;
@@ -626,7 +619,7 @@ function calcularKPIsEstatistica(dados, prefixo, operadorNome = "Nenhum") {
 
 
 /**
- * Busca dados no Firestore, aplica filtros e atualiza o Dashboard. (CORRIGIDO PARA FIREBASE)
+ * Busca dados no Firestore, aplica filtros e atualiza o Dashboard. 
  */
 async function atualizarDashboard(){
   if (!producoesCol || !window.getDocs || !window.query) {
@@ -644,15 +637,12 @@ async function atualizarDashboard(){
     operador: document.getElementById("dashFiltroOperador").value 
   };
   
-  // 2. Define a query do Firestore (Filtros de Data, Setor, Turno)
+  // 2. Define a query do Firestore (Apenas Filtros de Data)
   const conditions = [];
 
   if(filtro.dataInicio) conditions.push(window.where("data", ">=", filtro.dataInicio));
   if(filtro.dataFim) conditions.push(window.where("data", "<=", filtro.dataFim));
-  if(filtro.setor) conditions.push(window.where("setor", "==", filtro.setor));
-  if(filtro.turno) conditions.push(window.where("turno", "==", filtro.turno));
   
-  // A ordem de busca no Firestore deve sempre ser o campo filtrado primeiro
   let q;
   if (conditions.length > 0) {
       q = window.query(producoesCol, ...conditions, window.orderBy("data", "desc"));
@@ -667,13 +657,13 @@ async function atualizarDashboard(){
           dadosGerais.push(doc.data());
       });
       
-      // 3. Filtros Cliente-Side (Máquina e Operador)
+      // 3. Filtros Cliente-Side (Setor, Turno, Máquina e Operador)
       const dadosFiltradosGeral = filtrarDadosDashboardLocal(dadosGerais, filtro);
       
-      // 4. ANÁLISE GERAL (Aplica TODOS os filtros)
+      // 4. ANÁLISE GERAL 
       calcularKPIsEstatistica(dadosFiltradosGeral, 'kpi');
       
-      // 5. ANÁLISE DO OPERADOR (Aplica filtros de data e operador)
+      // 5. ANÁLISE DO OPERADOR (Aplica filtros de data e operador no JS)
       let dadosOperador = [];
       let operadorNomeDisplay = "Nenhum";
       if (filtro.operador) {
@@ -684,7 +674,8 @@ async function atualizarDashboard(){
               dataFim: filtro.dataFim, 
               operador: filtro.operador 
           };
-          dadosOperador = filtrarDadosDashboardLocal(dadosGerais, filtroOperadorApenasData);
+          // Reutiliza o filtro local, mas apenas com os filtros de data e operador
+          dadosOperador = filtrarDadosDashboardLocal(dadosGerais, filtroOperadorApenasData); 
       }
       
       calcularKPIsEstatistica(dadosOperador, 'kpiOperador', operadorNomeDisplay);
