@@ -261,7 +261,7 @@
       </div>
     </section>
   </div>
-  
+
   <script type="module">
     // Importa as funções de inicialização do Firebase App
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
@@ -278,7 +278,7 @@
         doc 
     } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
 
-    // Sua configuração do aplicativo web Firebase
+    // Sua configuração do aplicativo web Firebase (MANTIDA)
     const firebaseConfig = {
       apiKey: "AIzaSyB2z4mFj5qVtb59uocKK8JXhMTfi8MGSTo",
       authDomain: "acompanhamento-de-produc-b68b0.firebaseapp.com",
@@ -312,20 +312,17 @@
   </script>
 
 <script>
-// NOTA: As variáveis globais abaixo agora SÃO AS PRÓPRIAS FUNÇÕES DO FIREBASE (ex: addDoc, getDocs)
-// A função DOMContentLoaded apenas pega as referências de db e da coleção.
+// Variáveis globais para as referências do Firebase (preenchidas no DOMContentLoaded)
 let db, producoesCol;
 
 document.addEventListener("DOMContentLoaded", ()=>{
+  // Pega as referências do escopo global criadas pelo módulo
   db = window.db; 
   producoesCol = window.producoesCol; 
   
-  // LOG DE VERIFICAÇÃO (OPCIONAL)
-  console.log("Variáveis DB carregadas:", !!db, !!producoesCol);
-
+  // Define datas padrões
   const today = new Date().toISOString().split('T')[0];
   document.getElementById("data").value = today;
-  // Define a data de início do filtro do dashboard para 7 dias atrás e a de fim para hoje
   const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
   document.getElementById("dashFiltroDataInicio").value = sevenDaysAgo;
   document.getElementById("dashFiltroDataFim").value = today;
@@ -343,8 +340,10 @@ document.getElementById("setor").addEventListener("change", e=>{
   const setor=e.target.value;
   const maqSelect=document.getElementById("maquinaSelect");
   maqSelect.innerHTML="";
+  
+  // Adiciona a opção de digitação manual
   const optDefault=document.createElement("option");
-  optDefault.textContent="(Digite manualmente)";
+  optDefault.textContent="(Selecione ou Digite)";
   optDefault.value="";
   maqSelect.appendChild(optDefault);
 
@@ -367,13 +366,12 @@ function mostrarPagina(pg){
 }
 
 /**
- * Lança o registro no Firestore.
- * @param {Event} e 
+ * Lança o registro no Firestore. (CORRIGIDO PARA FIREBASE)
  */
 document.getElementById("formProducao").addEventListener("submit", async (e)=>{
   e.preventDefault();
   
-  // O addDoc agora é uma função global (window.addDoc)
+  // Verifica se o Firebase está pronto
   if (!producoesCol || !window.addDoc) { 
       alert("Aguarde, o Firebase ainda não foi inicializado corretamente.");
       return;
@@ -384,7 +382,8 @@ document.getElementById("formProducao").addEventListener("submit", async (e)=>{
     setor:document.getElementById("setor").value,
     turno:document.getElementById("turno").value,
     operador:document.getElementById("operador").value,
-    maquina:document.getElementById("maquinaSelect").value || document.getElementById("maquinaSelect").value, // Se o select for vazio, pega o valor que o usuário digitou
+    // Se o select for vazio, pega o valor que o usuário pode ter digitado
+    maquina:document.getElementById("maquinaSelect").value, 
     massa:document.getElementById("massa").value,
     prevista:parseFloat(document.getElementById("prevista").value),
     realizada:parseFloat(document.getElementById("realizada").value),
@@ -394,45 +393,49 @@ document.getElementById("formProducao").addEventListener("submit", async (e)=>{
   };
 
   try {
-      // SUBSTITUIÇÃO: Salva no Firestore
       await window.addDoc(producoesCol, data);
       alert("Lançamento salvo com sucesso no Firebase!");
       limparFormulario();
   } catch (error) {
       console.error("Erro ao adicionar documento: ", error);
-      // Se você estava vendo o erro 'addDoc is not defined', agora você verá o erro de permissão (403) ou o sucesso.
-      alert("Erro ao salvar o lançamento. Verifique o console."); 
+      alert("Erro ao salvar o lançamento. Verifique o console. (Pode ser erro de Permissão!)"); 
   }
 });
 
 function limparFormulario(){document.getElementById("formProducao").reset();}
 
 /**
- * Deleta um registro no Firestore.
+ * Deleta um registro no Firestore. (CORRIGIDO PARA FIREBASE)
  * @param {string} docId O ID do documento a ser deletado.
  */
-async function deletarRegistro(docId) {
+function deletarRegistro(docId) {
     if (confirm("Tem certeza que deseja deletar este registro de produção?")) {
-        // As funções do Firestore agora estão no escopo global (window)
+        
         if (!docId || !producoesCol || !window.deleteDoc || !window.doc) {
             alert("Erro: ID do documento ou conexão Firebase inválida.");
             return;
         }
         
         try {
-            // SUBSTITUIÇÃO: Deleta no Firestore
-            await window.deleteDoc(window.doc(db, "producoes", docId));
-            alert("Registro deletado com sucesso!");
-            atualizarTabela(); 
+            window.deleteDoc(window.doc(db, "producoes", docId))
+                .then(() => {
+                    alert("Registro deletado com sucesso!");
+                    atualizarTabela(); 
+                })
+                .catch(error => {
+                    console.error("Erro ao deletar documento: ", error);
+                    alert("Erro ao deletar o registro. Verifique o console.");
+                });
+            
         } catch (error) {
-            console.error("Erro ao deletar documento: ", error);
+            console.error("Erro de execução na deleção: ", error);
             alert("Erro ao deletar o registro. Verifique o console.");
         }
     }
 }
 
 /**
- * Busca e atualiza a tabela com dados do Firestore (opcionalmente filtrados).
+ * Busca e atualiza a tabela com dados do Firestore (opcionalmente filtrados). (CORRIGIDO PARA FIREBASE)
  * @param {object|null} filtro Objeto de filtro ou null.
  */
 async function atualizarTabela(filtro=null){
@@ -445,24 +448,29 @@ async function atualizarTabela(filtro=null){
   }
 
   // 1. Cria a query inicial
-  let q = window.query(producoesCol, window.orderBy("data", "desc"), window.orderBy("timestamp", "desc"));
   const conditions = [];
   
-  // 2. Adiciona filtros se existirem
+  // 2. Adiciona filtros de data/setor/turno para o Firestore (where clauses)
   if(filtro){
+    // Filtros de range de data DEVEM vir primeiro
     if(filtro.dataInicio) conditions.push(window.where("data", ">=", filtro.dataInicio));
     if(filtro.dataFim) conditions.push(window.where("data", "<=", filtro.dataFim));
     if(filtro.setor) conditions.push(window.where("setor", "==", filtro.setor));
     if(filtro.turno) conditions.push(window.where("turno", "==", filtro.turno));
   }
-
-  // Se houver condições, aplicamos a query
+  
+  // Adiciona ordenação (sempre que usar where, a primeira ordem deve ser o campo filtrado)
+  // Como filtramos data e/ou setor/turno, usamos a data para a primeira ordem
+  let q;
   if (conditions.length > 0) {
+      // Ordena por data e, depois, por timestamp
       q = window.query(producoesCol, ...conditions, window.orderBy("data", "desc"), window.orderBy("timestamp", "desc"));
+  } else {
+      q = window.query(producoesCol, window.orderBy("data", "desc"), window.orderBy("timestamp", "desc"));
   }
 
+
   try {
-      // 3. Executa a busca no Firestore
       const querySnapshot = await window.getDocs(q);
       const regs = [];
       querySnapshot.forEach(doc => {
@@ -472,7 +480,7 @@ async function atualizarTabela(filtro=null){
 
       let filtrados = regs;
       
-      // Filtros manuais (para Máquina, se necessário)
+      // Filtros manuais para Máquina, que Firestore não permite LIKE
       if(filtro && filtro.maquina){
           const maquinaFiltro = filtro.maquina.toLowerCase();
           filtrados = filtrados.filter(r => r.maquina && r.maquina.toLowerCase().includes(maquinaFiltro));
@@ -499,5 +507,342 @@ async function atualizarTabela(filtro=null){
         // O doc.id (r.id) é passado para a função deletarRegistro
         tr.innerHTML=`<td>${r.data}</td><td>${r.setor}</td><td>${r.turno}</td><td>${r.operador}</td>
           <td>${r.maquina}</td><td>${r.massa}</td>
-          <td>${real}</td><td>${prev}</td><td>${queb}</td><td>${r.observacao}</td>
-          <td>$
+          <td>${prev}</td><td>${real}</td><td>${queb}</td><td>${r.observacao}</td>
+          <td>${percRealizadoPrevisto}</td>
+          <td>${percQuebrasRealizado}</td>
+          <td><button class="delete-btn" onclick="deletarRegistro('${r.id}')">Deletar</button></td>`; 
+        tbody.appendChild(tr);
+      });
+  } catch (error) {
+       console.error("Erro ao buscar documentos: ", error);
+       tbody.innerHTML="<tr><td colspan='13'>Erro ao carregar dados. Verifique o console.</td></tr>";
+  }
+}
+
+function filtrarHistorico(){
+  const filtro={
+    dataInicio:document.getElementById("filtroDataInicio").value,
+    dataFim:document.getElementById("filtroDataFim").value,
+    setor:document.getElementById("filtroSetor").value,
+    turno:document.getElementById("filtroTurno").value,
+    maquina:document.getElementById("filtroMaquina").value 
+  };
+  atualizarTabela(filtro);
+}
+
+function buscarTodos(){
+  document.getElementById("filtroDataInicio").value = "";
+  document.getElementById("filtroDataFim").value = "";
+  document.getElementById("filtroSetor").value = "";
+  document.getElementById("filtroTurno").value = "";
+  document.getElementById("filtroMaquina").value = "";
+  atualizarTabela(null);
+}
+
+function exportarExcel(){
+  const rows=[...document.querySelectorAll("#tabelaHistorico tbody tr")];
+  if(rows.length===0 || rows[0].textContent.includes('Carregando dados') || rows[0].textContent.includes('Nenhum registro')){
+      alert("Nenhum dado válido para exportar.");
+      return;
+  }
+  
+  const headers = [...document.querySelectorAll("#tabelaHistorico thead th")].map(th => th.textContent);
+  headers.pop(); // Remove a coluna 'Ação'
+  
+  const data = [];
+  rows.forEach(r => {
+      const c = r.querySelectorAll("td");
+      const rowData = {};
+      
+      for (let i = 0; i < headers.length; i++) {
+          rowData[headers[i]] = c[i].textContent;
+      }
+      data.push(rowData);
+  });
+  
+  const ws=XLSX.utils.json_to_sheet(data);
+  const wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,ws,"Histórico");
+  const nome=`Historico_Filtrado_${new Date().toISOString().split('T')[0]}.xlsx`;
+  XLSX.writeFile(wb,nome);
+}
+
+/* ====== DASHBOARD ====== */
+let grafico1, grafico2, grafico3;
+
+// Função que aplica filtros client-side (máquina e operador) após a busca no Firestore
+function filtrarDadosDashboardLocal(dados, filtro) {
+    return dados.filter(d => {
+        // Filtro de Máquina (LIKE)
+        const maquinaCorreta = 
+            (!filtro.maquina || (d.maquina && d.maquina.toLowerCase().includes(filtro.maquina.toLowerCase())));
+            
+        // Filtro de Operador (LIKE)
+        const operadorCorreto = 
+            (!filtro.operador || (d.operador && d.operador.toLowerCase().includes(filtro.operador.toLowerCase())));
+
+        return maquinaCorreta && operadorCorreto;
+    });
+}
+
+// Função para calcular e atualizar KPIs em uma área específica
+function calcularKPIsEstatistica(dados, prefixo, operadorNome = "Nenhum") {
+    let totalPrevisto = 0;
+    let totalRealizado = 0;
+    let totalQuebras = 0;
+
+    dados.forEach(d => {
+        // Usar parseFloat para garantir que os dados do Firestore sejam tratados como números
+        totalPrevisto += parseFloat(d.prevista) || 0;
+        totalRealizado += parseFloat(d.realizada) || 0;
+        totalQuebras += parseFloat(d.quebras) || 0;
+    });
+
+    const totalProducao = totalRealizado + totalQuebras;
+    
+    // Porcentagem de Realizado/Previsto
+    const percRealPrev = totalPrevisto > 0 
+        ? ((totalRealizado / totalPrevisto) * 100).toFixed(2) + '%' 
+        : (totalRealizado > 0 ? 'INF' : 'N/A');
+
+    // Porcentagem de Quebras / Total Produzido
+    const percQuebraTotal = totalProducao > 0 
+        ? ((totalQuebras / totalProducao) * 100).toFixed(2) + '%' 
+        : 'N/A';
+
+    // Atualiza os elementos HTML usando o prefixo fornecido
+    document.getElementById(`${prefixo}Previsto`).textContent = totalPrevisto.toLocaleString();
+    document.getElementById(`${prefixo}Realizado`).textContent = totalRealizado.toLocaleString();
+    document.getElementById(`${prefixo}Quebras`).textContent = totalQuebras.toLocaleString();
+    document.getElementById(`${prefixo}PercRealPrev`).textContent = percRealPrev;
+    document.getElementById(`${prefixo}PercQuebraTotal`).textContent = percQuebraTotal;
+    
+    if (prefixo === 'kpiOperador' && document.getElementById('operadorSelecionado')) {
+        document.getElementById('operadorSelecionado').textContent = operadorNome;
+    }
+
+    return dados; 
+}
+
+
+/**
+ * Busca dados no Firestore, aplica filtros e atualiza o Dashboard. (CORRIGIDO PARA FIREBASE)
+ */
+async function atualizarDashboard(){
+  if (!producoesCol || !window.getDocs || !window.query) {
+      console.error("Firebase não conectado para o Dashboard.");
+      return;
+  }
+
+  // 1. Coleta os filtros
+  const filtro = {
+    dataInicio: document.getElementById("dashFiltroDataInicio").value,
+    dataFim: document.getElementById("dashFiltroDataFim").value,
+    setor: document.getElementById("dashFiltroSetor").value,
+    turno: document.getElementById("dashFiltroTurno").value,
+    maquina: document.getElementById("dashFiltroMaquina").value,
+    operador: document.getElementById("dashFiltroOperador").value 
+  };
+  
+  // 2. Define a query do Firestore (Filtros de Data, Setor, Turno)
+  const conditions = [];
+
+  if(filtro.dataInicio) conditions.push(window.where("data", ">=", filtro.dataInicio));
+  if(filtro.dataFim) conditions.push(window.where("data", "<=", filtro.dataFim));
+  if(filtro.setor) conditions.push(window.where("setor", "==", filtro.setor));
+  if(filtro.turno) conditions.push(window.where("turno", "==", filtro.turno));
+  
+  // A ordem de busca no Firestore deve sempre ser o campo filtrado primeiro
+  let q;
+  if (conditions.length > 0) {
+      q = window.query(producoesCol, ...conditions, window.orderBy("data", "desc"));
+  } else {
+      q = window.query(producoesCol, window.orderBy("data", "desc"));
+  }
+  
+  try {
+      const querySnapshot = await window.getDocs(q);
+      const dadosGerais = [];
+      querySnapshot.forEach(doc => {
+          dadosGerais.push(doc.data());
+      });
+      
+      // 3. Filtros Cliente-Side (Máquina e Operador)
+      const dadosFiltradosGeral = filtrarDadosDashboardLocal(dadosGerais, filtro);
+      
+      // 4. ANÁLISE GERAL (Aplica TODOS os filtros)
+      calcularKPIsEstatistica(dadosFiltradosGeral, 'kpi');
+      
+      // 5. ANÁLISE DO OPERADOR (Aplica filtros de data e operador)
+      let dadosOperador = [];
+      let operadorNomeDisplay = "Nenhum";
+      if (filtro.operador) {
+          operadorNomeDisplay = filtro.operador;
+          // Para o KPI do Operador, ignoramos os filtros de Setor/Turno/Máquina para mostrar a performance geral dele
+          const filtroOperadorApenasData = { 
+              dataInicio: filtro.dataInicio, 
+              dataFim: filtro.dataFim, 
+              operador: filtro.operador 
+          };
+          dadosOperador = filtrarDadosDashboardLocal(dadosGerais, filtroOperadorApenasData);
+      }
+      
+      calcularKPIsEstatistica(dadosOperador, 'kpiOperador', operadorNomeDisplay);
+      
+      // 6. Gerar Gráficos (usando dados filtrados gerais)
+      if(dadosFiltradosGeral.length===0) {
+          if(grafico1) grafico1.destroy(); grafico1 = null;
+          if(grafico2) grafico2.destroy(); grafico2 = null;
+          if(grafico3) grafico3.destroy(); grafico3 = null;
+          return;
+      }
+
+      gerarGraficoProducao(dadosFiltradosGeral);
+      gerarGraficoQuebras(dadosFiltradosGeral);
+      gerarGraficoTurnos(dadosFiltradosGeral);
+
+  } catch (error) {
+      console.error("Erro ao carregar dados para o Dashboard: ", error);
+  }
+}
+
+// =================================================================
+// FUNÇÕES DE GRÁFICO (mantidas)
+// =================================================================
+
+function gerarGraficoProducao(dados) {
+    const dadosPorSetor = dados.reduce((acc, d) => {
+        if (!acc[d.setor]) acc[d.setor] = { previsto: 0, realizado: 0 };
+        acc[d.setor].previsto += parseFloat(d.prevista) || 0;
+        acc[d.setor].realizado += parseFloat(d.realizada) || 0;
+        return acc;
+    }, {});
+
+    const labels = Object.keys(dadosPorSetor);
+    const previsto = labels.map(s => dadosPorSetor[s].previsto);
+    const realizado = labels.map(s => dadosPorSetor[s].realizado);
+
+    const ctx = document.getElementById('graficoProducao').getContext('2d');
+    if (grafico1) grafico1.destroy();
+
+    grafico1 = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'Previsto',
+                    data: previsto,
+                    backgroundColor: 'rgba(0, 119, 204, 0.6)',
+                    borderColor: 'rgba(0, 119, 204, 1)',
+                    borderWidth: 1
+                },
+                {
+                    label: 'Realizado',
+                    data: realizado,
+                    backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                title: { display: true, text: 'Produção Prevista vs. Realizada por Setor' }
+            },
+            scales: { y: { beginAtZero: true } }
+        }
+    });
+}
+
+function gerarGraficoQuebras(dados) {
+    const dadosPorSetor = dados.reduce((acc, d) => {
+        if (!acc[d.setor]) acc[d.setor] = { quebras: 0, total: 0 };
+        acc[d.setor].quebras += parseFloat(d.quebras) || 0;
+        acc[d.setor].total += (parseFloat(d.realizada) || 0) + (parseFloat(d.quebras) || 0);
+        return acc;
+    }, {});
+
+    const labels = Object.keys(dadosPorSetor);
+    const quebrasPerc = labels.map(s => {
+        const total = dadosPorSetor[s].total;
+        const quebras = dadosPorSetor[s].quebras;
+        return total > 0 ? ((quebras / total) * 100).toFixed(2) : 0;
+    });
+
+    const ctx = document.getElementById('graficoQuebras').getContext('2d');
+    if (grafico2) grafico2.destroy();
+
+    grafico2 = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: '% Quebras sobre o Total de Peças',
+                    data: quebrasPerc,
+                    backgroundColor: 'rgba(255, 99, 132, 0.6)',
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    borderWidth: 1
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                title: { display: true, text: 'Percentual de Quebras por Setor' }
+            },
+            scales: { 
+                y: { 
+                    beginAtZero: true,
+                    max: 100,
+                    ticks: { callback: function(value) { return value + "%" } }
+                } 
+            }
+        }
+    });
+}
+
+function gerarGraficoTurnos(dados) {
+    const dadosPorTurno = dados.reduce((acc, d) => {
+        const turno = d.turno;
+        if (!acc[turno]) acc[turno] = 0;
+        acc[turno] += parseFloat(d.realizada) || 0;
+        return acc;
+    }, {});
+    
+    // Filtra turnos com produção zero para o gráfico de pizza
+    const labels = Object.keys(dadosPorTurno).filter(t => dadosPorTurno[t] > 0);
+    const realizado = labels.map(t => dadosPorTurno[t]);
+
+    const ctx = document.getElementById('graficoTurnos').getContext('2d');
+    if (grafico3) grafico3.destroy();
+
+    const cores = labels.map((_, i) => `hsl(${i * 60}, 70%, 50%)`); // Cores diferentes para cada fatia
+
+    grafico3 = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'Produção Realizada',
+                    data: realizado,
+                    backgroundColor: cores,
+                    hoverOffset: 4
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                title: { display: true, text: 'Distribuição da Produção Realizada por Turno' },
+                legend: { position: 'right' }
+            }
+        }
+    });
+}
+</script>
+</body>
+</html>
