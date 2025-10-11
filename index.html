@@ -262,7 +262,11 @@
     </section>
   </div>
   
-  <script type="module">
+  
+
+<script>
+// Variáveis Globais para referência do Firestore. Elas serão preenchidas no bloco acima.
+// NOTA: Você deve garantir q  <script type="module">
     // Importa as funções de inicialização do Firebase App
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
     // Importa as funções necessárias para o Firestore
@@ -294,16 +298,22 @@
     // Inicializa o Firestore
     const db = getFirestore(app);
     
-    // Torna as referências do Firestore (db e a coleção) globais para que o seu script principal possa usá-las.
+    // =========================================================
+    // CORREÇÃO CRÍTICA: Torna as funções do Firestore globais
+    // =========================================================
     window.db = db;
     window.producoesCol = collection(db, "producoes"); 
+    window.addDoc = addDoc;        // Adicionado!
+    window.getDocs = getDocs;      // Adicionado!
+    window.query = query;          // Adicionado!
+    window.where = where;          // Adicionado!
+    window.orderBy = orderBy;      // Adicionado!
+    window.deleteDoc = deleteDoc;  // Adicionado!
+    window.doc = doc;              // Adicionado!
     
-    console.log("Firebase e Firestore inicializados! Coleção 'producoes' pronta para uso.");
+    console.log("Firebase e Firestore inicializados!");
   </script>
-
-<script>
-// Variáveis Globais para referência do Firestore. Elas serão preenchidas no bloco acima.
-// NOTA: Você deve garantir que o bloco <script type="module"> rode antes.
+ue o bloco <script type="module"> rode antes.
 let db, producoesCol;
 document.addEventListener("DOMContentLoaded", ()=>{
   db = window.db; // Pega a referência global do Firestore
