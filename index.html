@@ -264,9 +264,7 @@
   
   
 
-<script>
-// Variáveis Globais para referência do Firestore. Elas serão preenchidas no bloco acima.
-// NOTA: Você deve garantir q  <script type="module">
+ <script type="module">
     // Importa as funções de inicialização do Firebase App
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
     // Importa as funções necessárias para o Firestore
@@ -313,6 +311,8 @@
     
     console.log("Firebase e Firestore inicializados!");
   </script>
+
+  
 ue o bloco <script type="module"> rode antes.
 let db, producoesCol;
 document.addEventListener("DOMContentLoaded", ()=>{
