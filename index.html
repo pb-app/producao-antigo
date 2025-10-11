@@ -135,6 +135,11 @@
                 </div>
 
                 <div>
+                    <label>Referência/CPB</label>
+                    <input type="text" id="refCpb" />
+                </div>
+
+                <div>
                     <label>Produção Prevista</label>
                     <input type="number" id="prevista" min="0" required />
                 </div>
@@ -186,6 +191,7 @@
                     <option>Turno 2 (5x2)</option>
                 </select>
                 <input type="text" id="filtroMaquina" placeholder="Máquina..." />
+                <input type="text" id="filtroRefCpb" placeholder="Ref/CPB..." />
                 <button onclick="filtrarHistorico()">Filtrar</button>
                 <button class="secondary" onclick="buscarTodos()">Mostrar todos</button>
                 <button style="background:green;" onclick="exportarExcel()">Exportar Excel</button>
@@ -200,6 +206,7 @@
                         <th>Operador</th>
                         <th>Máquina</th>
                         <th>Massa</th>
+                        <th>Ref/CPB</th>
                         <th>Prevista</th>
                         <th>Realizada</th>
                         <th>Quebras</th>
@@ -240,6 +247,7 @@
                     <option>Turno 2 (5x2)</option>
                 </select>
                 <input type="text" id="dashFiltroMaquina" placeholder="Máquina..." />
+                <input type="text" id="dashFiltroRefCpb" placeholder="Ref/CPB..."/>
                 <input type="text" id="dashFiltroOperador" placeholder="Operador..." /> 
                 <button onclick="atualizarDashboard()">Aplicar Filtro</button>
             </div>
@@ -398,6 +406,7 @@ document.getElementById("formProducao").addEventListener("submit", async (e)=>{
         operador:document.getElementById("operador").value,
         maquina:document.getElementById("maquinaSelect").value, 
         massa:document.getElementById("massa").value,
+        refCpb:document.getElementById("refCpb").value, // DADO ADICIONADO
         prevista:parseFloat(document.getElementById("prevista").value),
         realizada:parseFloat(document.getElementById("realizada").value),
         quebras:parseFloat(document.getElementById("quebras").value),
@@ -453,10 +462,10 @@ function deletarRegistro(docId) {
  */
 async function atualizarTabela(filtro=null){
     const tbody=document.querySelector("#tabelaHistorico tbody");
-    tbody.innerHTML="<tr><td colspan='13'>Carregando dados...</td></tr>";
+    tbody.innerHTML="<tr><td colspan='14'>Carregando dados...</td></tr>";
     
     if (!producoesCol || !window.getDocs || !window.query) {
-        tbody.innerHTML="<tr><td colspan='13'>Erro: O Firebase não está conectado.</td></tr>";
+        tbody.innerHTML="<tr><td colspan='14'>Erro: O Firebase não está conectado.</td></tr>";
         return;
     }
 
@@ -484,19 +493,20 @@ async function atualizarTabela(filtro=null){
 
         let filtrados = regs;
         
-        // 3. Filtros Locais (Setor, Turno, Máquina)
+        // 3. Filtros Locais (Setor, Turno, Máquina, Ref/CPB)
         if(filtro){
             filtrados = filtrados.filter(r => 
                 (!filtro.setor || r.setor === filtro.setor) &&
                 (!filtro.turno || r.turno === filtro.turno) &&
-                (!filtro.maquina || (r.maquina && r.maquina.toLowerCase().includes(filtro.maquina.toLowerCase())))
+                (!filtro.maquina || (r.maquina && r.maquina.toLowerCase().includes(filtro.maquina.toLowerCase()))) &&
+                (!filtro.refCpb || (r.refCpb && r.refCpb.toLowerCase().includes(filtro.refCpb.toLowerCase()))) // FILTRO ADICIONADO
             );
         }
 
         // 4. Renderiza a tabela
         tbody.innerHTML="";
         if (filtrados.length === 0) {
-               tbody.innerHTML="<tr><td colspan='13'>Nenhum registro encontrado com este filtro.</td></tr>";
+               tbody.innerHTML="<tr><td colspan='14'>Nenhum registro encontrado com este filtro.</td></tr>";
                return;
         }
         
@@ -513,7 +523,7 @@ async function atualizarTabela(filtro=null){
             const tr=document.createElement("tr");
             tr.innerHTML=`<td>${r.data}</td><td>${r.setor}</td><td>${r.turno}</td><td>${r.operador}</td>
                 <td>${r.maquina}</td><td>${r.massa}</td>
-                <td>${prev}</td><td>${real}</td><td>${queb}</td><td>${r.observacao}</td>
+                <td>${r.refCpb || ''}</td> <td>${prev}</td><td>${real}</td><td>${queb}</td><td>${r.observacao}</td>
                 <td>${percRealizadoPrevisto}</td>
                 <td>${percQuebrasRealizado}</td>
                 <td><button class="delete-btn" onclick="deletarRegistro('${r.id}')">Deletar</button></td>`; 
@@ -521,7 +531,7 @@ async function atualizarTabela(filtro=null){
         });
     } catch (error) {
        console.error("Erro ao buscar documentos: ", error);
-       tbody.innerHTML="<tr><td colspan='13'>Erro ao carregar dados. Verifique o console.</td></tr>";
+       tbody.innerHTML="<tr><td colspan='14'>Erro ao carregar dados. Verifique o console.</td></tr>";
     }
 }
 
@@ -531,7 +541,8 @@ function filtrarHistorico(){
         dataFim:document.getElementById("filtroDataFim").value,
         setor:document.getElementById("filtroSetor").value,
         turno:document.getElementById("filtroTurno").value,
-        maquina:document.getElementById("filtroMaquina").value 
+        maquina:document.getElementById("filtroMaquina").value,
+        refCpb:document.getElementById("filtroRefCpb").value // FILTRO ADICIONADO
     };
     atualizarTabela(filtro);
 }
@@ -542,6 +553,7 @@ function buscarTodos(){
     document.getElementById("filtroSetor").value = "";
     document.getElementById("filtroTurno").value = "";
     document.getElementById("filtroMaquina").value = "";
+    document.getElementById("filtroRefCpb").value = ""; // LIMPEZA ADICIONADA
     atualizarTabela(null);
 }
 
@@ -587,11 +599,14 @@ function filtrarDadosDashboardLocal(dados, filtro) {
         // Filtro de Máquina (LIKE)
         const maquinaCorreta = 
             (!filtro.maquina || (d.maquina && d.maquina.toLowerCase().includes(filtro.maquina.toLowerCase())));
+        // Filtro de Ref/CPB (LIKE) - ADICIONADO
+        const refCpbCorreto =
+            (!filtro.refCpb || (d.refCpb && d.refCpb.toLowerCase().includes(filtro.refCpb.toLowerCase())));
         // Filtro de Operador (LIKE)
         const operadorCorreto = 
             (!filtro.operador || (d.operador && d.operador.toLowerCase().includes(filtro.operador.toLowerCase())));
 
-        return setorCorreto && turnoCorreto && maquinaCorreta && operadorCorreto;
+        return setorCorreto && turnoCorreto && maquinaCorreta && refCpbCorreto && operadorCorreto;
     });
 }
 
@@ -662,6 +677,7 @@ async function atualizarDashboard(){
         setor: document.getElementById("dashFiltroSetor").value,
         turno: document.getElementById("dashFiltroTurno").value,
         maquina: document.getElementById("dashFiltroMaquina").value,
+        refCpb: document.getElementById("dashFiltroRefCpb").value.trim(), // FILTRO ADICIONADO
         operador: document.getElementById("dashFiltroOperador").value.trim() // Retira espaços
     };
     
@@ -694,7 +710,7 @@ async function atualizarDashboard(){
                 dataInicio: filtro.dataInicio, 
                 dataFim: filtro.dataFim, 
                 operador: filtro.operador,
-                setor: '', turno: '', maquina: '' // Ignora outros filtros
+                setor: '', turno: '', maquina: '', refCpb: '' // Ignora outros filtros
             };
             
             // Reutiliza o filtro local, mas apenas com os filtros de data e operador
