@@ -121,7 +121,7 @@
                         <option>Esmaltação</option>
                         <option>Embalagem</option>
                         <option>Forno Vidrado</option>
-                        <option>Forno Chacote</option>
+                        <option>Forno Chicote</option>
                     </select>
                 </div>
                 <div>
@@ -262,7 +262,8 @@
                     <option>Turno 1 (5x2)</option>
                     <option>Turno 2 (5x2)</option>
                 </select>
-                <input type="text" id="filtroMaquina" placeholder="Máquina..." />
+                <input type="text" id="filtroMaquina" placeholder="Máquina..." list="listaMaquinasFiltro" />
+                <datalist id="listaMaquinasFiltro"></datalist>
                 <input type="text" id="filtroRefCpb" placeholder="Ref/CPB..." />
                 <button onclick="filtrarHistorico()">Filtrar</button>
                 <button class="secondary" onclick="buscarTodos()">Mostrar todos</button>
@@ -309,7 +310,8 @@
                     <option>Turno 1 (5x2)</option>
                     <option>Turno 2 (5x2)</option>
                 </select>
-                <input type="text" id="dashFiltroMaquina" placeholder="Máquina..." />
+                <input type="text" id="dashFiltroMaquina" placeholder="Máquina..." list="listaMaquinasDash" />
+                <datalist id="listaMaquinasDash"></datalist>
                 <input type="text" id="dashFiltroRefCpb" placeholder="Ref/CPB..."/>
                 <input type="text" id="dashFiltroOperador" placeholder="Operador..." /> 
                 <button onclick="atualizarDashboard()">Aplicar Filtro</button>
@@ -332,8 +334,7 @@
                     <div class="kpi-card percent"><h3>% Quebras/Total</h3><p id="kpiOperadorPercQuebraTotal">N/A</p></div>
                 </div>
             </div>
-            
-            </section>
+        </section>
     </div>
 
     <script type="module">
@@ -389,6 +390,14 @@ document.addEventListener("DOMContentLoaded", ()=>{
     document.getElementById("setor").addEventListener("change", carregarOperadores);
     document.getElementById("turno").addEventListener("change", carregarOperadores);
     document.getElementById("formOperador").addEventListener("submit", cadastrarOperador);
+
+    // NOVOS LISTENERS PARA OS FILTROS
+    document.getElementById('filtroSetor').addEventListener('change', () => {
+        atualizarDatalistMaquina('filtroSetor', 'listaMaquinasFiltro');
+    });
+    document.getElementById('dashFiltroSetor').addEventListener('change', () => {
+        atualizarDatalistMaquina('dashFiltroSetor', 'listaMaquinasDash');
+    });
 });
 
 const maquinasPorSetor = {
@@ -399,9 +408,10 @@ const maquinasPorSetor = {
     "Forno Chicote":["Forno 3"]
 };
 
+// Listener para o seletor de máquina do formulário principal
 document.getElementById("setor").addEventListener("change", e=>{
-    const setor=e.target.value;
-    const maqSelect=document.getElementById("maquinaSelect");
+    const setor = e.target.value;
+    const maqSelect = document.getElementById("maquinaSelect");
     maqSelect.innerHTML='<option value="">(Selecione ou Digite)</option>';
     if(maquinasPorSetor[setor]){
         maquinasPorSetor[setor].forEach(m=>{
@@ -411,6 +421,22 @@ document.getElementById("setor").addEventListener("change", e=>{
         });
     }
 });
+
+// NOVA FUNÇÃO REUTILIZÁVEL PARA ATUALIZAR OS DATALISTS
+function atualizarDatalistMaquina(idSetor, idDatalist) {
+    const setor = document.getElementById(idSetor).value;
+    const datalist = document.getElementById(idDatalist);
+    datalist.innerHTML = ''; // Limpa opções antigas
+
+    if (maquinasPorSetor[setor]) {
+        maquinasPorSetor[setor].forEach(m => {
+            const option = document.createElement('option');
+            option.value = m;
+            datalist.appendChild(option);
+        });
+    }
+}
+
 
 function mostrarPagina(pg){
     document.querySelectorAll("section").forEach(s=>s.style.display="none");
@@ -780,8 +806,6 @@ async function exportarExcel() {
     }
 }
 
-
-// --- SEÇÃO DE GRÁFICOS REMOVIDA ---
 
 function filtrarDadosDashboardLocal(dados, filtro) {
     return dados.filter(d => 
