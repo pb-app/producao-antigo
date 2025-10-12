@@ -486,6 +486,42 @@ async function cadastrarOperador(e) {
     }
 }
 
+async function atualizarTabelaOperadores() {
+    const tbody = document.querySelector("#tabelaOperadores tbody");
+    tbody.innerHTML = "<tr><td colspan='5'>Carregando...</td></tr>";
+
+    if (!operadoresCol || !window.getDocs || !window.query) {
+        tbody.innerHTML = "<tr><td colspan='5'>Erro: Firebase não conectado.</td></tr>";
+        return;
+    }
+
+    try {
+        const q = window.query(operadoresCol, window.orderBy("nome"));
+        const snapshot = await window.getDocs(q);
+        
+        if (snapshot.empty) {
+            tbody.innerHTML = "<tr><td colspan='5'>Nenhum operador cadastrado.</td></tr>";
+            return;
+        }
+
+        tbody.innerHTML = "";
+        snapshot.forEach(doc => {
+            const op = doc.data();
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+                <td>${op.dataCadastro}</td>
+                <td>${op.nome}</td>
+                <td>${op.setor}</td>
+                <td>${op.turno}</td>
+                <td><button class="delete-btn" onclick="deletarOperador('${doc.id}')">Deletar</button></td>`;
+            tbody.appendChild(tr);
+        });
+    } catch (error) {
+        console.error("Erro ao buscar operadores:", error);
+        tbody.innerHTML = "<tr><td colspan='5'>Erro ao carregar dados.</td></tr>";
+    }
+}
+
 async function deletarOperador(docId) {
     const senhaCorreta = "pb2025";
     const senhaDigitada = prompt("Para confirmar a exclusão, digite a senha:");
