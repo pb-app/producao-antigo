@@ -383,6 +383,10 @@ document.addEventListener("DOMContentLoaded", ()=>{
     document.getElementById("data").value = today;
     document.getElementById("dataCadastroOp").value = today;
 
+    // MODIFICAÇÃO: Define a data do filtro de Histórico como hoje
+    document.getElementById("filtroDataInicio").value = today;
+    document.getElementById("filtroDataFim").value = today;
+
     const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
     document.getElementById("dashFiltroDataInicio").value = sevenDaysAgo;
     document.getElementById("dashFiltroDataFim").value = today;
@@ -391,7 +395,6 @@ document.addEventListener("DOMContentLoaded", ()=>{
     document.getElementById("turno").addEventListener("change", carregarOperadores);
     document.getElementById("formOperador").addEventListener("submit", cadastrarOperador);
 
-    // NOVOS LISTENERS PARA OS FILTROS
     document.getElementById('filtroSetor').addEventListener('change', () => {
         atualizarDatalistMaquina('filtroSetor', 'listaMaquinasFiltro');
     });
@@ -408,7 +411,6 @@ const maquinasPorSetor = {
     "Forno Chicote":["Forno 3"]
 };
 
-// Listener para o seletor de máquina do formulário principal
 document.getElementById("setor").addEventListener("change", e=>{
     const setor = e.target.value;
     const maqSelect = document.getElementById("maquinaSelect");
@@ -422,11 +424,10 @@ document.getElementById("setor").addEventListener("change", e=>{
     }
 });
 
-// NOVA FUNÇÃO REUTILIZÁVEL PARA ATUALIZAR OS DATALISTS
 function atualizarDatalistMaquina(idSetor, idDatalist) {
     const setor = document.getElementById(idSetor).value;
     const datalist = document.getElementById(idDatalist);
-    datalist.innerHTML = ''; // Limpa opções antigas
+    datalist.innerHTML = ''; 
 
     if (maquinasPorSetor[setor]) {
         maquinasPorSetor[setor].forEach(m => {
@@ -446,7 +447,8 @@ function mostrarPagina(pg){
     const linkId = `#link${pg.charAt(0).toUpperCase()}${pg.slice(1,4)}`;
     document.querySelector(linkId).classList.add("active");
     
-    if(pg==="historico") atualizarTabela();
+    // MODIFICAÇÃO: Aplica o filtro automaticamente ao abrir a página de histórico
+    if(pg==="historico") filtrarHistorico(); 
     if(pg==="dashboard") atualizarDashboard();
     if(pg==="operadores") atualizarTabelaOperadores();
 }
