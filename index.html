@@ -66,6 +66,38 @@
             color: var(--accent); 
             font-size: 26px; 
         }
+
+        /* === CSS ADICIONADO PARA LINHAS EXPANSÍVEIS === */
+        .linha-detalhes {
+            display: none; /* Começa escondida */
+            background-color: #f9f9f9;
+        }
+        .linha-detalhes td {
+            padding: 10px 15px;
+            text-align: left !important;
+            border: 0;
+        }
+        .linha-detalhes .detalhe-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 8px;
+        }
+        .detalhe-grid span {
+            font-weight: bold;
+            color: var(--primary);
+        }
+        .expand-btn {
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 16px;
+            padding: 2px 8px;
+            border-radius: 50%;
+            background-color: #ddd;
+            border: none;
+        }
+        .expand-btn:hover {
+            background-color: #ccc;
+        }
     </style>
 </head>
 <body>
@@ -74,7 +106,8 @@
     <div class="container">
         <div class="nav">
             <a href="#" id="linkLanc" class="active" onclick="mostrarPagina('lancamento')">Lançamento</a>
-            <a href="#" id="linkOper" onclick="mostrarPagina('operadores')">Cadastro Operadores</a> <a href="#" id="linkHist" onclick="mostrarPagina('historico')">Histórico</a>
+            <a href="#" id="linkOper" onclick="mostrarPagina('operadores')">Cadastro Operadores</a>
+            <a href="#" id="linkHist" onclick="mostrarPagina('historico')">Histórico</a>
             <a href="#" id="linkDash" onclick="mostrarPagina('dashboard')">Dashboard</a>
         </div>
 
@@ -85,7 +118,6 @@
                     <label>Data</label>
                     <input type="date" id="data" required />
                 </div>
-
                 <div>
                     <label>Setor</label>
                     <select id="setor" required>
@@ -97,7 +129,6 @@
                         <option>Forno Chicote</option>
                     </select>
                 </div>
-
                 <div>
                     <label>Turno</label>
                     <select id="turno" required>
@@ -111,21 +142,18 @@
                         <option>Turno 2 (5x2)</option>
                     </select>
                 </div>
-                
                 <div>
                     <label>Operador</label>
                     <select id="operadorSelect" required>
                         <option value="">Selecione o setor e turno</option>
                     </select>
                 </div>
-
                 <div>
                     <label>Máquina</label>
                     <select id="maquinaSelect" required>
                         <option value="">Selecione o setor primeiro</option>
                     </select>
                 </div>
-
                 <div>
                     <label>Massa</label>
                     <select id="massa" required>
@@ -134,32 +162,26 @@
                         <option>Faiança</option>
                     </select>
                 </div>
-
                 <div>
                     <label>Referência/CPB</label>
                     <input type="text" id="refCpb" />
                 </div>
-
                 <div>
                     <label>Produção Prevista</label>
                     <input type="number" id="prevista" min="0" required />
                 </div>
-
                 <div>
                     <label>Produção Realizada</label>
                     <input type="number" id="realizada" min="0" required />
                 </div>
-
                 <div>
                     <label>Quebras</label>
                     <input type="number" id="quebras" min="0" required />
                 </div>
-
                 <div class="full">
                     <label>Observação</label>
                     <textarea id="observacao"></textarea>
                 </div>
-
                 <div class="full" style="text-align:right;">
                     <button type="button" class="secondary" onclick="limparFormulario()">Limpar</button>
                     <button type="submit">Lançar</button>
@@ -251,22 +273,16 @@
                 <button class="secondary" onclick="buscarTodos()">Mostrar todos</button>
                 <button style="background:green;" onclick="exportarExcel()">Exportar Excel</button>
             </div>
+
             <table id="tabelaHistorico">
                 <thead>
                     <tr>
-                        <th>Data</th>
+                        <th></th> <th>Data</th>
                         <th>Setor</th>
-                        <th>Turno</th>
                         <th>Operador</th>
                         <th>Máquina</th>
-                        <th>Massa</th>
-                        <th>Ref/CPB</th>
-                        <th>Prevista</th>
                         <th>Realizada</th>
-                        <th>Quebras</th>
-                        <th>Obs</th>
-                        <th class="table-porcentagem">% Realizado/Previsto</th>
-                        <th class="table-porcentagem">% Quebras/Total</th>
+                        <th>% Realizado/Previsto</th>
                         <th>Ação</th>
                     </tr>
                 </thead>
@@ -349,7 +365,7 @@
         
         window.db = db;
         window.producoesCol = collection(db, "producoes"); 
-        window.operadoresCol = collection(db, "operadores"); // NOVA COLEÇÃO
+        window.operadoresCol = collection(db, "operadores");
         window.addDoc = addDoc;        
         window.getDocs = getDocs;      
         window.query = query;          
@@ -368,21 +384,18 @@ let db, producoesCol, operadoresCol;
 document.addEventListener("DOMContentLoaded", ()=>{
     db = window.db; 
     producoesCol = window.producoesCol; 
-    operadoresCol = window.operadoresCol; // INICIALIZA A NOVA COLEÇÃO
+    operadoresCol = window.operadoresCol;
     
     const today = new Date().toISOString().split('T')[0];
     document.getElementById("data").value = today;
-    document.getElementById("dataCadastroOp").value = today; // Data no novo formulário
+    document.getElementById("dataCadastroOp").value = today;
 
     const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
     document.getElementById("dashFiltroDataInicio").value = sevenDaysAgo;
     document.getElementById("dashFiltroDataFim").value = today;
 
-    // Adiciona listeners para carregar operadores dinamicamente
     document.getElementById("setor").addEventListener("change", carregarOperadores);
     document.getElementById("turno").addEventListener("change", carregarOperadores);
-    
-    // Adiciona listener para o novo form de operadores
     document.getElementById("formOperador").addEventListener("submit", cadastrarOperador);
 });
 
@@ -417,11 +430,21 @@ function mostrarPagina(pg){
     
     if(pg==="historico") atualizarTabela();
     if(pg==="dashboard") atualizarDashboard();
-    if(pg==="operadores") atualizarTabelaOperadores(); // ATUALIZA TABELA DE OPERADORES
+    if(pg==="operadores") atualizarTabelaOperadores();
 }
 
-
-// ====== NOVAS FUNÇÕES: CADASTRO DE OPERADORES ======
+// ====== FUNÇÃO ADICIONADA PARA EXPANDIR/RECOLHER LINHAS ======
+function toggleDetalhes(index) {
+    const detalhesRow = document.getElementById(`detalhes-${index}`);
+    const btn = event.target;
+    if (detalhesRow.style.display === "table-row") {
+        detalhesRow.style.display = "none";
+        btn.textContent = "+";
+    } else {
+        detalhesRow.style.display = "table-row";
+        btn.textContent = "-";
+    }
+}
 
 async function cadastrarOperador(e) {
     e.preventDefault();
@@ -506,6 +529,7 @@ async function carregarOperadores() {
 
     if (!setor || !turno) {
         opSelect.innerHTML = '<option value="">Selecione o setor e turno</option>';
+        opSelect.disabled = false; // Habilita para o usuário poder clicar
         return;
     }
 
@@ -536,8 +560,6 @@ async function carregarOperadores() {
 }
 
 
-// ====== FUNÇÕES EXISTENTES (Com pequenas modificações) ======
-
 document.getElementById("formProducao").addEventListener("submit", async (e)=>{
     e.preventDefault();
     if (!producoesCol || !window.addDoc) { 
@@ -548,7 +570,7 @@ document.getElementById("formProducao").addEventListener("submit", async (e)=>{
         data:document.getElementById("data").value,
         setor:document.getElementById("setor").value,
         turno:document.getElementById("turno").value,
-        operador:document.getElementById("operadorSelect").value, // MODIFICADO AQUI
+        operador:document.getElementById("operadorSelect").value,
         maquina:document.getElementById("maquinaSelect").value, 
         massa:document.getElementById("massa").value,
         refCpb:document.getElementById("refCpb").value,
@@ -575,19 +597,11 @@ function limparFormulario(){
 
 function deletarRegistro(docId) {
     if (confirm("Tem certeza que deseja deletar este registro de produção?")) {
-        if (!docId || !producoesCol || !window.deleteDoc || !window.doc) {
-            alert("Erro: ID do documento ou conexão Firebase inválida.");
-            return;
-        }
         try {
             window.deleteDoc(window.doc(db, "producoes", docId))
                 .then(() => {
                     alert("Registro deletado com sucesso!");
                     atualizarTabela(); 
-                })
-                .catch(error => {
-                    console.error("Erro ao deletar documento: ", error);
-                    alert("Erro ao deletar o registro. Verifique o console.");
                 });
         } catch (error) {
             console.error("Erro de execução na deleção: ", error);
@@ -596,13 +610,16 @@ function deletarRegistro(docId) {
     }
 }
 
+// === FUNÇÃO ATUALIZARTABELA MODIFICADA ===
 async function atualizarTabela(filtro=null){
     const tbody=document.querySelector("#tabelaHistorico tbody");
-    tbody.innerHTML="<tr><td colspan='14'>Carregando dados...</td></tr>";
+    tbody.innerHTML="<tr><td colspan='8'>Carregando dados...</td></tr>"; // Colspan ajustado para 8
+    
     if (!producoesCol || !window.getDocs || !window.query) {
-        tbody.innerHTML="<tr><td colspan='14'>Erro: O Firebase não está conectado.</td></tr>";
+        tbody.innerHTML="<tr><td colspan='8'>Erro: O Firebase não está conectado.</td></tr>";
         return;
     }
+
     const conditions = [];
     if(filtro){
         if(filtro.dataInicio) conditions.push(window.where("data", ">=", filtro.dataInicio));
@@ -610,6 +627,7 @@ async function atualizarTabela(filtro=null){
     }
     const baseOrdering = [window.orderBy("data", "desc"), window.orderBy("timestamp", "desc")];
     let q = window.query(producoesCol, ...conditions, ...baseOrdering);
+
     try {
         const querySnapshot = await window.getDocs(q);
         const regs = [];
@@ -627,28 +645,58 @@ async function atualizarTabela(filtro=null){
 
         tbody.innerHTML="";
         if (filtrados.length === 0) {
-               tbody.innerHTML="<tr><td colspan='14'>Nenhum registro encontrado com este filtro.</td></tr>";
+               tbody.innerHTML="<tr><td colspan='8'>Nenhum registro encontrado com este filtro.</td></tr>";
                return;
         }
-        filtrados.forEach(r=>{
+        
+        // LÓGICA DE CRIAÇÃO DE LINHA MODIFICADA
+        filtrados.forEach((r, index) => {
             const prev = parseFloat(r.prevista) || 0;
             const real = parseFloat(r.realizada) || 0;
             const queb = parseFloat(r.quebras) || 0;
-            const percRealizadoPrevisto = prev > 0 ? ((real / prev) * 100).toFixed(2) + '%' : (real > 0 ? 'INF' : 'N/A');
+            
+            const percRealizadoPrevisto = prev > 0 ? ((real / prev) * 100).toFixed(2) + '%' : 'N/A';
             const totalProd = real + queb;
             const percQuebrasRealizado = totalProd > 0 ? ((queb / totalProd) * 100).toFixed(2) + '%' : 'N/A';
-            const tr=document.createElement("tr");
-            tr.innerHTML=`<td>${r.data}</td><td>${r.setor}</td><td>${r.turno}</td><td>${r.operador}</td>
-                <td>${r.maquina}</td><td>${r.massa}</td>
-                <td>${r.refCpb || ''}</td><td>${prev}</td><td>${real}</td><td>${queb}</td><td>${r.observacao}</td>
+            
+            // --- LINHA PRINCIPAL (VISÍVEL) ---
+            const trPrincipal = document.createElement("tr");
+            trPrincipal.innerHTML = `
+                <td><button class="expand-btn" onclick="toggleDetalhes(${index})">+</button></td>
+                <td>${r.data}</td>
+                <td>${r.setor}</td>
+                <td>${r.operador}</td>
+                <td>${r.maquina}</td>
+                <td>${real}</td>
                 <td>${percRealizadoPrevisto}</td>
-                <td>${percQuebrasRealizado}</td>
-                <td><button class="delete-btn" onclick="deletarRegistro('${r.id}')">Deletar</button></td>`; 
-            tbody.appendChild(tr);
+                <td><button class="delete-btn" onclick="deletarRegistro('${r.id}')">Deletar</button></td>
+            `;
+            
+            // --- LINHA DE DETALHES (ESCONDIDA) ---
+            const trDetalhes = document.createElement("tr");
+            trDetalhes.classList.add("linha-detalhes");
+            trDetalhes.id = `detalhes-${index}`;
+            trDetalhes.innerHTML = `
+                <td colspan="8">
+                    <div class="detalhe-grid">
+                        <div><span>Turno:</span> ${r.turno}</div>
+                        <div><span>Massa:</span> ${r.massa}</div>
+                        <div><span>Ref/CPB:</span> ${r.refCpb || 'N/A'}</div>
+                        <div><span>Prevista:</span> ${prev}</div>
+                        <div><span>Quebras:</span> ${queb}</div>
+                        <div><span>% Quebras:</span> ${percQuebrasRealizado}</div>
+                        <div><span>Observação:</span> ${r.observacao || 'Nenhuma'}</div>
+                    </div>
+                </td>
+            `;
+            
+            tbody.appendChild(trPrincipal);
+            tbody.appendChild(trDetalhes);
         });
+
     } catch (error) {
        console.error("Erro ao buscar documentos: ", error);
-       tbody.innerHTML="<tr><td colspan='14'>Erro ao carregar dados. Verifique o console.</td></tr>";
+       tbody.innerHTML="<tr><td colspan='8'>Erro ao carregar dados. Verifique o console.</td></tr>";
     }
 }
 
@@ -674,26 +722,78 @@ function buscarTodos(){
     atualizarTabela(null);
 }
 
-function exportarExcel(){
-    const rows=[...document.querySelectorAll("#tabelaHistorico tbody tr")];
-    if(rows.length===0 || rows[0].textContent.includes('Carregando dados') || rows[0].textContent.includes('Nenhum registro')){
-        alert("Nenhum dado válido para exportar."); return;
-    }
-    const headers = [...document.querySelectorAll("#tabelaHistorico thead th")].map(th => th.textContent).slice(0, -1);
-    const data = [];
-    rows.forEach(r => {
-        const c = r.querySelectorAll("td");
-        const rowData = {};
-        for (let i = 0; i < headers.length; i++) {
-            rowData[headers[i]] = c[i].textContent;
+// === FUNÇÃO EXPORTAREXCEL MODIFICADA PARA FUNCIONAR COM OS DADOS COMPLETOS ===
+async function exportarExcel() {
+    alert("Preparando dados para exportação. Isso pode levar um momento...");
+
+    const filtro = {
+        dataInicio: document.getElementById("filtroDataInicio").value,
+        dataFim: document.getElementById("filtroDataFim").value,
+        setor: document.getElementById("filtroSetor").value,
+        turno: document.getElementById("filtroTurno").value,
+        maquina: document.getElementById("filtroMaquina").value,
+        refCpb: document.getElementById("filtroRefCpb").value
+    };
+
+    const conditions = [];
+    if(filtro.dataInicio) conditions.push(window.where("data", ">=", filtro.dataInicio));
+    if(filtro.dataFim) conditions.push(window.where("data", "<=", filtro.dataFim));
+    const baseOrdering = [window.orderBy("data", "desc"), window.orderBy("timestamp", "desc")];
+    let q = window.query(producoesCol, ...conditions, ...baseOrdering);
+    
+    try {
+        const querySnapshot = await window.getDocs(q);
+        const regs = [];
+        querySnapshot.forEach(doc => regs.push({ id: doc.id, ...doc.data() }));
+
+        let filtrados = regs.filter(r => 
+            (!filtro.setor || r.setor === filtro.setor) &&
+            (!filtro.turno || r.turno === filtro.turno) &&
+            (!filtro.maquina || (r.maquina && r.maquina.toLowerCase().includes(filtro.maquina.toLowerCase()))) &&
+            (!filtro.refCpb || (r.refCpb && r.refCpb.toLowerCase().includes(filtro.refCpb.toLowerCase())))
+        );
+
+        if (filtrados.length === 0) {
+            alert("Nenhum dado para exportar com os filtros atuais.");
+            return;
         }
-        data.push(rowData);
-    });
-    const ws=XLSX.utils.json_to_sheet(data);
-    const wb=XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb,ws,"Histórico");
-    XLSX.writeFile(wb,`Historico_Filtrado_${new Date().toISOString().split('T')[0]}.xlsx`);
+
+        const dataToExport = filtrados.map(r => {
+            const prev = parseFloat(r.prevista) || 0;
+            const real = parseFloat(r.realizada) || 0;
+            const queb = parseFloat(r.quebras) || 0;
+            const percRealizadoPrevisto = prev > 0 ? `${((real / prev) * 100).toFixed(2)}%` : 'N/A';
+            const totalProd = real + queb;
+            const percQuebrasRealizado = totalProd > 0 ? `${((queb / totalProd) * 100).toFixed(2)}%` : 'N/A';
+
+            return {
+                "Data": r.data,
+                "Setor": r.setor,
+                "Turno": r.turno,
+                "Operador": r.operador,
+                "Máquina": r.maquina,
+                "Massa": r.massa,
+                "Ref/CPB": r.refCpb,
+                "Prevista": prev,
+                "Realizada": real,
+                "Quebras": queb,
+                "Obs": r.observacao,
+                "% Realizado/Previsto": percRealizadoPrevisto,
+                "% Quebras/Total": percQuebrasRealizado,
+            };
+        });
+
+        const ws = XLSX.utils.json_to_sheet(dataToExport);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Histórico");
+        XLSX.writeFile(wb, `Historico_Filtrado_${new Date().toISOString().split('T')[0]}.xlsx`);
+
+    } catch(error) {
+        console.error("Erro ao exportar para Excel:", error);
+        alert("Ocorreu um erro ao preparar os dados para exportação.");
+    }
 }
+
 
 let grafico1, grafico2, grafico3;
 
@@ -827,13 +927,14 @@ function gerarGraficoTurnos(dados) {
 
 // Torna as funções globais para o HTML
 window.deletarRegistro = deletarRegistro;
-window.deletarOperador = deletarOperador; // NOVA FUNÇÃO GLOBAL
+window.deletarOperador = deletarOperador;
 window.filtrarHistorico = filtrarHistorico;
 window.buscarTodos = buscarTodos;
 window.exportarExcel = exportarExcel;
 window.atualizarDashboard = atualizarDashboard;
 window.limparFormulario = limparFormulario;
 window.mostrarPagina = mostrarPagina;
+window.toggleDetalhes = toggleDetalhes; // Torna a nova função acessível globalmente
 </script>
 </body>
 </html>
