@@ -383,12 +383,11 @@ document.addEventListener("DOMContentLoaded", ()=>{
     document.getElementById("data").value = today;
     document.getElementById("dataCadastroOp").value = today;
 
-    // MODIFICAÇÃO: Define a data do filtro de Histórico como hoje
     document.getElementById("filtroDataInicio").value = today;
     document.getElementById("filtroDataFim").value = today;
 
-    const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
-    document.getElementById("dashFiltroDataInicio").value = sevenDaysAgo;
+    // MODIFICAÇÃO: Define a data do filtro do Dashboard como hoje
+    document.getElementById("dashFiltroDataInicio").value = today;
     document.getElementById("dashFiltroDataFim").value = today;
 
     document.getElementById("setor").addEventListener("change", carregarOperadores);
@@ -447,7 +446,6 @@ function mostrarPagina(pg){
     const linkId = `#link${pg.charAt(0).toUpperCase()}${pg.slice(1,4)}`;
     document.querySelector(linkId).classList.add("active");
     
-    // MODIFICAÇÃO: Aplica o filtro automaticamente ao abrir a página de histórico
     if(pg==="historico") filtrarHistorico(); 
     if(pg==="dashboard") atualizarDashboard();
     if(pg==="operadores") atualizarTabelaOperadores();
