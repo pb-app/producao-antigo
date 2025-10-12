@@ -66,10 +66,8 @@
             color: var(--accent); 
             font-size: 26px; 
         }
-
-        /* === CSS ADICIONADO PARA LINHAS EXPANSÍVEIS === */
         .linha-detalhes {
-            display: none; /* Começa escondida */
+            display: none;
             background-color: #f9f9f9;
         }
         .linha-detalhes td {
@@ -277,12 +275,13 @@
             <table id="tabelaHistorico">
                 <thead>
                     <tr>
-                        <th></th> <th>Data</th>
+                        <th></th>
+                        <th>Data</th>
                         <th>Setor</th>
                         <th>Operador</th>
                         <th>Máquina</th>
-                        <th>Realizada</th>
                         <th>% Realizado/Previsto</th>
+                        <th>% Quebras</th>
                         <th>Ação</th>
                     </tr>
                 </thead>
@@ -433,7 +432,6 @@ function mostrarPagina(pg){
     if(pg==="operadores") atualizarTabelaOperadores();
 }
 
-// ====== FUNÇÃO ADICIONADA PARA EXPANDIR/RECOLHER LINHAS ======
 function toggleDetalhes(index) {
     const detalhesRow = document.getElementById(`detalhes-${index}`);
     const btn = event.target;
@@ -529,7 +527,7 @@ async function carregarOperadores() {
 
     if (!setor || !turno) {
         opSelect.innerHTML = '<option value="">Selecione o setor e turno</option>';
-        opSelect.disabled = false; // Habilita para o usuário poder clicar
+        opSelect.disabled = false;
         return;
     }
 
@@ -610,10 +608,9 @@ function deletarRegistro(docId) {
     }
 }
 
-// === FUNÇÃO ATUALIZARTABELA MODIFICADA ===
 async function atualizarTabela(filtro=null){
     const tbody=document.querySelector("#tabelaHistorico tbody");
-    tbody.innerHTML="<tr><td colspan='8'>Carregando dados...</td></tr>"; // Colspan ajustado para 8
+    tbody.innerHTML="<tr><td colspan='8'>Carregando dados...</td></tr>";
     
     if (!producoesCol || !window.getDocs || !window.query) {
         tbody.innerHTML="<tr><td colspan='8'>Erro: O Firebase não está conectado.</td></tr>";
@@ -649,7 +646,6 @@ async function atualizarTabela(filtro=null){
                return;
         }
         
-        // LÓGICA DE CRIAÇÃO DE LINHA MODIFICADA
         filtrados.forEach((r, index) => {
             const prev = parseFloat(r.prevista) || 0;
             const real = parseFloat(r.realizada) || 0;
@@ -659,7 +655,7 @@ async function atualizarTabela(filtro=null){
             const totalProd = real + queb;
             const percQuebrasRealizado = totalProd > 0 ? ((queb / totalProd) * 100).toFixed(2) + '%' : 'N/A';
             
-            // --- LINHA PRINCIPAL (VISÍVEL) ---
+            // --- LINHA PRINCIPAL (VISÍVEL) - MODIFICADA ---
             const trPrincipal = document.createElement("tr");
             trPrincipal.innerHTML = `
                 <td><button class="expand-btn" onclick="toggleDetalhes(${index})">+</button></td>
@@ -667,12 +663,12 @@ async function atualizarTabela(filtro=null){
                 <td>${r.setor}</td>
                 <td>${r.operador}</td>
                 <td>${r.maquina}</td>
-                <td>${real}</td>
                 <td>${percRealizadoPrevisto}</td>
+                <td>${percQuebrasRealizado}</td>
                 <td><button class="delete-btn" onclick="deletarRegistro('${r.id}')">Deletar</button></td>
             `;
             
-            // --- LINHA DE DETALHES (ESCONDIDA) ---
+            // --- LINHA DE DETALHES (ESCONDIDA) - MODIFICADA ---
             const trDetalhes = document.createElement("tr");
             trDetalhes.classList.add("linha-detalhes");
             trDetalhes.id = `detalhes-${index}`;
@@ -683,8 +679,8 @@ async function atualizarTabela(filtro=null){
                         <div><span>Massa:</span> ${r.massa}</div>
                         <div><span>Ref/CPB:</span> ${r.refCpb || 'N/A'}</div>
                         <div><span>Prevista:</span> ${prev}</div>
+                        <div><span>Realizada:</span> ${real}</div>
                         <div><span>Quebras:</span> ${queb}</div>
-                        <div><span>% Quebras:</span> ${percQuebrasRealizado}</div>
                         <div><span>Observação:</span> ${r.observacao || 'Nenhuma'}</div>
                     </div>
                 </td>
@@ -722,7 +718,6 @@ function buscarTodos(){
     atualizarTabela(null);
 }
 
-// === FUNÇÃO EXPORTAREXCEL MODIFICADA PARA FUNCIONAR COM OS DADOS COMPLETOS ===
 async function exportarExcel() {
     alert("Preparando dados para exportação. Isso pode levar um momento...");
 
@@ -925,7 +920,6 @@ function gerarGraficoTurnos(dados) {
     grafico3 = new Chart(ctx, { type: 'doughnut', data: { labels, datasets: [{ label: 'Produção Realizada', data: realizado, backgroundColor: cores, hoverOffset: 8 }] }, options: { responsive: true, plugins: { title: { display: true, text: 'Distribuição da Produção por Turno' }, legend: { position: 'right' } } } });
 }
 
-// Torna as funções globais para o HTML
 window.deletarRegistro = deletarRegistro;
 window.deletarOperador = deletarOperador;
 window.filtrarHistorico = filtrarHistorico;
@@ -934,7 +928,7 @@ window.exportarExcel = exportarExcel;
 window.atualizarDashboard = atualizarDashboard;
 window.limparFormulario = limparFormulario;
 window.mostrarPagina = mostrarPagina;
-window.toggleDetalhes = toggleDetalhes; // Torna a nova função acessível globalmente
+window.toggleDetalhes = toggleDetalhes;
 </script>
 </body>
 </html>
