@@ -278,8 +278,8 @@
                         <th>Setor</th>
                         <th>Operador</th>
                         <th>Máquina</th>
-                        <th>% Realizado/Previsto</th>
-                        <th>% Quebras</th>
+                        <th>% Efic.</th>
+                        <th>% Perda</th>
                         <th>Ação</th>
                     </tr>
                 </thead>
@@ -486,7 +486,6 @@ async function cadastrarOperador(e) {
     }
 }
 
-// FUNÇÃO deletarOperador MODIFICADA
 async function deletarOperador(docId) {
     const senhaCorreta = "pb2025";
     const senhaDigitada = prompt("Para confirmar a exclusão, digite a senha:");
@@ -587,7 +586,6 @@ function limparFormulario(){
     document.getElementById("operadorSelect").innerHTML = '<option value="">Selecione o setor e turno</option>';
 }
 
-// FUNÇÃO deletarRegistro MODIFICADA
 function deletarRegistro(docId) {
     const senhaCorreta = "pb2025";
     const senhaDigitada = prompt("Para confirmar a exclusão, digite a senha:");
