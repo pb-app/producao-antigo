@@ -288,11 +288,9 @@
                         <th></th>
                         <th>Data</th>
                         <th>Setor</th>
-                        <th>Operador</th>
                         <th>Máquina</th>
                         <th>% Efic.</th>
                         <th>% Perda</th>
-                        <th>Ação</th>
                     </tr>
                 </thead>
                 <tbody></tbody>
@@ -682,10 +680,10 @@ function deletarRegistro(docId) {
 // FUNÇÃO ATUALIZARTABELA TOTALMENTE MODIFICADA PARA PAGINAÇÃO
 async function atualizarTabela(filtro, direcao = null) {
     const tbody = document.querySelector("#tabelaHistorico tbody");
-    tbody.innerHTML = "<tr><td colspan='8'>Carregando dados...</td></tr>";
+    tbody.innerHTML = "<tr><td colspan='6'>Carregando dados...</td></tr>";
 
     if (!producoesCol) {
-        tbody.innerHTML = "<tr><td colspan='8'>Erro: O Firebase não está conectado.</td></tr>";
+        tbody.innerHTML = "<tr><td colspan='6'>Erro: O Firebase não está conectado.</td></tr>";
         return;
     }
 
@@ -732,7 +730,7 @@ async function atualizarTabela(filtro, direcao = null) {
 
         tbody.innerHTML = "";
         if (filtrados.length === 0) {
-            tbody.innerHTML = `<tr><td colspan='8'>${paginaAtual > 1 ? 'Fim dos resultados.' : 'Nenhum registro encontrado.'}</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan='6'>${paginaAtual > 1 ? 'Fim dos resultados.' : 'Nenhum registro encontrado.'}</td></tr>`;
             document.getElementById('btnProxima').disabled = true;
             return;
         }
@@ -754,12 +752,12 @@ async function atualizarTabela(filtro, direcao = null) {
             const percQuebrasRealizado = totalProd > 0 ? ((queb / totalProd) * 100).toFixed(2) + '%' : 'N/A';
             
             const trPrincipal = document.createElement("tr");
-            trPrincipal.innerHTML = `<td><button class="expand-btn" onclick="toggleDetalhes(${index})">+</button></td><td>${r.data}</td><td>${r.setor}</td><td>${r.operador}</td><td>${r.maquina}</td><td>${percRealizadoPrevisto}</td><td>${percQuebrasRealizado}</td><td><button class="delete-btn" onclick="deletarRegistro('${r.id}')">Deletar</button></td>`;
+            trPrincipal.innerHTML = `<td><button class="expand-btn" onclick="toggleDetalhes(${index})">+</button></td><td>${r.data}</td><td>${r.setor}</td><td>${r.maquina}</td><td>${percRealizadoPrevisto}</td><td>${percQuebrasRealizado}</td>`;
             
             const trDetalhes = document.createElement("tr");
             trDetalhes.classList.add("linha-detalhes");
             trDetalhes.id = `detalhes-${index}`;
-            trDetalhes.innerHTML = `<td colspan="8"><div class="detalhe-grid"><div><span>Turno:</span> ${r.turno}</div><div><span>Massa:</span> ${r.massa}</div><div><span>Ref/CPB:</span> ${r.refCpb || 'N/A'}</div><div><span>Prevista:</span> ${prev}</div><div><span>Realizada:</span> ${real}</div><div><span>Quebras:</span> ${queb}</div><div><span>Observação:</span> ${r.observacao || 'Nenhuma'}</div></div></td>`;
+            trDetalhes.innerHTML = `<td colspan="6"><div class="detalhe-grid"><div><span>Operador:</span> ${r.operador}</div><div><span>Turno:</span> ${r.turno}</div><div><span>Massa:</span> ${r.massa}</div><div><span>Ref/CPB:</span> ${r.refCpb || 'N/A'}</div><div><span>Prevista:</span> ${prev}</div><div><span>Realizada:</span> ${real}</div><div><span>Quebras:</span> ${queb}</div><div><span>Observação:</span> ${r.observacao || 'Nenhuma'}</div><div><span>Ação:</span> <button class="delete-btn" onclick="deletarRegistro('${r.id}')">Deletar</button></div></div></td>`;
             
             tbody.appendChild(trPrincipal);
             tbody.appendChild(trDetalhes);
@@ -772,7 +770,7 @@ async function atualizarTabela(filtro, direcao = null) {
 
     } catch (error) {
        console.error("Erro ao buscar documentos: ", error);
-       tbody.innerHTML="<tr><td colspan='8'>Erro ao carregar dados. Verifique o console.</td></tr>";
+       tbody.innerHTML="<tr><td colspan='6'>Erro ao carregar dados. Verifique o console.</td></tr>";
     }
 }
 
