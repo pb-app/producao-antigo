@@ -152,7 +152,7 @@
                 <div>
                     <label>Operador</label>
                     <select id="operadorSelect" required>
-                        <option value="">Selecione o setor e turno</option>
+                        <option value="">Selecione o setor</option>
                     </select>
                 </div>
                 <div>
@@ -416,7 +416,7 @@ document.addEventListener("DOMContentLoaded", ()=>{
     document.getElementById("dashFiltroDataFim").value = today;
 
     document.getElementById("setor").addEventListener("change", carregarOperadores);
-    document.getElementById("turno").addEventListener("change", carregarOperadores);
+    // document.getElementById("turno").addEventListener("change", carregarOperadores); // REMOVIDO
     document.getElementById("formOperador").addEventListener("submit", cadastrarOperador);
 
     document.getElementById('filtroSetor').addEventListener('change', () => {
@@ -573,14 +573,13 @@ async function deletarOperador(docId) {
 
 async function carregarOperadores() {
     const setor = document.getElementById("setor").value;
-    const turno = document.getElementById("turno").value;
     const opSelect = document.getElementById("operadorSelect");
 
     opSelect.innerHTML = '<option value="">Carregando...</option>';
     opSelect.disabled = true;
 
-    if (!setor || !turno) {
-        opSelect.innerHTML = '<option value="">Selecione o setor e turno</option>';
+    if (!setor) {
+        opSelect.innerHTML = '<option value="">Selecione o setor</option>';
         opSelect.disabled = false;
         return;
     }
@@ -588,14 +587,13 @@ async function carregarOperadores() {
     try {
         const q = window.query(operadoresCol, 
             window.where("setor", "==", setor),
-            window.where("turno", "==", turno),
             window.orderBy("nome")
         );
         const snapshot = await window.getDocs(q);
         
         opSelect.innerHTML = '';
         if (snapshot.empty) {
-            opSelect.innerHTML = '<option value="">Nenhum operador neste turno/setor</option>';
+            opSelect.innerHTML = '<option value="">Nenhum operador neste setor</option>';
         } else {
             opSelect.innerHTML = '<option value="">Selecione um operador</option>';
             snapshot.forEach(doc => {
@@ -644,7 +642,7 @@ document.getElementById("formProducao").addEventListener("submit", async (e)=>{
 
 function limparFormulario(){
     document.getElementById("formProducao").reset();
-    document.getElementById("operadorSelect").innerHTML = '<option value="">Selecione o setor e turno</option>';
+    document.getElementById("operadorSelect").innerHTML = '<option value="">Selecione o setor</option>';
 }
 
 function deletarRegistro(docId) {
