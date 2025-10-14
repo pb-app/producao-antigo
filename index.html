@@ -1,3 +1,41 @@
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
+    import { 
+        getFirestore, collection, addDoc, getDocs, 
+        query, where, orderBy, deleteDoc, doc, limit, startAfter,
+        getDoc, updateDoc
+    } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyB2z4mFj5qVtb59uocKK8JXhMTfi8MGSTo",
+        authDomain: "acompanhamento-de-produc-b68b0.firebaseapp.com",
+        projectId: "acompanhamento-de-produc-b68b0",
+        storageBucket: "acompanhamento-de-produc-b68b0.firebasestorage.app",
+        messagingSenderId: "891709449679",
+        appId: "1:891709449679:web:43e83e076f5fb3201e1eba"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    
+    window.db = db;
+    window.producoesCol = collection(db, "producoes"); 
+    window.operadoresCol = collection(db, "operadores");
+    window.addDoc = addDoc;        
+    window.getDocs = getDocs;      
+    window.query = query;          
+    window.where = where;          
+    window.orderBy = orderBy;      
+    window.deleteDoc = deleteDoc;  
+    window.doc = doc;
+    window.limit = limit;
+    window.startAfter = startAfter;
+    window.getDoc = getDoc;
+    window.updateDoc = updateDoc;
+    
+    console.log("Firebase e Firestore inicializados!");
+</script>
+
 <script>
 // Variáveis globais
 let db, producoesCol, operadoresCol;
@@ -20,15 +58,11 @@ document.addEventListener("DOMContentLoaded", ()=>{
     document.getElementById("dashFiltroDataInicio").value = today;
     document.getElementById("dashFiltroDataFim").value = today;
 
-    // --- LINHA CORRIGIDA AQUI ---
     document.getElementById("setor").addEventListener("change", carregarOperadores);
-    // --- FIM DA LINHA CORRIGIDA ---
 
     document.getElementById("formOperador").addEventListener("submit", cadastrarOperador);
-    // LISTENERS PARA OS FORMULÁRIOS DE EDIÇÃO
     document.getElementById("formEdicaoHistorico").addEventListener("submit", salvarEdicaoHistorico);
     document.getElementById("formEdicaoOperador").addEventListener("submit", salvarEdicaoOperador);
-
 
     document.getElementById('filtroSetor').addEventListener('change', () => {
         atualizarDatalistMaquina('filtroSetor', 'listaMaquinasFiltro');
@@ -37,9 +71,7 @@ document.addEventListener("DOMContentLoaded", ()=>{
         atualizarDatalistMaquina('dashFiltroSetor', 'listaMaquinasDash');
     });
     
-    // Listeners para o modal de edição de histórico
     document.getElementById("edit-setor").addEventListener("change", () => carregarOperadores('edit-setor', 'edit-operadorSelect'));
-
 });
 
 const maquinasPorSetor = {
