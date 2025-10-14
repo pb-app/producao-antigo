@@ -14,7 +14,7 @@
       "sizes": "512x512"
     }
   ],
-  "start_url": "/",
+  "start_url": "https://pb-app.github.io/Acompanhamento-produ-o-/#",
   "display": "standalone",
   "background_color": "#e6f0ff",
   "theme_color": "#0077cc"
