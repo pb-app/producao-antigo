@@ -1,10 +1,11 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>Lançamento - Fábrica de Massa</title>
+    <!-- BIBLIOTECA PARA EXCEL ADICIONADA -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <style>
         :root {
             --primary: #0077cc;
@@ -39,6 +40,7 @@
             background: var(--card);
             border-radius: 12px;
             box-shadow: 0 6px 24px rgba(0,0,0,0.08);
+            position: relative;
         }
         h1, h2 { margin: 0 0 1rem; }
         h2 { border-bottom: 2px solid var(--muted); padding-bottom: 0.5rem; }
@@ -92,30 +94,51 @@
         button.secondary { background: #6c757d; color: white; }
         button.secondary:hover { background: #5a6268; }
         button.delete-btn { background: var(--danger); padding: 0.3rem 0.6rem; font-size: 0.8rem; }
+        button.excel-btn { background: var(--secondary); }
 
-        /* Estilos da Seção de Configurações */
-        .config-section {
+        /* --- ESTILOS DO NOVO BOTÃO DE CONFIG E MODAL --- */
+        #openConfigBtn {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
             background: var(--muted);
-            border: 1px dashed var(--border-color);
-            padding: 1rem;
-            border-radius: 8px;
-            margin-bottom: 2rem;
+            border: 1px solid var(--border-color);
+            color: var(--text-light);
+            font-size: 1.2rem;
+            padding: 0.4rem 0.7rem;
+            line-height: 1;
         }
-        .config-section h3 { margin-top: 0; font-size: 1.1rem; color: var(--primary); cursor: pointer; }
-        .config-body { display: none; }
+        #openConfigBtn:hover {
+            background: #e2e6ea;
+            color: var(--text-dark);
+        }
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 700px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        .modal-content h3 { margin-top: 0; color: var(--primary); }
         .config-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 1rem;
-            margin-top: 1rem;
+            margin-top: 1.5rem;
+            margin-bottom: 1.5rem;
         }
-        .config-password {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
-        .config-password input { flex-grow: 1; }
-        .config-password button { padding: 0.5rem 1rem; font-size: 0.9rem; background-color: var(--secondary); }
+        .modal-actions { display: flex; justify-content: flex-end; gap: 10px; }
         
         /* Histórico e Filtros */
         .history-section { margin-top: 2.5rem; }
@@ -129,7 +152,7 @@
             padding: 1rem;
             border-radius: 8px;
         }
-        .filters > div { flex: 1 1 200px; }
+        .filters > div, .filters > button { flex: 1 1 200px; }
         table {
             width: 100%;
             border-collapse: collapse;
@@ -146,11 +169,35 @@
             color: white;
             font-weight: 600;
         }
-        tbody tr:nth-child(odd) { background-color: var(--muted); }
-        tbody tr:hover { background-color: #e9ecef; }
+        tbody tr:nth-child(2n) { background-color: var(--muted); }
+        tbody tr:not(.linha-detalhes):hover { background-color: #e9ecef; }
         .efficiency-good { color: #28a745; font-weight: bold; }
         .efficiency-ok { color: #ffc107; font-weight: bold; }
         .efficiency-bad { color: #dc3545; font-weight: bold; }
+        .linha-detalhes { display: none; background-color: #f0f8ff; }
+        .linha-detalhes td { padding: 1rem 1.5rem; text-align: left !important; border-top: none; }
+        .detalhe-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); 
+            gap: 1rem; 
+        }
+        .detalhe-grid span { 
+            font-weight: bold; 
+            color: var(--primary);
+            display: block;
+            margin-bottom: 0.25rem;
+        }
+        .expand-btn { 
+            cursor: pointer; 
+            font-weight: bold; 
+            font-size: 1.1rem; 
+            padding: 0 8px; 
+            border-radius: 50%; 
+            background-color: #e9ecef;
+            border: 1px solid #ced4da;
+            line-height: 1.4;
+        }
+        .expand-btn:hover { background-color: #ced4da; }
     </style>
 </head>
 <body>
@@ -160,132 +207,80 @@
 
     <div class="container">
         
-        <!-- SEÇÃO DE CONFIGURAÇÕES (PESOS E METAS) -->
-        <div class="config-section">
-            <h3 onclick="document.getElementById('configBody').style.display = document.getElementById('configBody').style.display === 'block' ? 'none' : 'block'">
-                ⚙️ Configurações de Pesos e Metas (Clique para expandir)
-            </h3>
-            <div id="configBody" class="config-body">
-                <div class="config-grid">
-                    <div>
-                        <label for="pesoFiltro">Peso por Filtro Prensa (kg)</label>
-                        <input type="number" id="pesoFiltro" step="0.1" value="4100">
-                    </div>
-                    <div>
-                        <label for="pesoPlaca">Peso por Placa (kg)</label>
-                        <input type="number" id="pesoPlaca" step="0.1" value="39.1">
-                    </div>
-                    <div>
-                        <label for="metaKgFT">Meta KG (Filtro Prensa)</label>
-                        <input type="number" id="metaKgFT" step="100" value="12300">
-                    </div>
-                     <div>
-                        <label for="metaKgPalete">Meta KG (Paletes)</label>
-                        <input type="number" id="metaKgPalete" step="100" value="12500">
-                    </div>
-                </div>
-                <div class="config-password">
-                    <input type="password" id="configSenha" placeholder="Senha para salvar">
-                    <button onclick="salvarConfiguracoes()">Salvar Configurações</button>
-                </div>
-                <small>Digite a senha para salvar as alterações de pesos e metas. Os valores ficam salvos no seu navegador.</small>
-            </div>
-        </div>
+        <button id="openConfigBtn" title="Configurações de Pesos e Metas" onclick="openConfigModal()">⚙️</button>
 
-        <!-- FORMULÁRIO DE LANÇAMENTO -->
         <section>
             <h2>Lançar Produção</h2>
             <form id="formMassa">
-                <div>
-                    <label for="data">Data</label>
-                    <input type="date" id="data" required>
-                </div>
-                <div>
-                    <label for="turno">Turno</label>
-                    <select id="turno" required>
-                        <option value="">Selecione um turno</option>
-                        <option>Comercial</option>
-                        <option>Turno 1 (6x2)</option>
-                        <option>Turno 2 (6x2)</option>
-                        <option>Turno 3 (6x2)</option>
-                        <option>Turno 4 (6x2)</option>
-                        <option>Turno 1 (5x2)</option>
-                        <option>Turno 2 (5x2)</option>
-                    </select>
-                </div>
-                <div>
-                    <label for="qtdFT">Quantidade de Filtros (FT)</label>
-                    <input type="number" id="qtdFT" min="0" required>
-                </div>
-                <div>
-                    <label for="qtdPlacas">Quantidade de Placas</label>
-                    <input type="number" id="qtdPlacas" min="0" value="0" required>
-                </div>
-                <div class="full-width">
-                    <label for="kgPalete">Kg de Massa no Palete (Peso Real)</label>
-                    <input type="number" id="kgPalete" step="0.1" min="0" required>
-                </div>
-                <div class="full-width">
-                    <label for="observacao">Observação</label>
-                    <textarea id="observacao" placeholder="Alguma observação sobre a produção..."></textarea>
-                </div>
-                <div class="form-actions">
-                    <button type="button" class="secondary" onclick="document.getElementById('formMassa').reset(); document.getElementById('data').value = obterDataLocalFormatada();">Limpar</button>
-                    <button type="submit">Lançar Produção</button>
-                </div>
+                <div> <label for="data">Data</label> <input type="date" id="data" required> </div> <div> <label for="turno">Turno</label> <select id="turno" required> <option value="">Selecione um turno</option> <option>Comercial</option> <option>Turno 1 (6x2)</option> <option>Turno 2 (6x2)</option> <option>Turno 3 (6x2)</option> <option>Turno 4 (6x2)</option> <option>Turno 1 (5x2)</option> <option>Turno 2 (5x2)</option> </select> </div> <div> <label for="qtdFT">Quantidade de Filtros (FT)</label> <input type="number" id="qtdFT" min="0" required> </div> <div> <label for="qtdPlacas">Quantidade de Placas</label> <input type="number" id="qtdPlacas" min="0" value="0" required> </div> <div class="full-width"> <label for="kgPalete">Kg de Massa no Palete (Peso Real)</label> <input type="number" id="kgPalete" step="0.1" min="0" required> </div> <div class="full-width"> <label for="observacao">Observação</label> <textarea id="observacao" placeholder="Alguma observação sobre a produção..."></textarea> </div> <div class="form-actions"> <button type="button" class="secondary" onclick="document.getElementById('formMassa').reset(); document.getElementById('data').value = obterDataLocalFormatada();">Limpar</button> <button type="submit">Lançar Produção</button> </div>
             </form>
         </section>
 
-        <!-- SEÇÃO DE HISTÓRICO -->
         <section class="history-section">
             <h2>Histórico de Produção</h2>
             <div class="filters">
-                <div>
-                    <label for="filtroDataInicio">Data Início</label>
-                    <input type="date" id="filtroDataInicio">
-                </div>
-                <div>
-                    <label for="filtroDataFim">Data Fim</label>
-                    <input type="date" id="filtroDataFim">
-                </div>
-                <div>
-                    <label for="filtroTurno">Turno</label>
-                    <select id="filtroTurno">
-                        <option value="">Todos os Turnos</option>
-                        <option>Comercial</option>
-                        <option>Turno 1 (6x2)</option>
-                        <option>Turno 2 (6x2)</option>
-                        <option>Turno 3 (6x2)</option>
-                        <option>Turno 4 (6x2)</option>
-                        <option>Turno 1 (5x2)</option>
-                        <option>Turno 2 (5x2)</option>
-                    </select>
-                </div>
+                 <div> <label for="filtroDataInicio">Data Início</label> <input type="date" id="filtroDataInicio"> </div> <div> <label for="filtroDataFim">Data Fim</label> <input type="date" id="filtroDataFim"> </div> <div> <label for="filtroTurno">Turno</label> <select id="filtroTurno"> <option value="">Todos os Turnos</option> <option>Comercial</option> <option>Turno 1 (6x2)</option> <option>Turno 2 (6x2)</option> <option>Turno 3 (6x2)</option> <option>Turno 4 (6x2)</option> <option>Turno 1 (5x2)</option> <option>Turno 2 (5x2)</option> </select> </div>
+                 <!-- BOTÃO DE EXPORTAR ADICIONADO -->
+                 <button class="excel-btn" onclick="exportarExcel()">Exportar Excel</button>
             </div>
 
             <table>
                 <thead>
                     <tr>
+                        <th></th>
                         <th>Data</th>
                         <th>Turno</th>
-                        <th>Qtd. FT</th>
-                        <th>Qtd. Placas</th>
-                        <th>KG Calculado</th>
-                        <th>KG Palete</th>
-                        <th>% Efic. FT</th>
-                        <th>% Efic. Palete</th>
-                        <th>Ações</th>
+                        <th>% FT</th>
+                        <th>% Palete</th>
                     </tr>
                 </thead>
                 <tbody id="tabelaHistoricoBody">
-                    <!-- Linhas do histórico serão inseridas aqui via JavaScript -->
+                    <!-- Linhas do histórico -->
                 </tbody>
             </table>
         </section>
     </div>
 
+    <!-- MODAL DE CONFIGURAÇÕES -->
+    <div id="configModal" class="modal-overlay" onclick="closeConfigModal(event)">
+        <div class="modal-content">
+            <h3>Configurações de Pesos e Metas</h3>
+            <div class="config-grid">
+                <div>
+                    <label for="pesoFiltro">Peso por Filtro Prensa (kg)</label>
+                    <input type="number" id="pesoFiltro" step="0.1" value="4100">
+                </div>
+                <div>
+                    <label for="pesoPlaca">Peso por Placa (kg)</label>
+                    <input type="number" id="pesoPlaca" step="0.1" value="39.1">
+                </div>
+                <div>
+                    <label for="metaKgFT">Meta KG (Filtro Prensa)</label>
+                    <input type="number" id="metaKgFT" step="100" value="12300">
+                </div>
+                 <div>
+                    <label for="metaKgPalete">Meta KG (Paletes)</label>
+                    <input type="number" id="metaKgPalete" step="100" value="12500">
+                </div>
+            </div>
+            <div class="modal-actions">
+                <input type="password" id="configSenha" placeholder="Senha para salvar" style="flex-grow: 1;">
+                <button type="button" class="secondary" onclick="closeConfigModal(event, true)">Cancelar</button>
+                <button onclick="salvarConfiguracoes()">Salvar</button>
+            </div>
+        </div>
+    </div>
+
 <script>
-    // --- FUNÇÃO PARA OBTER DATA LOCAL ---
+    function openConfigModal() {
+        document.getElementById('configModal').style.display = 'flex';
+    }
+    function closeConfigModal(event, force = false) {
+        if (force || event.target.id === 'configModal') {
+             document.getElementById('configModal').style.display = 'none';
+        }
+    }
+
     function obterDataLocalFormatada() {
         const data = new Date();
         const ano = data.getFullYear();
@@ -294,25 +289,22 @@
         return `${ano}-${mes}-${dia}`;
     }
 
-    // --- LÓGICA DE CONFIGURAÇÕES ---
     function salvarConfiguracoes() {
-        const senha = document.getElementById('configSenha').value;
-        if (senha !== 'pb2025') {
+        if (document.getElementById('configSenha').value !== 'pb2025') {
             alert('Senha incorreta!');
             return;
         }
-
         const config = {
             pesoFiltro: document.getElementById('pesoFiltro').value,
             pesoPlaca: document.getElementById('pesoPlaca').value,
             metaKgFT: document.getElementById('metaKgFT').value,
             metaKgPalete: document.getElementById('metaKgPalete').value
         };
-
         localStorage.setItem('configMassa', JSON.stringify(config));
         alert('Configurações salvas com sucesso!');
         document.getElementById('configSenha').value = '';
-        renderizarHistorico(); // Atualiza a tabela com as novas metas
+        closeConfigModal({target: {id: 'configModal'}});
+        renderizarHistorico();
     }
 
     function carregarConfiguracoes() {
@@ -326,24 +318,16 @@
         }
     }
 
-    // --- LÓGICA DO FORMULÁRIO E DADOS ---
     document.getElementById('formMassa').addEventListener('submit', function(event) {
         event.preventDefault();
-
-        // 1. Pega os pesos e metas salvos
         const config = JSON.parse(localStorage.getItem('configMassa')) || {};
         const pesoFiltro = parseFloat(config.pesoFiltro || document.getElementById('pesoFiltro').value);
         const pesoPlaca = parseFloat(config.pesoPlaca || document.getElementById('pesoPlaca').value);
-
-        // 2. Pega os dados do formulário
         const qtdFT = parseInt(document.getElementById('qtdFT').value);
         const qtdPlacas = parseInt(document.getElementById('qtdPlacas').value);
-
-        // 3. Calcula o KG Teórico
         const kgCalculado = (qtdFT * pesoFiltro) + (qtdPlacas * pesoPlaca);
-
         const novoRegistro = {
-            id: Date.now(), // ID único para o registro
+            id: Date.now(),
             data: document.getElementById('data').value,
             turno: document.getElementById('turno').value,
             qtdFT: qtdFT,
@@ -352,79 +336,131 @@
             observacao: document.getElementById('observacao').value,
             kgCalculado: kgCalculado
         };
-
-        // 4. Salva no localStorage
         const historico = JSON.parse(localStorage.getItem('historicoMassa')) || [];
         historico.push(novoRegistro);
         localStorage.setItem('historicoMassa', JSON.stringify(historico));
-
-        // 5. Atualiza a tela
         renderizarHistorico();
         alert('Produção lançada com sucesso!');
         this.reset();
         document.getElementById('data').value = obterDataLocalFormatada();
     });
     
-    // --- LÓGICA DO HISTÓRICO E FILTROS ---
-    function renderizarHistorico() {
+    // --- LÓGICA DE FILTRO E RENDERIZAÇÃO ---
+    function getFilteredData() {
         const historico = JSON.parse(localStorage.getItem('historicoMassa')) || [];
-        const config = JSON.parse(localStorage.getItem('configMassa')) || {};
-        const metaKgFT = parseFloat(config.metaKgFT || document.getElementById('metaKgFT').value) || 1;
-        const metaKgPalete = parseFloat(config.metaKgPalete || document.getElementById('metaKgPalete').value) || 1;
-        
-        const tbody = document.getElementById('tabelaHistoricoBody');
-        tbody.innerHTML = '';
-
-        // Aplica os filtros
         const filtroDataInicio = document.getElementById('filtroDataInicio').value;
         const filtroDataFim = document.getElementById('filtroDataFim').value;
         const filtroTurno = document.getElementById('filtroTurno').value;
 
-        const dadosFiltrados = historico.filter(reg => {
-            const dataReg = new Date(reg.data + 'T00:00:00'); // Adiciona T00:00 para evitar problemas de fuso
+        return historico.filter(reg => {
+            const dataReg = new Date(reg.data + 'T00:00:00');
             if (filtroDataInicio && dataReg < new Date(filtroDataInicio + 'T00:00:00')) return false;
             if (filtroDataFim && dataReg > new Date(filtroDataFim + 'T00:00:00')) return false;
             if (filtroTurno && reg.turno !== filtroTurno) return false;
             return true;
-        }).sort((a, b) => new Date(b.data) - new Date(a.data)); // Ordena do mais novo para o mais antigo
+        }).sort((a, b) => b.id - a.id);
+    }
+
+    function renderizarHistorico() {
+        const dadosFiltrados = getFilteredData();
+        const config = JSON.parse(localStorage.getItem('configMassa')) || {};
+        const metaKgFT = parseFloat(config.metaKgFT || document.getElementById('metaKgFT').value) || 1;
+        const metaKgPalete = parseFloat(config.metaKgPalete || document.getElementById('metaKgPalete').value) || 1;
+        const tbody = document.getElementById('tabelaHistoricoBody');
+        tbody.innerHTML = '';
 
         if (dadosFiltrados.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="9">Nenhum registro encontrado.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="5">Nenhum registro encontrado.</td></tr>';
             return;
         }
 
         dadosFiltrados.forEach(reg => {
             const eficFT = (reg.kgCalculado / metaKgFT) * 100;
             const eficPalete = (reg.kgPalete / metaKgPalete) * 100;
-
             const getEficClass = (perc) => {
                 if (perc >= 98) return 'efficiency-good';
                 if (perc >= 90) return 'efficiency-ok';
                 return 'efficiency-bad';
             };
-
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
+            const trPrincipal = document.createElement('tr');
+            trPrincipal.innerHTML = `
+                <td><button class="expand-btn" onclick="toggleDetalhes(${reg.id})">+</button></td>
                 <td>${new Date(reg.data + 'T00:00:00').toLocaleDateString('pt-BR')}</td>
                 <td>${reg.turno}</td>
-                <td>${reg.qtdFT}</td>
-                <td>${reg.qtdPlacas}</td>
-                <td>${reg.kgCalculado.toFixed(2)} kg</td>
-                <td>${reg.kgPalete.toFixed(2)} kg</td>
                 <td class="${getEficClass(eficFT)}">${eficFT.toFixed(2)}%</td>
                 <td class="${getEficClass(eficPalete)}">${eficPalete.toFixed(2)}%</td>
-                <td>
-                    <button class="delete-btn" onclick="deletarRegistro(${reg.id})">Excluir</button>
+            `;
+            const trDetalhes = document.createElement('tr');
+            trDetalhes.id = `detalhes-${reg.id}`;
+            trDetalhes.className = 'linha-detalhes';
+            trDetalhes.innerHTML = `
+                <td colspan="5">
+                    <div class="detalhe-grid">
+                        <div><span>KG Calculado:</span> ${reg.kgCalculado.toFixed(2)} kg</div>
+                        <div><span>KG Palete (Real):</span> ${reg.kgPalete.toFixed(2)} kg</div>
+                        <div><span>Qtd. Filtros (FT):</span> ${reg.qtdFT}</div>
+                        <div><span>Qtd. Placas:</span> ${reg.qtdPlacas}</div>
+                        <div><span>Observação:</span> ${reg.observacao || 'Nenhuma'}</div>
+                        <div>
+                            <span>Ações:</span> 
+                            <button class="delete-btn" onclick="deletarRegistro(${reg.id})">Excluir</button>
+                        </div>
+                    </div>
                 </td>
             `;
-            tbody.appendChild(tr);
+            tbody.appendChild(trPrincipal);
+            tbody.appendChild(trDetalhes);
         });
     }
 
-    function deletarRegistro(id) {
-        if (!confirm('Tem certeza que deseja excluir este lançamento?')) {
+    // --- NOVA FUNÇÃO PARA EXPORTAR EXCEL ---
+    function exportarExcel() {
+        alert('Preparando o arquivo Excel...');
+        const dadosParaExportar = getFilteredData();
+
+        if (dadosParaExportar.length === 0) {
+            alert('Nenhum dado encontrado com os filtros atuais para exportar.');
             return;
         }
+        
+        const config = JSON.parse(localStorage.getItem('configMassa')) || {};
+        const metaKgFT = parseFloat(config.metaKgFT || 1);
+        const metaKgPalete = parseFloat(config.metaKgPalete || 1);
+
+        const dadosFormatados = dadosParaExportar.map(reg => ({
+            'Data': new Date(reg.data + 'T00:00:00').toLocaleDateString('pt-BR'),
+            'Turno': reg.turno,
+            'Qtd Filtros (FT)': reg.qtdFT,
+            'Qtd Placas': reg.qtdPlacas,
+            'KG Calculado': reg.kgCalculado,
+            'KG Palete (Real)': reg.kgPalete,
+            '% Eficiência FT': ((reg.kgCalculado / metaKgFT) * 100).toFixed(2) + '%',
+            '% Eficiência Palete': ((reg.kgPalete / metaKgPalete) * 100).toFixed(2) + '%',
+            'Observação': reg.observacao
+        }));
+
+        const ws = XLSX.utils.json_to_sheet(dadosFormatados);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Histórico de Massa");
+        
+        const nomeArquivo = `Historico_Massa_${obterDataLocalFormatada()}.xlsx`;
+        XLSX.writeFile(wb, nomeArquivo);
+    }
+    
+    function toggleDetalhes(id) {
+        const detalhesRow = document.getElementById(`detalhes-${id}`);
+        const btn = event.target;
+        if (detalhesRow.style.display === "table-row") {
+            detalhesRow.style.display = "none";
+            btn.textContent = "+";
+        } else {
+            detalhesRow.style.display = "table-row";
+            btn.textContent = "-";
+        }
+    }
+
+    function deletarRegistro(id) {
+        if (!confirm('Tem certeza que deseja excluir este lançamento?')) return;
         let historico = JSON.parse(localStorage.getItem('historicoMassa')) || [];
         historico = historico.filter(reg => reg.id !== id);
         localStorage.setItem('historicoMassa', JSON.stringify(historico));
@@ -432,20 +468,14 @@
         alert('Registro excluído.');
     }
 
-    // --- INICIALIZAÇÃO DA PÁGINA ---
     document.addEventListener('DOMContentLoaded', () => {
-        // Define a data de hoje nos campos de data
         const hoje = obterDataLocalFormatada();
         document.getElementById('data').value = hoje;
         document.getElementById('filtroDataInicio').value = hoje;
         document.getElementById('filtroDataFim').value = hoje;
-
-        // Adiciona listeners aos filtros
         document.getElementById('filtroDataInicio').addEventListener('change', renderizarHistorico);
         document.getElementById('filtroDataFim').addEventListener('change', renderizarHistorico);
         document.getElementById('filtroTurno').addEventListener('change', renderizarHistorico);
-        
-        // Carrega as configurações e o histórico
         carregarConfiguracoes();
         renderizarHistorico();
     });
@@ -453,4 +483,5 @@
 </script>
 </body>
 </html>
+
 
