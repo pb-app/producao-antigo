@@ -5,9 +5,12 @@
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>Acompanhamento de Produção</title>
 
-    <link rel="manifest" href="manifest.json" />
+    <link rel="manifest" href="manifest.json?v=1.0.1" />
+    
     <meta name="theme-color" content="#0077cc">
-    <link rel="apple-touch-icon" href="icons/icon-180x180.png" />
+    
+    <link rel="apple-touch-icon" href="icons/icon-180x180.png?v=1.0.1" />
+
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <style>
         :root{--primary:#0077cc;--muted:#e6f0ff;--card:#ffffff;--accent:#ff9900;--danger:#dc3545}
@@ -405,12 +408,12 @@
         window.db = db;
         window.producoesCol = collection(db, "producoes"); 
         window.operadoresCol = collection(db, "operadores");
-        window.addDoc = addDoc;      
-        window.getDocs = getDocs;      
-        window.query = query;        
-        window.where = where;        
+        window.addDoc = addDoc;        
+        window.getDocs = getDocs;        
+        window.query = query;         
+        window.where = where;         
         window.orderBy = orderBy;      
-        window.deleteDoc = deleteDoc;  
+        window.deleteDoc = deleteDoc; 
         window.doc = doc;
         window.limit = limit;
         window.startAfter = startAfter;
@@ -1085,7 +1088,8 @@ window.fecharModal = fecharModal;
 </script>
 <script>
 if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("service-worker.js")
+  // LINHA MODIFICADA
+  navigator.serviceWorker.register("service-worker.js?v=1.0.1")
     .then(() => console.log("Service Worker registrado com sucesso."))
     .catch(err => console.log("Erro ao registrar o Service Worker:", err));
 }
