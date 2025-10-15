@@ -1,1 +1,456 @@
-tete
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Lançamento - Fábrica de Massa</title>
+    <style>
+        :root {
+            --primary: #0077cc;
+            --secondary: #28a745;
+            --muted: #f8f9fa;
+            --card: #ffffff;
+            --accent: #ff9900;
+            --danger: #dc3545;
+            --text-dark: #212529;
+            --text-light: #6c757d;
+            --border-color: #dee2e6;
+        }
+        * { box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            margin: 0;
+            background: var(--muted);
+            color: var(--text-dark);
+            line-height: 1.5;
+        }
+        header {
+            background: var(--primary);
+            color: white;
+            padding: 1rem 1.25rem;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .container {
+            max-width: 1100px;
+            margin: 1.5rem auto;
+            padding: 1.5rem;
+            background: var(--card);
+            border-radius: 12px;
+            box-shadow: 0 6px 24px rgba(0,0,0,0.08);
+        }
+        h1, h2 { margin: 0 0 1rem; }
+        h2 { border-bottom: 2px solid var(--muted); padding-bottom: 0.5rem; }
+        form {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.25rem;
+        }
+        label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+            display: block;
+            color: var(--text-light);
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(0, 119, 204, 0.2);
+        }
+        textarea { min-height: 80px; resize: vertical; }
+        .full-width { grid-column: 1 / -1; }
+        .form-actions {
+            grid-column: 1 / -1;
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+        button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.25rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: background 0.2s, transform 0.1s;
+        }
+        button:hover { filter: brightness(1.1); }
+        button:active { transform: scale(0.98); }
+        button.secondary { background: #6c757d; color: white; }
+        button.secondary:hover { background: #5a6268; }
+        button.delete-btn { background: var(--danger); padding: 0.3rem 0.6rem; font-size: 0.8rem; }
+
+        /* Estilos da Seção de Configurações */
+        .config-section {
+            background: var(--muted);
+            border: 1px dashed var(--border-color);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+        }
+        .config-section h3 { margin-top: 0; font-size: 1.1rem; color: var(--primary); cursor: pointer; }
+        .config-body { display: none; }
+        .config-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        .config-password {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .config-password input { flex-grow: 1; }
+        .config-password button { padding: 0.5rem 1rem; font-size: 0.9rem; background-color: var(--secondary); }
+        
+        /* Histórico e Filtros */
+        .history-section { margin-top: 2.5rem; }
+        .filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            background-color: var(--muted);
+            padding: 1rem;
+            border-radius: 8px;
+        }
+        .filters > div { flex: 1 1 200px; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1.5rem;
+        }
+        th, td {
+            border: 1px solid var(--border-color);
+            padding: 0.75rem;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+        th {
+            background: var(--primary);
+            color: white;
+            font-weight: 600;
+        }
+        tbody tr:nth-child(odd) { background-color: var(--muted); }
+        tbody tr:hover { background-color: #e9ecef; }
+        .efficiency-good { color: #28a745; font-weight: bold; }
+        .efficiency-ok { color: #ffc107; font-weight: bold; }
+        .efficiency-bad { color: #dc3545; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Fábrica de Massa - Lançamento de Produção</h1>
+    </header>
+
+    <div class="container">
+        
+        <!-- SEÇÃO DE CONFIGURAÇÕES (PESOS E METAS) -->
+        <div class="config-section">
+            <h3 onclick="document.getElementById('configBody').style.display = document.getElementById('configBody').style.display === 'block' ? 'none' : 'block'">
+                ⚙️ Configurações de Pesos e Metas (Clique para expandir)
+            </h3>
+            <div id="configBody" class="config-body">
+                <div class="config-grid">
+                    <div>
+                        <label for="pesoFiltro">Peso por Filtro Prensa (kg)</label>
+                        <input type="number" id="pesoFiltro" step="0.1" value="4100">
+                    </div>
+                    <div>
+                        <label for="pesoPlaca">Peso por Placa (kg)</label>
+                        <input type="number" id="pesoPlaca" step="0.1" value="39.1">
+                    </div>
+                    <div>
+                        <label for="metaKgFT">Meta KG (Filtro Prensa)</label>
+                        <input type="number" id="metaKgFT" step="100" value="12300">
+                    </div>
+                     <div>
+                        <label for="metaKgPalete">Meta KG (Paletes)</label>
+                        <input type="number" id="metaKgPalete" step="100" value="12500">
+                    </div>
+                </div>
+                <div class="config-password">
+                    <input type="password" id="configSenha" placeholder="Senha para salvar">
+                    <button onclick="salvarConfiguracoes()">Salvar Configurações</button>
+                </div>
+                <small>Digite a senha para salvar as alterações de pesos e metas. Os valores ficam salvos no seu navegador.</small>
+            </div>
+        </div>
+
+        <!-- FORMULÁRIO DE LANÇAMENTO -->
+        <section>
+            <h2>Lançar Produção</h2>
+            <form id="formMassa">
+                <div>
+                    <label for="data">Data</label>
+                    <input type="date" id="data" required>
+                </div>
+                <div>
+                    <label for="turno">Turno</label>
+                    <select id="turno" required>
+                        <option value="">Selecione um turno</option>
+                        <option>Comercial</option>
+                        <option>Turno 1 (6x2)</option>
+                        <option>Turno 2 (6x2)</option>
+                        <option>Turno 3 (6x2)</option>
+                        <option>Turno 4 (6x2)</option>
+                        <option>Turno 1 (5x2)</option>
+                        <option>Turno 2 (5x2)</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="qtdFT">Quantidade de Filtros (FT)</label>
+                    <input type="number" id="qtdFT" min="0" required>
+                </div>
+                <div>
+                    <label for="qtdPlacas">Quantidade de Placas</label>
+                    <input type="number" id="qtdPlacas" min="0" value="0" required>
+                </div>
+                <div class="full-width">
+                    <label for="kgPalete">Kg de Massa no Palete (Peso Real)</label>
+                    <input type="number" id="kgPalete" step="0.1" min="0" required>
+                </div>
+                <div class="full-width">
+                    <label for="observacao">Observação</label>
+                    <textarea id="observacao" placeholder="Alguma observação sobre a produção..."></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="secondary" onclick="document.getElementById('formMassa').reset(); document.getElementById('data').value = obterDataLocalFormatada();">Limpar</button>
+                    <button type="submit">Lançar Produção</button>
+                </div>
+            </form>
+        </section>
+
+        <!-- SEÇÃO DE HISTÓRICO -->
+        <section class="history-section">
+            <h2>Histórico de Produção</h2>
+            <div class="filters">
+                <div>
+                    <label for="filtroDataInicio">Data Início</label>
+                    <input type="date" id="filtroDataInicio">
+                </div>
+                <div>
+                    <label for="filtroDataFim">Data Fim</label>
+                    <input type="date" id="filtroDataFim">
+                </div>
+                <div>
+                    <label for="filtroTurno">Turno</label>
+                    <select id="filtroTurno">
+                        <option value="">Todos os Turnos</option>
+                        <option>Comercial</option>
+                        <option>Turno 1 (6x2)</option>
+                        <option>Turno 2 (6x2)</option>
+                        <option>Turno 3 (6x2)</option>
+                        <option>Turno 4 (6x2)</option>
+                        <option>Turno 1 (5x2)</option>
+                        <option>Turno 2 (5x2)</option>
+                    </select>
+                </div>
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Data</th>
+                        <th>Turno</th>
+                        <th>Qtd. FT</th>
+                        <th>Qtd. Placas</th>
+                        <th>KG Calculado</th>
+                        <th>KG Palete</th>
+                        <th>% Efic. FT</th>
+                        <th>% Efic. Palete</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="tabelaHistoricoBody">
+                    <!-- Linhas do histórico serão inseridas aqui via JavaScript -->
+                </tbody>
+            </table>
+        </section>
+    </div>
+
+<script>
+    // --- FUNÇÃO PARA OBTER DATA LOCAL ---
+    function obterDataLocalFormatada() {
+        const data = new Date();
+        const ano = data.getFullYear();
+        const mes = String(data.getMonth() + 1).padStart(2, '0');
+        const dia = String(data.getDate()).padStart(2, '0');
+        return `${ano}-${mes}-${dia}`;
+    }
+
+    // --- LÓGICA DE CONFIGURAÇÕES ---
+    function salvarConfiguracoes() {
+        const senha = document.getElementById('configSenha').value;
+        if (senha !== 'pb2025') {
+            alert('Senha incorreta!');
+            return;
+        }
+
+        const config = {
+            pesoFiltro: document.getElementById('pesoFiltro').value,
+            pesoPlaca: document.getElementById('pesoPlaca').value,
+            metaKgFT: document.getElementById('metaKgFT').value,
+            metaKgPalete: document.getElementById('metaKgPalete').value
+        };
+
+        localStorage.setItem('configMassa', JSON.stringify(config));
+        alert('Configurações salvas com sucesso!');
+        document.getElementById('configSenha').value = '';
+        renderizarHistorico(); // Atualiza a tabela com as novas metas
+    }
+
+    function carregarConfiguracoes() {
+        const configSalva = localStorage.getItem('configMassa');
+        if (configSalva) {
+            const config = JSON.parse(configSalva);
+            document.getElementById('pesoFiltro').value = config.pesoFiltro || '4100';
+            document.getElementById('pesoPlaca').value = config.pesoPlaca || '39.1';
+            document.getElementById('metaKgFT').value = config.metaKgFT || '12300';
+            document.getElementById('metaKgPalete').value = config.metaKgPalete || '12500';
+        }
+    }
+
+    // --- LÓGICA DO FORMULÁRIO E DADOS ---
+    document.getElementById('formMassa').addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        // 1. Pega os pesos e metas salvos
+        const config = JSON.parse(localStorage.getItem('configMassa')) || {};
+        const pesoFiltro = parseFloat(config.pesoFiltro || document.getElementById('pesoFiltro').value);
+        const pesoPlaca = parseFloat(config.pesoPlaca || document.getElementById('pesoPlaca').value);
+
+        // 2. Pega os dados do formulário
+        const qtdFT = parseInt(document.getElementById('qtdFT').value);
+        const qtdPlacas = parseInt(document.getElementById('qtdPlacas').value);
+
+        // 3. Calcula o KG Teórico
+        const kgCalculado = (qtdFT * pesoFiltro) + (qtdPlacas * pesoPlaca);
+
+        const novoRegistro = {
+            id: Date.now(), // ID único para o registro
+            data: document.getElementById('data').value,
+            turno: document.getElementById('turno').value,
+            qtdFT: qtdFT,
+            qtdPlacas: qtdPlacas,
+            kgPalete: parseFloat(document.getElementById('kgPalete').value),
+            observacao: document.getElementById('observacao').value,
+            kgCalculado: kgCalculado
+        };
+
+        // 4. Salva no localStorage
+        const historico = JSON.parse(localStorage.getItem('historicoMassa')) || [];
+        historico.push(novoRegistro);
+        localStorage.setItem('historicoMassa', JSON.stringify(historico));
+
+        // 5. Atualiza a tela
+        renderizarHistorico();
+        alert('Produção lançada com sucesso!');
+        this.reset();
+        document.getElementById('data').value = obterDataLocalFormatada();
+    });
+    
+    // --- LÓGICA DO HISTÓRICO E FILTROS ---
+    function renderizarHistorico() {
+        const historico = JSON.parse(localStorage.getItem('historicoMassa')) || [];
+        const config = JSON.parse(localStorage.getItem('configMassa')) || {};
+        const metaKgFT = parseFloat(config.metaKgFT || document.getElementById('metaKgFT').value) || 1;
+        const metaKgPalete = parseFloat(config.metaKgPalete || document.getElementById('metaKgPalete').value) || 1;
+        
+        const tbody = document.getElementById('tabelaHistoricoBody');
+        tbody.innerHTML = '';
+
+        // Aplica os filtros
+        const filtroDataInicio = document.getElementById('filtroDataInicio').value;
+        const filtroDataFim = document.getElementById('filtroDataFim').value;
+        const filtroTurno = document.getElementById('filtroTurno').value;
+
+        const dadosFiltrados = historico.filter(reg => {
+            const dataReg = new Date(reg.data + 'T00:00:00'); // Adiciona T00:00 para evitar problemas de fuso
+            if (filtroDataInicio && dataReg < new Date(filtroDataInicio + 'T00:00:00')) return false;
+            if (filtroDataFim && dataReg > new Date(filtroDataFim + 'T00:00:00')) return false;
+            if (filtroTurno && reg.turno !== filtroTurno) return false;
+            return true;
+        }).sort((a, b) => new Date(b.data) - new Date(a.data)); // Ordena do mais novo para o mais antigo
+
+        if (dadosFiltrados.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="9">Nenhum registro encontrado.</td></tr>';
+            return;
+        }
+
+        dadosFiltrados.forEach(reg => {
+            const eficFT = (reg.kgCalculado / metaKgFT) * 100;
+            const eficPalete = (reg.kgPalete / metaKgPalete) * 100;
+
+            const getEficClass = (perc) => {
+                if (perc >= 98) return 'efficiency-good';
+                if (perc >= 90) return 'efficiency-ok';
+                return 'efficiency-bad';
+            };
+
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${new Date(reg.data + 'T00:00:00').toLocaleDateString('pt-BR')}</td>
+                <td>${reg.turno}</td>
+                <td>${reg.qtdFT}</td>
+                <td>${reg.qtdPlacas}</td>
+                <td>${reg.kgCalculado.toFixed(2)} kg</td>
+                <td>${reg.kgPalete.toFixed(2)} kg</td>
+                <td class="${getEficClass(eficFT)}">${eficFT.toFixed(2)}%</td>
+                <td class="${getEficClass(eficPalete)}">${eficPalete.toFixed(2)}%</td>
+                <td>
+                    <button class="delete-btn" onclick="deletarRegistro(${reg.id})">Excluir</button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    function deletarRegistro(id) {
+        if (!confirm('Tem certeza que deseja excluir este lançamento?')) {
+            return;
+        }
+        let historico = JSON.parse(localStorage.getItem('historicoMassa')) || [];
+        historico = historico.filter(reg => reg.id !== id);
+        localStorage.setItem('historicoMassa', JSON.stringify(historico));
+        renderizarHistorico();
+        alert('Registro excluído.');
+    }
+
+    // --- INICIALIZAÇÃO DA PÁGINA ---
+    document.addEventListener('DOMContentLoaded', () => {
+        // Define a data de hoje nos campos de data
+        const hoje = obterDataLocalFormatada();
+        document.getElementById('data').value = hoje;
+        document.getElementById('filtroDataInicio').value = hoje;
+        document.getElementById('filtroDataFim').value = hoje;
+
+        // Adiciona listeners aos filtros
+        document.getElementById('filtroDataInicio').addEventListener('change', renderizarHistorico);
+        document.getElementById('filtroDataFim').addEventListener('change', renderizarHistorico);
+        document.getElementById('filtroTurno').addEventListener('change', renderizarHistorico);
+        
+        // Carrega as configurações e o histórico
+        carregarConfiguracoes();
+        renderizarHistorico();
+    });
+
+</script>
+</body>
+</html>
+
