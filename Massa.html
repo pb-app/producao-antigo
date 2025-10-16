@@ -5,7 +5,8 @@
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>Lançamento - Fábrica de Massa</title>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> 
+    <style>
         :root {
             --primary: #0077cc;
             --secondary: #28a745;
@@ -195,56 +196,18 @@
             border-bottom: 2px solid var(--border-color);
             margin-bottom: 1.5rem;
         }
-        .tab-link {
-            padding: 0.75rem 1.25rem;
-            cursor: pointer;
-            border: none;
-            background: none;
-            font-size: 1rem;
-            font-weight: 600;
-            color: var(--text-light);
-            border-bottom: 3px solid transparent;
-            margin-bottom: -2px;
-        }
-        .tab-link.active {
-            color: var(--primary);
-            border-bottom-color: var(--primary);
-        }
+        .tab-link { padding: 0.75rem 1.25rem; cursor: pointer; border: none; background: none; font-size: 1rem; font-weight: 600; color: var(--text-light); border-bottom: 3px solid transparent; margin-bottom: -2px; }
+        .tab-link.active { color: var(--primary); border-bottom-color: var(--primary); }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
         
         /* --- ESTILOS PARA NOVA SEÇÃO DE PALETES --- */
-        .paletes-fieldset {
-            grid-column: 1 / -1;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 1rem;
-            margin-top: 1rem;
-        }
-        .paletes-fieldset legend {
-            font-weight: 600;
-            color: var(--primary);
-            padding: 0 0.5rem;
-        }
-        .palete-entry-row {
-            display: grid;
-            grid-template-columns: 2fr 1fr 1fr;
-            gap: 1rem;
-            align-items: center;
-            margin-bottom: 1rem;
-        }
-        .palete-entry-row:last-child {
-            margin-bottom: 0;
-        }
-        .palete-peso-total {
-            font-weight: bold;
-            font-size: 1.1rem;
-        }
-        #kgPalete {
-            background-color: #e9ecef;
-            font-weight: bold;
-            color: var(--primary);
-        }
+        .paletes-fieldset { grid-column: 1 / -1; border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; margin-top: 1rem; }
+        .paletes-fieldset legend { font-weight: 600; color: var(--primary); padding: 0 0.5rem; }
+        .palete-entry-row { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 1rem; align-items: center; margin-bottom: 1rem; }
+        .palete-entry-row:last-child { margin-bottom: 0; }
+        .palete-peso-total { font-weight: bold; font-size: 1.1rem; }
+        #kgPalete { background-color: #e9ecef; font-weight: bold; color: var(--primary); }
         
         /* --- ESTILOS DO DASHBOARD --- */
         .dashboard-filters {
@@ -255,56 +218,66 @@
             background-color: var(--muted);
             padding: 1rem;
             border-radius: 8px;
+            align-items: flex-end;
         }
-         .dashboard-filters > div {
-            flex: 1 1 150px;
-        }
-        .kpi-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2.5rem;
-        }
-        .kpi-card {
-            background-color: #fff;
-            padding: 1.5rem;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-            border-left: 5px solid var(--primary);
-        }
-        .kpi-card h3 {
-            margin: 0 0 0.5rem;
-            font-size: 1rem;
-            color: var(--text-light);
-            font-weight: 500;
-        }
-        .kpi-card .value {
-            font-size: 2.25rem;
-            font-weight: 700;
-            color: var(--text-dark);
-        }
+        .dashboard-filters > div { flex: 1 1 150px; }
+        .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 2.5rem; }
+        .kpi-card { background-color: #fff; padding: 1.5rem; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border-left: 5px solid var(--primary); }
+        .kpi-card h3 { margin: 0 0 0.5rem; font-size: 1rem; color: var(--text-light); font-weight: 500; }
+        .kpi-card .value { font-size: 2.25rem; font-weight: 700; color: var(--text-dark); }
         .kpi-card.efficiency .value.good { color: var(--secondary); }
         .kpi-card.efficiency .value.bad { color: var(--danger); }
 
-        .chart-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1.5rem;
+        .chart-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+        .chart-container { background-color: #fff; padding: 1.5rem; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .chart-container h3 { margin-top: 0; text-align: center; }
+        @media (max-width: 900px) { .chart-grid { grid-template-columns: 1fr; } }
+        
+        /* ### ESTILOS DE IMPRESSÃO OTIMIZADOS ### */
+        @page {
+            size: landscape;
+            margin: 15mm;
         }
-        .chart-container {
-            background-color: #fff;
-            padding: 1.5rem;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-        }
-         .chart-container h3 {
-            margin-top: 0;
-            text-align: center;
-        }
-        @media (max-width: 900px) {
-            .chart-grid {
-                grid-template-columns: 1fr;
+
+        @media print {
+            body {
+                background: #fff !important;
+                font-size: 10pt; /* Reduz o tamanho da fonte base */
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
             }
+            body > header, .nav-container, #openConfigBtn, .tab-nav,
+            #tabProducao, #tabPesagem, .dashboard-filters,
+            .expand-btn, .delete-btn, .edit-btn, .excel-btn, .form-actions {
+                display: none !important;
+            }
+
+            .tab-content, #tabDashboard {
+                display: block !important;
+            }
+
+            .container {
+                box-shadow: none !important; border: none !important; padding: 0 !important;
+                margin: 0 !important; width: 100% !important; max-width: 100% !important;
+            }
+
+            #tabDashboard::before {
+                content: 'Relatório de Produção - Fábrica de Massa';
+                display: block; text-align: center; font-size: 1.4rem;
+                font-weight: bold; margin-bottom: 1.5rem;
+                border-bottom: 2px solid #333; padding-bottom: 1rem;
+            }
+            
+            h2 { display: none; }
+
+            .kpi-grid { margin-bottom: 1rem; gap: 1rem; }
+            .kpi-card { padding: 0.8rem; }
+            .kpi-card h3 { font-size: 0.8rem; margin-bottom: 0.2rem; }
+            .kpi-card .value { font-size: 1.8rem; }
+
+            .chart-grid { grid-template-columns: 1fr 1fr; gap: 1rem; }
+            .chart-container { padding: 1rem; page-break-inside: avoid; box-shadow: none !important; border: 1px solid var(--border-color) !important;}
+            .chart-container h3 { font-size: 1rem; margin-bottom: 0.5rem; }
         }
     </style>
 </head>
@@ -433,24 +406,21 @@
                         <option>Comercial</option> <option>Turno 1 (6x2)</option> <option>Turno 2 (6x2)</option> <option>Turno 3 (6x2)</option> <option>Turno 4 (6x2)</option> <option>Turno 1 (5x2)</option> <option>Turno 2 (5x2)</option>
                     </select>
                 </div>
+                <button id="printDashboardBtn" onclick="window.print()" style="background-color: var(--accent);">🖨️ Imprimir Dashboard</button>
             </div>
 
             <div class="kpi-grid">
-                <div class="kpi-card">
-                    <h3>Meta FT (kg)</h3>
-                    <div class="value" id="kpiTotalMeta">---</div>
+                 <div class="kpi-card">
+                    <h3>Meta FT (kg)</h3> <div class="value" id="kpiTotalMeta">---</div>
                 </div>
                  <div class="kpi-card">
-                    <h3>Realizado FT (kg)</h3>
-                    <div class="value" id="kpiTotalRealizado">---</div>
+                    <h3>Realizado FT (kg)</h3> <div class="value" id="kpiTotalRealizado">---</div>
                 </div>
                  <div class="kpi-card efficiency">
-                    <h3>Eficiência</h3>
-                    <div class="value" id="kpiEficiencia">---</div>
+                    <h3>Eficiência</h3> <div class="value" id="kpiEficiencia">---</div>
                 </div>
                  <div class="kpi-card">
-                    <h3>Retrabalho (kg)</h3>
-                    <div class="value" id="kpiRetrabalho">---</div>
+                    <h3>Retrabalho (kg)</h3> <div class="value" id="kpiRetrabalho">---</div>
                 </div>
             </div>
 
@@ -900,11 +870,14 @@
         ['filtroDataInicio', 'filtroDataFim', 'filtroTurno'].forEach(id => document.getElementById(id).addEventListener('change', renderizarHistorico));
         ['dashFiltroDataInicio', 'dashFiltroDataFim', 'dashFiltroTurno'].forEach(id => document.getElementById(id).addEventListener('change', atualizarDashboard));
         document.getElementById('filtroTurnoGraficoMes').addEventListener('change', gerarGraficoProducaoMensal);
+        
         await carregarConfiguracoes(); 
         await carregarOpcoesPaletes();
+        
         renderizarHistorico();
         renderizarHistoricoPesagem();
         calcularPesoTotalPaletes();
+        
         await atualizarDashboard();
         await gerarGraficoProducaoMensal();
     });
@@ -915,7 +888,7 @@
     async function renderizarHistoricoPesagem(){const d=document.getElementById("tabelaPesagemBody");d.innerHTML='<tr><td colspan="4">Carregando dados...</td></tr>';try{const t=await window.getDocs(window.query(window.pesagemCol,window.orderBy("codigo")));if(d.innerHTML="",t.empty){d.innerHTML='<tr><td colspan="4">Nenhum registro de pesagem encontrado.</td></tr>';return}t.forEach(t=>{const o=t.data(),e=t.id,n=document.createElement("tr");n.innerHTML=`\n <td>${new Date(o.data+"T03:00:00").toLocaleDateString("pt-BR")}</td>\n <td>${o.codigo}</td>\n <td>${o.peso.toFixed(2)} kg</td>\n <td>\n <button class="edit-btn" onclick='editarRegistroPesagem("${e}", ${JSON.stringify(o)})'>Editar</button>\n <button class="delete-btn" onclick="deletarRegistroPesagem('${e}')">Excluir</button>\n </td>\n `,d.appendChild(n)})}catch(t){console.error("Erro ao buscar histórico de pesagem: ",t),d.innerHTML='<tr><td colspan="4">Erro ao carregar dados.</td></tr>'}};
     window.editarRegistroPesagem=async function(d,t){const o=prompt("Para editar, por favor, insira a senha:");if("pb2025"!==o)return void alert("Senha incorreta. Operação cancelada.");const e=prompt("Editar Data (AAAA-MM-DD):",t.data);if(null===e)return;const n=prompt("Editar Código:",t.codigo);if(null===n)return;const a=prompt("Editar Peso (kg):",t.peso);if(null===a)return;const r={...t,data:e,codigo:n.trim().toUpperCase(),peso:parseFloat(a)};if(isNaN(r.peso)||!r.codigo)return void alert("Dados inválidos. A edição foi cancelada.");try{await window.setDoc(window.doc(db,"pesagem_paletes",d),r),alert("Registro atualizado com sucesso!"),renderizarHistoricoPesagem(),carregarOpcoesPaletes()}catch(d){console.error("Erro ao atualizar registro: ",d),alert("Falha ao atualizar o registro.")}};
     window.deletarRegistroPesagem=async function(d){const t=prompt("Para excluir, por favor, insira a senha:");if("pb2025"!==t)return void alert("Senha incorreta. Operação cancelada.");if(confirm("Tem certeza que deseja excluir este registro de pesagem?"))try{await window.deleteDoc(window.doc(db,"pesagem_paletes",d)),alert("Registro excluído com sucesso!"),renderizarHistoricoPesagem(),carregarOpcoesPaletes()}catch(d){console.error("Erro ao excluir registro de pesagem:",d),alert("Falha ao excluir o registro.")}};
-    async function exportarExcel(){alert("Preparando o arquivo Excel com dados do Firebase...");const d=document.getElementById("filtroDataInicio").value,t=document.getElementById("filtroDataFim").value,o=document.getElementById("filtroTurno").value;let e=[window.orderBy("data","desc"),window.orderBy("timestamp","desc")];d&&e.push(window.where("data",">=",d)),t&&e.push(window.where("data","<=",t)),o&&e.push(window.where("turno","==",o));try{const d=await window.getDocs(window.query(window.massaCol,...e)),t=d.docs.map(d=>d.data());if(0===t.length)return void alert("Nenhum dado encontrado para exportar.");const o=t.map(d=>{var t,o;const e=d.metaKgFT||appConfig.metaKgFT,n=d.metaKgPalete||appConfig.metaKgPalete,a=(null!==(t=d.retrabalhoKg)?t:d.kgPalete-d.kgCalculado);return{'Data':new Date(d.data+"T03:00:00").toLocaleDateString("pt-BR"),'Turno':d.turno,'Qtd Filtros (FT)':d.qtdFT,'Qtd Placas':d.qtdPlacas,'KG Calculado':d.kgCalculado.toFixed(2),'KG Palete (Real)':d.kgPalete.toFixed(2),'Retrabalho (kg)':a.toFixed(2),'Meta FT (kg)':e.toFixed(2),'Meta Palete (kg)':n.toFixed(2),'% Eficiência FT':(d.kgCalculado/(e||1)*100).toFixed(2)+"%",'% Eficiência Palete':(d.kgPalete/(n||1)*100).toFixed(2)+"%",'Observação':d.observacao}}),n=XLSX.utils.json_to_sheet(o),a=XLSX.utils.book_new();XLSX.utils.book_append_sheet(a,n,"Histórico de Massa"),XLSX.writeFile(a,`Historico_Massa_${obterDataLocalFormatada()}.xlsx`)}catch(d){console.error("Erro ao exportar dados do Firebase: ",d),alert("Ocorreu um erro ao preparar o arquivo.")}};
+    async function exportarExcel(){alert("Preparando o arquivo Excel com dados do Firebase...");const d=document.getElementById("filtroDataInicio").value,t=document.getElementById("filtroDataFim").value,o=document.getElementById("filtroTurno").value;let e=[window.orderBy("data","desc"),window.orderBy("timestamp","desc")];d&&e.push(window.where("data",">=",d)),t&&e.push(window.where("data","<=",t)),o&&e.push(window.where("turno","==",o));try{const d=await window.getDocs(window.query(window.massaCol,...e)),t=d.docs.map(d=>d.data());if(0===t.length)return void alert("Nenhum dado encontrado para exportar.");const o=t.map(d=>{var t;const o=d.metaKgFT||appConfig.metaKgFT,e=d.metaKgPalete||appConfig.metaKgPalete,n=(null!==(t=d.retrabalhoKg)?t:d.kgPalete-d.kgCalculado);return{'Data':new Date(d.data+"T03:00:00").toLocaleDateString("pt-BR"),'Turno':d.turno,'Qtd Filtros (FT)':d.qtdFT,'Qtd Placas':d.qtdPlacas,'KG Calculado':d.kgCalculado.toFixed(2),'KG Palete (Real)':d.kgPalete.toFixed(2),'Retrabalho (kg)':n.toFixed(2),'Meta FT (kg)':o.toFixed(2),'Meta Palete (kg)':e.toFixed(2),'% Eficiência FT':(d.kgCalculado/(o||1)*100).toFixed(2)+"%",'% Eficiência Palete':(d.kgPalete/(e||1)*100).toFixed(2)+"%",'Observação':d.observacao}}),n=XLSX.utils.json_to_sheet(o),a=XLSX.utils.book_new();XLSX.utils.book_append_sheet(a,n,"Histórico de Massa"),XLSX.writeFile(a,`Historico_Massa_${obterDataLocalFormatada()}.xlsx`)}catch(d){console.error("Erro ao exportar dados do Firebase: ",d),alert("Ocorreu um erro ao preparar o arquivo.")}};
     </script>
 </body>
 </html>
