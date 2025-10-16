@@ -4,8 +4,6 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>Lançamento - Fábrica de Massa</title>
-     <a href="index.html" style="color: black; display: block; margin-top: 5px;">Voltar para Produção Cerâmica</a>
-    <!-- BIBLIOTECA PARA EXCEL ADICIONADA -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <style>
         :root {
@@ -34,6 +32,28 @@
             text-align: center;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
+        
+        /* ESTILO ADICIONADO PARA O BOTÃO VOLTAR */
+        .nav-container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+        .back-link {
+            display: inline-block;
+            margin-top: 1rem;
+            padding: 0.5rem 1rem;
+            background-color: var(--secondary);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: background-color 0.2s;
+        }
+        .back-link:hover {
+            background-color: #218838;
+        }
+
         .container {
             max-width: 1100px;
             margin: 1.5rem auto;
@@ -203,8 +223,12 @@
 </head>
 <body>
     <header>
-        <h1>Fábrica de Massa - Lançamento de Produção</h1>
+        <h1>Fábrica de Massa - Lançamento</h1>
     </header>
+
+    <div class="nav-container">
+        <a href="index.html" class="back-link">❮ Voltar para Produção Cerâmica</a>
+    </div>
 
     <div class="container">
         
@@ -213,16 +237,15 @@
         <section>
             <h2>Lançar Produção</h2>
             <form id="formMassa">
-                <div> <label for="data">Data</label> <input type="date" id="data" required> </div> <div> <label for="turno">Turno</label> <select id="turno" required> <option value="">Selecione um turno</option> <option>Comercial</option> <option>Turno 1 (6x2)</option> <option>Turno 2 (6x2)</option> <option>Turno 3 (6x2)</option> <option>Turno 4 (6x2)</option> <option>Turno 1 (5x2)</option> <option>Turno 2 (5x2)</option> </select> </div> <div> <label for="qtdFT">Quantidade de Filtros (FT)</label> <input type="number" id="qtdFT" min="0" required> </div> <div> <label for="qtdPlacas">Quantidade de Placas</label> <input type="number" id="qtdPlacas" min="0" value="0" required> </div> <div class="full-width"> <label for="kgPalete">Kg de Massa no Palete (Peso Real)</label> <input type="number" id="kgPalete" step="0.1" min="0" required> </div> <div class="full-width"> <label for="observacao">Observação</label> <textarea id="observacao" placeholder="Alguma observação sobre a produção..."></textarea> </div> <div class="form-actions"> <button type="button" class="secondary" onclick="document.getElementById('formMassa').reset(); document.getElementById('data').value = obterDataLocalFormatada();">Limpar</button> <button type="submit">Lançar Produção</button> </div>
+                <div> <label for="data">Data</label> <input type="date" id="data" required> </div> <div> <label for="turno">Turno</label> <select id="turno" required> <option value="">Selecione um turno</option> <option>Comercial</option> <option>Turno 1 (6x2)</option> <option>Turno 2 (6x2)</option> <option>Turno 3 (6x2)</option> <option>Turno 4 (6x2)</option> <option>Turno 1 (5x2)</option> <option>Turno 2 (5x2)</option> </select> </div> <div> <label for="qtdFT">Quantidade de Filtro-prensagem (FT)</label> <input type="number" id="qtdFT" min="0" required> </div> <div> <label for="qtdPlacas">Quantidade de Placas</label> <input type="number" id="qtdPlacas" min="0" value="0" required> </div> <div class="full-width"> <label for="kgPalete">Kg de Massa no Palete (Peso Real)</label> <input type="number" id="kgPalete" step="0.1" min="0" required> </div> <div class="full-width"> <label for="observacao">Observação</label> <textarea id="observacao" placeholder="Alguma observação sobre a produção..."></textarea> </div> <div class="form-actions"> <button type="button" class="secondary" onclick="document.getElementById('formMassa').reset(); document.getElementById('data').value = obterDataLocalFormatada();">Limpar</button> <button type="submit">Lançar Produção</button> </div>
             </form>
         </section>
 
         <section class="history-section">
             <h2>Histórico de Produção</h2>
             <div class="filters">
-                 <div> <label for="filtroDataInicio">Data Início</label> <input type="date" id="filtroDataInicio"> </div> <div> <label for="filtroDataFim">Data Fim</label> <input type="date" id="filtroDataFim"> </div> <div> <label for="filtroTurno">Turno</label> <select id="filtroTurno"> <option value="">Todos os Turnos</option> <option>Comercial</option> <option>Turno 1 (6x2)</option> <option>Turno 2 (6x2)</option> <option>Turno 3 (6x2)</option> <option>Turno 4 (6x2)</option> <option>Turno 1 (5x2)</option> <option>Turno 2 (5x2)</option> </select> </div>
-                 <!-- BOTÃO DE EXPORTAR ADICIONADO -->
-                 <button class="excel-btn" onclick="exportarExcel()">Exportar Excel</button>
+                  <div> <label for="filtroDataInicio">Data Início</label> <input type="date" id="filtroDataInicio"> </div> <div> <label for="filtroDataFim">Data Fim</label> <input type="date" id="filtroDataFim"> </div> <div> <label for="filtroTurno">Turno</label> <select id="filtroTurno"> <option value="">Todos os Turnos</option> <option>Comercial</option> <option>Turno 1 (6x2)</option> <option>Turno 2 (6x2)</option> <option>Turno 3 (6x2)</option> <option>Turno 4 (6x2)</option> <option>Turno 1 (5x2)</option> <option>Turno 2 (5x2)</option> </select> </div>
+                  <button class="excel-btn" onclick="exportarExcel()">Exportar Excel</button>
             </div>
 
             <table>
@@ -236,13 +259,11 @@
                     </tr>
                 </thead>
                 <tbody id="tabelaHistoricoBody">
-                    <!-- Linhas do histórico -->
-                </tbody>
+                    </tbody>
             </table>
         </section>
     </div>
 
-    <!-- MODAL DE CONFIGURAÇÕES -->
     <div id="configModal" class="modal-overlay" onclick="closeConfigModal(event)">
         <div class="modal-content">
             <h3>Configurações de Pesos e Metas</h3>
@@ -484,5 +505,3 @@
 </script>
 </body>
 </html>
-
-
