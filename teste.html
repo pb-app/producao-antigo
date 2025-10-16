@@ -1,418 +1,1162 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Acompanhamento de Produção</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Acompanhamento de Produção</title>
 
-    <link rel="manifest" href="manifest.json?v=1.0.1" />
-    
-    <meta name="theme-color" content="#0077cc">
-    
-    <link rel="apple-touch-icon" href="icons/icon-180x180.png?v=1.0.1" />
+    <link rel="manifest" href="manifest.json?v=1.0.1" />
+    
+    <meta name="theme-color" content="#0077cc">
+    
+    <link rel="apple-touch-icon" href="icons/icon-180x180.png?v=1.0.1" />
 
-    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-    <style>
-        :root{--primary:#0077cc;--muted:#f8f9fa;--card:#ffffff;--accent:#ff9900;--danger:#dc3545;--border-color:#dee2e6;--text-dark:#212529;--text-light:#6c757d;}
-        *{box-sizing:border-box}
-        body{font-family:-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;margin:0;background:var(--muted);color:var(--text-dark);line-height:1.5;}
-        header{background:var(--primary);color:white;padding:1rem 1.25rem;text-align:center;box-shadow:0 2px 4px rgba(0,0,0,0.1);}
-        .container{max-width:1100px;margin:1.5rem auto;padding:1.5rem;background:var(--card);border-radius:12px;box-shadow:0 6px 24px rgba(0,0,0,0.08);}
-        h1,h2{margin:0 0 1rem;color: var(--text-dark);}
-        h2{border-bottom:2px solid var(--muted);padding-bottom:0.5rem;}
-        .nav{display:flex;flex-wrap: wrap; gap:10px;justify-content:center;margin-bottom:1.5rem;border-bottom: 1px solid var(--border-color);padding-bottom: 1.5rem;}
-        .nav a{color:var(--primary);text-decoration:none;font-weight:600;padding:0.5rem 1rem;border-radius:8px;transition:background-color 0.2s, color 0.2s; border: 1px solid transparent;}
-        .nav a:hover{background-color:var(--muted); color: var(--text-dark);}
-        .nav a.active{background-color:var(--primary);color:white;}
-        form{display:grid;grid-template-columns:repeat(auto-fit, minmax(250px, 1fr));gap:1.25rem;}
-        label{font-size:0.9rem;font-weight:600;margin-bottom:0.25rem;display:block;color:var(--text-light);}
-        input[type="date"], input[type="text"], input[type="number"], select, textarea{width:100%;padding:0.75rem;border:1px solid var(--border-color);border-radius:8px;font-size:1rem;transition:border-color 0.2s, box-shadow 0.2s;}
-        input:focus, select:focus, textarea:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(0, 119, 204, 0.2);}
-        textarea{min-height:80px;resize:vertical;}
-        .full{grid-column:1/-1}
-        .form-actions{display:flex;justify-content:flex-end;gap:0.75rem;margin-top:1rem;}
-        button{background:var(--primary);color:white;border:none;padding:0.75rem 1.25rem;border-radius:8px;cursor:pointer;font-weight:600;font-size:1rem;transition:background 0.2s, transform 0.1s;}
-        button:hover{filter:brightness(1.1)}
-        button:active{transform:scale(0.98)}
-        button.secondary{background:#6c757d;color:white;}
-        button.secondary:hover{background:#5a6268;}
-        button.edit-btn{background:var(--accent); margin-right: 5px; padding: 0.3rem 0.6rem; font-size: 0.8rem;}
-        button.delete-btn{background:var(--danger); padding: 0.3rem 0.6rem; font-size: 0.8rem;}
-        .filtros{display:flex;flex-wrap:wrap;gap:1rem;align-items:center;margin-bottom:1.5rem;background-color:var(--muted);padding:1rem;border-radius:8px;}
-        .filtros > * {flex: 1 1 180px;}
-        table{width:100%;border-collapse:collapse;margin-top:1.5rem}
-        th,td{border:1px solid var(--border-color);padding:0.75rem;text-align:center;font-size:0.9rem}
-        th{background:var(--primary);color:white;font-weight:600;}
-        tbody tr:nth-child(2n){background-color:var(--muted);}
-        
-        /* --- ESTILOS ADICIONADOS/AJUSTADOS --- */
-        #pesquisaOperador {
-             margin-bottom: 1.5rem;
-             width: 100%;
-        }
-        #tabelaOperadores th, #tabelaOperadores td { text-align: left; }
-        #tabelaOperadores td:last-child { text-align: center; }
-        /* --- FIM DOS ESTILOS ADICIONADOS --- */
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <style>
+        :root{--primary:#0077cc;--muted:#e6f0ff;--card:#ffffff;--accent:#ff9900;--danger:#dc3545}
+        *{box-sizing:border-box}
+        body{font-family:Arial,Helvetica,sans-serif;margin:0;background:var(--muted);color:#222}
+        header{background:var(--primary);color:#fff;padding:14px 12px;text-align:center}
+        .container{max-width:980px;margin:18px auto;padding:16px;background:var(--card);border-radius:10px;box-shadow:0 6px 18px rgba(0,0,0,0.08)}
+        h1,h2{margin:0 0 12px}
+        .nav{display:flex;flex-wrap: wrap; gap:8px;justify-content:center;margin-bottom:14px}
+        .nav a{color:var(--primary);text-decoration:none;font-weight:700;padding:6px 10px;border-radius:6px;transition:background 0.2s}
+        .nav a:hover{background:rgba(0,0,0,0.08)}
+        .nav a.active{background:rgba(0,0,0,0.08)}
+        form{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+        label{font-size:13px;font-weight:700;margin-bottom:4px;display:block}
+        input[type="date"], input[type="text"], input[type="number"], select, textarea{width:100%;padding:8px;border:1px solid #cfd8e3;border-radius:6px}
+        textarea{min-height:70px;resize:vertical}
+        .full{grid-column:1/-1}
+        button{background:var(--primary);color:#fff;border:none;padding:10px 14px;border-radius:8px;cursor:pointer;font-weight:700;transition:background 0.2s}
+        button:hover{filter:brightness(1.1)}
+        button.secondary{background:#eee;color:#111}
+        button.secondary:hover{background:#ddd;filter:none}
+        button.edit-btn{background:var(--accent); margin-right: 5px;}
+        button.delete-btn{background:var(--danger);}
+        .filtros{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom: 12px;padding: 8px;border: 1px solid #ddd;border-radius: 8px;} 
+        .filtros input, .filtros select{padding:8px;border-radius:6px;border:1px solid #ccc;}
+        table{width:100%;border-collapse:collapse;margin-top:12px}
+        th,td{border:1px solid #e0e6ef;padding:8px;text-align:center;font-size:13px}
+        th{background:var(--primary);color:#fff}
+        .table-porcentagem{min-width: 80px;} 
+        @media(min-width:880px){form{grid-template-columns:repeat(3,1fr)}}
+        .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin:20px 0 0;}
+        .kpi-card{background:var(--muted);padding:12px;border-radius:8px;box-shadow:0 2px 4px rgba(0,0,0,0.05)}
+        .kpi-card h3{font-size:14px;color:#555;margin:0 0 4px}
+        .kpi-card p{font-size:28px;font-weight:bold;margin:0;color:var(--primary)} 
+        .kpi-card.percent p{color:#00a000} 
+        #analiseOperadorArea{
+            border: 2px solid var(--accent);
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+            opacity: 1; transition: opacity 0.3s ease-in-out;
+        }
+        #analiseOperadorArea.hidden {
+            opacity: 0;
+            height: 0;
+            padding-top: 0;
+            padding-bottom: 0;
+            margin-top: 0;
+            border-color: transparent;
+            overflow: hidden;
+        }
+        #analiseOperadorArea h3 {
+            color: var(--accent);
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        #analiseOperadorArea .kpi-card p {
+            color: var(--accent); 
+            font-size: 26px; 
+        }
+        .linha-detalhes { display: none; background-color: #f9f9f9; }
+        .linha-detalhes td { padding: 10px 15px; text-align: left !important; border: 0; }
+        .linha-detalhes .detalhe-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 8px; }
+        .detalhe-grid span { font-weight: bold; color: var(--primary); }
+        .expand-btn { cursor: pointer; font-weight: bold; font-size: 16px; padding: 2px 8px; border-radius: 50%; background-color: #ddd; border: none; }
+        .expand-btn:hover { background-color: #ccc; }
+        .paginacao { display: flex; justify-content: center; align-items: center; margin-top: 15px; gap: 10px; }
+        .paginacao button:disabled { background-color: #ccc; cursor: not-allowed; }
 
-        .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem;margin-top:1.5rem;}
-        .kpi-card{background:var(--muted);padding:1.25rem;border-radius:8px;box-shadow:0 2px 4px rgba(0,0,0,0.05)}
-        .kpi-card h3{font-size:1rem;color:var(--text-light);margin:0 0 0.25rem}
-        .kpi-card p{font-size:2rem;font-weight:bold;margin:0;color:var(--primary)}
-        .kpi-card.percent p{color:#28a745}
-        #analiseOperadorArea{border:2px solid var(--accent);padding:1.5rem;border-radius:10px;margin-top:1.5rem;opacity:1;transition:opacity 0.3s ease-in-out;}
-        #analiseOperadorArea.hidden{opacity:0;height:0;padding:0;margin:0;border:none;overflow:hidden;}
-        #analiseOperadorArea h3{color:var(--accent);text-align:center;margin-bottom:1rem;}
-        #analiseOperadorArea .kpi-card p{color:var(--accent);font-size:1.8rem;}
-        .linha-detalhes{display:none;background-color:#f9f9f9;}
-        .linha-detalhes td{padding:1rem;text-align:left !important;border:0;}
-        .linha-detalhes .detalhe-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem;}
-        .detalhe-grid span{font-weight:bold;color:var(--primary);}
-        .expand-btn{cursor:pointer;font-weight:bold;font-size:1rem;padding:0.2rem 0.6rem;border-radius:50%;background-color:#e9ecef;border:1px solid #ced4da;}
-        .expand-btn:hover{background-color:#ced4da;}
-        .paginacao{display:flex;justify-content:center;align-items:center;margin-top:1.5rem;gap:1rem;}
-        .modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);display:none;justify-content:center;align-items:center;z-index:1000;}
-        .modal-content{background:white;padding:2rem;border-radius:12px;width:90%;max-width:800px;box-shadow:0 5px 15px rgba(0,0,0,0.3);}
-        .modal-content h2{margin-top:0;}
-    </style>
+        /* ESTILOS PARA O MODAL DE EDIÇÃO */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background: white; padding: 20px; border-radius: 8px;
+            width: 90%; max-width: 800px;
+        }
+        .modal-content h2 { margin-top: 0; }
+        .modal-content form { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+        @media (max-width: 600px) {
+            .modal-content form { grid-template-columns: 1fr; }
+        }
+    </style>
 </head>
 <body>
-    <header><h1>Acompanhamento de Produção</h1></header>
+    <header><h1>Acompanhamento de Produção</h1></header>
 
-    <div class="container">
-        <div class="nav">
-            <a href="#" id="linkLanc" class="active" onclick="mostrarPagina('lancamento')">Lançamento</a>
-            <a href="#" id="linkOper" onclick="mostrarPagina('operadores')">Operadores</a>
-            <a href="#" id="linkHist" onclick="mostrarPagina('historico')">Histórico</a>
-            <a href="#" id="linkDash" onclick="mostrarPagina('dashboard')">Dashboard</a>
-            <a href="Massa.html" style="background-color: var(--muted); border-color: var(--border-color);">Fábrica de Massa</a>
-        </div>
+    <div class="container">
+        <div class="nav">
+            <a href="#" id="linkLanc" class="active" onclick="mostrarPagina('lancamento')">Lançamento</a>
+            <a href="#" id="linkOper" onclick="mostrarPagina('operadores')">Operadores</a>
+            <a href="#" id="linkHist" onclick="mostrarPagina('historico')">Histórico</a>
+            <a href="#" id="linkDash" onclick="mostrarPagina('dashboard')">Dashboard</a>
+            <a href="Massa.html" style="background-color: ; color: #0077cc;">Fábrica de Massa</a>
+        </div>
 
-        <section id="lancamento">
-            <!-- Seu conteúdo de Lançamento aqui -->
-        </section>
-        
-        <section id="operadores" style="display:none;">
-            <h2>Cadastro de Operadores</h2>
-            <form id="formOperador">
-                <div>
-                    <label>Data do Cadastro</label>
-                    <input type="date" id="dataCadastroOp" required />
-                </div>
-                <div>
-                    <label>Nome do Operador</label>
-                    <input type="text" id="nomeOperador" required placeholder="Nome completo" />
-                </div>
-                <div>
-                    <label>Setor</label>
-                    <select id="setorOperador" required>
-                        <option value="">Selecione</option>
-                        <option>Conformação</option>
-                        <option>Esmaltação</option>
-                        <option>Embalagem</option>
-                        <option>Forno Vidrado</option>
-                        <option>Forno chacote</option>
-                    </select>
-                </div>
-                <div>
-                    <label>Turno</label>
-                    <select id="turnoOperador" required>
-                        <option value="">Selecione</option>
-                        <option>Comercial</option> 
-                        <option>Turno 1 (6x2)</option>
-                        <option>Turno 2 (6x2)</option>
-                        <option>Turno 3 (6x2)</option>
-                        <option>Turno 4 (6x2)</option>
-                        <option>Turno 1 (5x2)</option>
-                        <option>Turno 2 (5x2)</option>
-                    </select>
-                </div>
-                <div class="full form-actions">
-                   <button type="submit">Cadastrar Operador</button>
-                </div>
-            </form>
-            
-            <h2 style="margin-top: 2rem;">Operadores Cadastrados</h2>
-            <input type="text" id="pesquisaOperador" placeholder="🔎 Pesquisar por nome, setor ou turno...">
-             <table id="tabelaOperadores">
-                <thead>
-                    <tr>
-                        <th>Data Cadastro</th>
-                        <th>Nome</th>
-                        <th>Setor</th>
-                        <th>Turno</th>
-                        <th>Ação</th>
-                    </tr>
-                </thead>
-                <tbody></tbody>
-            </table>
-        </section>
+        <section id="lancamento">
+            <h2>Lançamento de Produção</h2>
+            <form id="formProducao">
+                <div>
+                    <label>Data</label>
+                    <input type="date" id="data" required />
+                </div>
+                <div>
+                    <label>Setor</label>
+                    <select id="setor" required>
+                        <option value="">Selecione</option>
+                        <option>Conformação</option>
+                        <option>Esmaltação</option>
+                        <option>Embalagem</option>
+                        <option>Forno Vidrado</option>
+                        <option>Forno chacote</option>
+                    </select>
+                </div>
+                <div>
+                    <label>Turno</label>
+                    <select id="turno" required>
+                        <option value="">Selecione</option>
+                        <option>Comercial</option> 
+                        <option>Turno 1 (6x2)</option>
+                        <option>Turno 2 (6x2)</option>
+                        <option>Turno 3 (6x2)</option>
+                        <option>Turno 4 (6x2)</option>
+                        <option>Turno 1 (5x2)</option>
+                        <option>Turno 2 (5x2)</option>
+                    </select>
+                </div>
+                <div>
+                    <label>Operador</label>
+                    <select id="operadorSelect" required>
+                        <option value="">Selecione o setor</option>
+                    </select>
+                </div>
+                <div>
+                    <label>Máquina</label>
+                    <select id="maquinaSelect" required>
+                        <option value="">Selecione o setor primeiro</option>
+                    </select>
+                </div>
+                <div>
+                    <label>Massa</label>
+                    <select id="massa" required>
+                        <option value="">Selecione</option>
+                        <option>Stone</option>
+                        <option>Faiança</option>
+                    </select>
+                </div>
+                <div>
+                    <label>Referência/CPB</label>
+                    <input type="text" id="refCpb" />
+                </div>
+                <div>
+                    <label>Produção Prevista</label>
+                    <input type="number" id="prevista" min="0" required />
+                </div>
+                <div>
+                    <label>Produção Realizada</label>
+                    <input type="number" id="realizada" min="0" required />
+                </div>
+                <div>
+                    <label>Quebras</label>
+                    <input type="number" id="quebras" min="0" required />
+                </div>
+                <div class="full">
+                    <label>Observação</label>
+                    <textarea id="observacao"></textarea>
+                </div>
+                <div class="full" style="text-align:right;">
+                    <button type="button" class="secondary" onclick="limparFormulario()">Limpar</button>
+                    <button type="submit">Lançar</button>
+                </div>
+            </form>
+        </section>
+        
+        <section id="operadores" style="display:none;">
+            <h2>Cadastro de Operadores</h2>
+            <form id="formOperador">
+                <div>
+                    <label>Data do Cadastro</label>
+                    <input type="date" id="dataCadastroOp" required />
+                </div>
+                <div>
+                    <label>Nome do Operador</label>
+                    <input type="text" id="nomeOperador" required placeholder="Nome completo" />
+                </div>
+                <div>
+                    <label>Setor</label>
+                    <select id="setorOperador" required>
+                        <option value="">Selecione</option>
+                        <option>Conformação</option>
+                        <option>Esmaltação</option>
+                        <option>Embalagem</option>
+                        <option>Forno Vidrado</option>
+                        <option>Forno chacote</option>
+                    </select>
+                </div>
+                <div>
+                    <label>Turno</label>
+                    <select id="turnoOperador" required>
+                        <option value="">Selecione</option>
+                        <option>Comercial</option> 
+                        <option>Turno 1 (6x2)</option>
+                        <option>Turno 2 (6x2)</option>
+                        <option>Turno 3 (6x2)</option>
+                        <option>Turno 4 (6x2)</option>
+                        <option>Turno 1 (5x2)</option>
+                        <option>Turno 2 (5x2)</option>
+                    </select>
+                </div>
+                <div class="full" style="text-align:right;">
+                   <button type="submit">Cadastrar Operador</button>
+                </div>
+            </form>
+            
+            <h2 style="margin-top: 20px;">Operadores Cadastrados</h2>
+             <table id="tabelaOperadores">
+                <thead>
+                    <tr>
+                        <th>Data Cadastro</th>
+                        <th>Nome</th>
+                        <th>Setor</th>
+                        <th>Turno</th>
+                        <th>Ação</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </section>
 
-        <section id="historico" style="display:none">
-            <!-- Seu conteúdo de Histórico aqui -->
-        </section>
+        <section id="historico" style="display:none">
+            <h2>Histórico</h2>
+            <div class="filtros">
+                <input type="date" id="filtroDataInicio" placeholder="Data Início" />
+                <input type="date" id="filtroDataFim" placeholder="Data Fim" />
+                <select id="filtroSetor">
+                    <option value="">Todos os Setores</option>
+                    <option>Conformação</option>
+                    <option>Esmaltação</option>
+                    <option>Embalagem</option>
+                    <option>Forno Vidrado</option>
+                    <option>Forno chacote</option>
+                </select>
+                <select id="filtroTurno">
+                    <option value="">Todos os Turnos</option>
+                    <option>Comercial</option> 
+                    <option>Turno 1 (6x2)</option>
+                    <option>Turno 2 (6x2)</option>
+                    <option>Turno 3 (6x2)</option>
+                    <option>Turno 4 (6x2)</option>
+                    <option>Turno 1 (5x2)</option>
+                    <option>Turno 2 (5x2)</option>
+                </select>
+                <input type="text" id="filtroMaquina" placeholder="Máquina..." list="listaMaquinasFiltro" />
+                <datalist id="listaMaquinasFiltro"></datalist>
+                <input type="text" id="filtroRefCpb" placeholder="Ref/CPB..." />
+                <button onclick="filtrarHistorico()">Filtrar</button>
+                <button class="secondary" onclick="buscarTodos()">Mostrar todos</button>
+                <button style="background:green;" onclick="exportarExcel()">Exportar Excel</button>
+            </div>
 
-        <section id="dashboard" style="display:none">
-            <!-- Seu conteúdo de Dashboard aqui -->
-        </section>
-    </div>
+            <table id="tabelaHistorico">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>Data</th>
+                        <th>Setor</th>
+                        <th>Máquina</th>
+                        <th>% Efic.</th>
+                        <th>% Perda</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
 
-    <!-- Seus Modais de Edição aqui -->
+            <div class="paginacao">
+                <button id="btnAnterior" onclick="paginaAnterior()">Anterior</button>
+                <span id="infoPagina">Página 1</span>
+                <button id="btnProxima" onclick="proximaPagina()">Próxima</button>
+            </div>
+        </section>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
-        import { 
-            getFirestore, collection, addDoc, getDocs, 
-            query, where, orderBy, deleteDoc, doc, limit, startAfter,
-            getDoc, updateDoc
-        } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
+        <section id="dashboard" style="display:none">
+            <h2>Dashboard</h2>
+            <div class="filtros">
+                <input type="date" id="dashFiltroDataInicio" placeholder="Data Início" />
+                <input type="date" id="dashFiltroDataFim" placeholder="Data Fim" />
+                <select id="dashFiltroSetor">
+                    <option value="">Todos os Setores</option>
+                    <option>Conformação</option>
+                    <option>Esmaltação</option>
+                    <option>Embalagem</option>
+                    <option>Forno Vidrado</option>
+                    <option>Forno chacote</option>
+                </select>
+                <select id="dashFiltroTurno">
+                    <option value="">Todos os Turnos</option>
+                    <option>Comercial</option> 
+                    <option>Turno 1 (6x2)</option>
+                    <option>Turno 2 (6x2)</option>
+                    <option>Turno 3 (6x2)</option>
+                    <option>Turno 4 (6x2)</option>
+                    <option>Turno 1 (5x2)</option>
+                    <option>Turno 2 (5x2)</option>
+                </select>
+                <input type="text" id="dashFiltroMaquina" placeholder="Máquina..." list="listaMaquinasDash" />
+                <datalist id="listaMaquinasDash"></datalist>
+                <input type="text" id="dashFiltroRefCpb" placeholder="Ref/CPB..."/>
+                <input type="text" id="dashFiltroOperador" placeholder="Operador..." /> 
+                <button onclick="atualizarDashboard()">Aplicar Filtro</button>
+            </div>
+            <h3>Resumo Geral da Produção (Filtros Aplicados)</h3>
+            <div class="kpis" id="kpisResumo">
+                <div class="kpi-card"><h3>Total Previsto</h3><p id="kpiPrevisto">0</p></div>
+                <div class="kpi-card"><h3>Total Realizado</h3><p id="kpiRealizado">0</p></div>
+                <div class="kpi-card"><h3>Total Quebras</h3><p id="kpiQuebras">0</p></div>
+                <div class="kpi-card percent"><h3>% Realizado/Previsto</h3><p id="kpiPercRealPrev">N/A</p></div>
+                <div class="kpi-card percent"><h3>% Quebras/Total</h3><p id="kpiPercQuebraTotal">N/A</p></div>
+            </div>
+            <div id="analiseOperadorArea">
+                <h3>Análise do Operador: <span id="operadorSelecionado">Nenhum</span></h3>
+                <div class="kpis" id="kpisOperador">
+                    <div class="kpi-card"><h3>Previsto Operador</h3><p id="kpiOperadorPrevisto">0</p></div>
+                    <div class="kpi-card"><h3>Realizado Operador</h3><p id="kpiOperadorRealizado">0</p></div>
+                    <div class="kpi-card"><h3>Quebras Operador</h3><p id="kpiOperadorQuebras">0</p></div>
+                    <div class="kpi-card percent"><h3>% Realizado/Previsto</h3><p id="kpiOperadorPercRealPrev">N/A</p></div>
+                    <div class="kpi-card percent"><h3>% Quebras/Total</h3><p id="kpiOperadorPercQuebraTotal">N/A</p></div>
+                </div>
+            </div>
+        </section>
+    </div>
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyB2z4mFj5qVtb59uocKK8JXhMTfi8MGSTo",
-            authDomain: "acompanhamento-de-produc-b68b0.firebaseapp.com",
-            projectId: "acompanhamento-de-produc-b68b0",
-            storageBucket: "acompanhamento-de-produc-b68b0.firebasestorage.app",
-            messagingSenderId: "891709449679",
-            appId: "1:891709449679:web:43e83e076f5fb3201e1eba"
-        };
+    <div id="modalEdicaoProducao" class="modal-overlay">
+        <div class="modal-content">
+            <h2>Editar Lançamento</h2>
+            <form id="formEdicaoProducao">
+                <input type="hidden" id="editDocId">
+                <div> <label>Data</label> <input type="date" id="editData" required /> </div>
+                <div> <label>Setor</label> <select id="editSetor" required> <option>Conformação</option> <option>Esmaltação</option> <option>Embalagem</option> <option>Forno Vidrado</option> <option>Forno chacote</option> </select> </div>
+                <div> <label>Turno</label> <select id="editTurno" required> <option>Comercial</option> <option>Turno 1 (6x2)</option> <option>Turno 2 (6x2)</option> <option>Turno 3 (6x2)</option> <option>Turno 4 (6x2)</option> <option>Turno 1 (5x2)</option> <option>Turno 2 (5x2)</option> </select> </div>
+                <div> <label>Operador</label> <input type="text" id="editOperador" required /> </div>
+                <div> <label>Máquina</label> <input type="text" id="editMaquina" required /> </div>
+                <div> <label>Massa</label> <select id="editMassa" required> <option>Stone</option> <option>Faiança</option> </select> </div>
+                <div> <label>Referência/CPB</label> <input type="text" id="editRefCpb" /> </div>
+                <div> <label>Prod. Prevista</label> <input type="number" id="editPrevista" required /> </div>
+                <div> <label>Prod. Realizada</label> <input type="number" id="editRealizada" required /> </div>
+                <div> <label>Quebras</label> <input type="number" id="editQuebras" required /> </div>
+                <div class="full"> <label>Observação</label> <textarea id="editObservacao"></textarea> </div>
+                <div class="full" style="text-align: right; margin-top: 10px;">
+                    <button type="button" class="secondary" onclick="fecharModal('modalEdicaoProducao')">Cancelar</button>
+                    <button type="submit">Salvar Alterações</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <div id="modalEdicaoOperador" class="modal-overlay">
+        <div class="modal-content">
+            <h2>Editar Operador</h2>
+            <form id="formEdicaoOperador" style="grid-template-columns: 1fr;">
+                <input type="hidden" id="editOpDocId">
+                <div><label>Data Cadastro</label><input type="date" id="editOpData" required></div>
+                <div><label>Nome</label><input type="text" id="editOpNome" required></div>
+                <div><label>Setor</label><select id="editOpSetor" required> <option>Conformação</option> <option>Esmaltação</option> <option>Embalagem</option> <option>Forno Vidrado</option> <option>Forno chacote</option> </select></div>
+                <div><label>Turno</label><select id="editOpTurno" required> <option>Comercial</option> <option>Turno 1 (6x2)</option> <option>Turno 2 (6x2)</option> <option>Turno 3 (6x2)</option> <option>Turno 4 (6x2)</option> <option>Turno 1 (5x2)</option> <option>Turno 2 (5x2)</option> </select></div>
+                <div class="full" style="text-align: right; margin-top: 10px;">
+                    <button type="button" class="secondary" onclick="fecharModal('modalEdicaoOperador')">Cancelar</button>
+                    <button type="submit">Salvar Alterações</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-        
-        window.db = db;
-        window.producoesCol = collection(db, "producoes"); 
-        window.operadoresCol = collection(db, "operadores");
-        window.addDoc = addDoc;        
-        window.getDocs = getDocs;        
-        window.query = query;        
-        window.where = where;        
-        window.orderBy = orderBy;    
-        window.deleteDoc = deleteDoc; 
-        window.doc = doc;
-        window.limit = limit;
-        window.startAfter = startAfter;
-        window.getDoc = getDoc;
-        window.updateDoc = updateDoc;
-        
-        console.log("Firebase e Firestore inicializados!");
-    </script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
+        import { 
+            getFirestore, collection, addDoc, getDocs, 
+            query, where, orderBy, deleteDoc, doc, limit, startAfter,
+            getDoc, updateDoc // FUNÇÕES ADICIONADAS
+        } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyB2z4mFj5qVtb59uocKK8JXhMTfi8MGSTo",
+            authDomain: "acompanhamento-de-produc-b68b0.firebaseapp.com",
+            projectId: "acompanhamento-de-produc-b68b0",
+            storageBucket: "acompanhamento-de-produc-b68b0.firebasestorage.app",
+            messagingSenderId: "891709449679",
+            appId: "1:891709449679:web:43e83e076f5fb3201e1eba"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        
+        window.db = db;
+        window.producoesCol = collection(db, "producoes"); 
+        window.operadoresCol = collection(db, "operadores");
+        window.addDoc = addDoc;        
+        window.getDocs = getDocs;        
+        window.query = query;         
+        window.where = where;         
+        window.orderBy = orderBy;      
+        window.deleteDoc = deleteDoc; 
+        window.doc = doc;
+        window.limit = limit;
+        window.startAfter = startAfter;
+        // FUNÇÕES ADICIONADAS
+        window.getDoc = getDoc;
+        window.updateDoc = updateDoc;
+        
+        console.log("Firebase e Firestore inicializados!");
+    </script>
 
 <script>
 // Variáveis globais
-let todosOperadoresCadastrados = [];
 let db, producoesCol, operadoresCol;
+const ITENS_POR_PAGINA = 30;
+let ultimoDocumentoVisivel = null;
+let primeiroDocumentoStack = [null];
+let paginaAtual = 1;
+let filtroAtual = null;
 
+// ======================= FUNÇÃO CORRIGIDA =======================
+/**
+ * Retorna a data local atual no formato AAAA-MM-DD, evitando problemas de fuso horário.
+ * @returns {string} A data formatada.
+ */
 function obterDataLocalFormatada() {
-    const data = new Date();
-    const ano = data.getFullYear();
-    const mes = String(data.getMonth() + 1).padStart(2, '0');
-    const dia = String(data.getDate()).padStart(2, '0');
-    return `${ano}-${mes}-${dia}`;
+    const data = new Date();
+    const ano = data.getFullYear();
+    const mes = String(data.getMonth() + 1).padStart(2, '0'); // Mês é 0-indexado, por isso +1
+    const dia = String(data.getDate()).padStart(2, '0');
+    return `${ano}-${mes}-${dia}`;
 }
+// ================================================================
 
 document.addEventListener("DOMContentLoaded", ()=>{
-    db = window.db; 
-    producoesCol = window.producoesCol; 
-    operadoresCol = window.operadoresCol;
-    
-    const today = obterDataLocalFormatada();
-    // Preenche todos os campos de data necessários
-    ['data', 'dataCadastroOp', 'filtroDataInicio', 'filtroDataFim', 'dashFiltroDataInicio', 'dashFiltroDataFim'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.value = today;
-    });
+    db = window.db; 
+    producoesCol = window.producoesCol; 
+    operadoresCol = window.operadoresCol;
+    
+    // ======== LINHA ALTERADA PARA USAR A NOVA FUNÇÃO ========
+    const today = obterDataLocalFormatada();
+    // ======================================================
 
-    // Adiciona o listener CORRETO ao formulário de operadores
-    document.getElementById("formOperador").addEventListener("submit", cadastrarOperador);
-    // Adiciona o listener para a nova barra de pesquisa
-    document.getElementById("pesquisaOperador").addEventListener('keyup', renderizarTabelaFiltrada);
+    document.getElementById("data").value = today;
+    document.getElementById("dataCadastroOp").value = today;
+    document.getElementById("filtroDataInicio").value = today;
+    document.getElementById("filtroDataFim").value = today;
+    document.getElementById("dashFiltroDataInicio").value = today;
+    document.getElementById("dashFiltroDataFim").value = today;
 
-    // Outros listeners...
+    document.getElementById("setor").addEventListener("change", carregarOperadores);
+    document.getElementById("formOperador").addEventListener("submit", cadastrarOperador);
+
+    document.getElementById('filtroSetor').addEventListener('change', () => {
+        atualizarDatalistMaquina('filtroSetor', 'listaMaquinasFiltro');
+    });
+    document.getElementById('dashFiltroSetor').addEventListener('change', () => {
+        atualizarDatalistMaquina('dashFiltroSetor', 'listaMaquinasDash');
+    });
+
+    // LISTENERS PARA OS FORMULÁRIOS DE EDIÇÃO
+    document.getElementById('formEdicaoProducao').addEventListener('submit', salvarEdicaoProducao);
+    document.getElementById('formEdicaoOperador').addEventListener('submit', salvarEdicaoOperador);
 });
 
+const maquinasPorSetor = {
+    "Conformação":["Secador 2","Secador 3","Secador 4","Secador 10","Máquina de Xícara 1","Máquina de Xícara 2","Máquina de Prato","Prensa"],
+    "Esmaltação":["Disco 1","Disco 2","Disco 3","Disco 4","Robô 1","Robô 2","Spray","Imersão"],
+    "Embalagem":["Linha 1","Linha 2","Linha 3","Linha 4","Linha 5"],
+    "Forno Vidrado":["Forno 1","Forno 2"],
+    "Forno chacote":["Forno 3"]
+};
 
-// ======================= FUNÇÃO DE CADASTRO CORRIGIDA E MELHORADA =======================
-async function cadastrarOperador(e) {
-    e.preventDefault(); // Impede o recarregamento da página, ESSENCIAL!
-    
-    const dataCadastro = document.getElementById("dataCadastroOp").value;
-    const nome = document.getElementById("nomeOperador").value.trim();
-    const setor = document.getElementById("setorOperador").value;
-    const turno = document.getElementById("turnoOperador").value;
+document.getElementById("setor").addEventListener("change", e=>{
+    const setor = e.target.value;
+    const maqSelect = document.getElementById("maquinaSelect");
+    maqSelect.innerHTML='<option value="">(Selecione ou Digite)</option>';
+    if(maquinasPorSetor[setor]){
+        maquinasPorSetor[setor].forEach(m=>{
+            const opt=document.createElement("option");
+            opt.textContent=m; opt.value=m;
+            maqSelect.appendChild(opt);
+        });
+    }
+});
 
-    if (!dataCadastro || !nome || !setor || !turno) {
-        alert("Todos os campos são obrigatórios!");
-        return;
-    }
+function atualizarDatalistMaquina(idSetor, idDatalist) {
+    const setor = document.getElementById(idSetor).value;
+    const datalist = document.getElementById(idDatalist);
+    datalist.innerHTML = ''; 
 
-    try {
-        await window.addDoc(operadoresCol, {
-            dataCadastro,
-            nome,
-            setor,
-            turno,
-            timestamp: new Date().toISOString()
-        });
-        alert("Operador cadastrado com sucesso! ✅");
-        document.getElementById("formOperador").reset();
-        document.getElementById("dataCadastroOp").value = obterDataLocalFormatada();
-        atualizarTabelaOperadores(); // Atualiza a lista de operadores
-    } catch (error) {
-        console.error("Erro ao cadastrar operador: ", error);
-        alert("Erro ao cadastrar. Verifique o console. ❌");
-    }
-}
-// =======================================================================================
-
-
-// ======================= NOVAS FUNÇÕES PARA PESQUISA E RENDERIZAÇÃO =======================
-async function atualizarTabelaOperadores() {
-    const tbody = document.querySelector("#tabelaOperadores tbody");
-    tbody.innerHTML = "<tr><td colspan='5'>Carregando...</td></tr>";
-
-    if (!operadoresCol) return;
-
-    try {
-        const q = window.query(operadoresCol, window.orderBy("nome"));
-        const snapshot = await window.getDocs(q);
-        
-        // Armazena todos os operadores na variável global para pesquisa rápida
-        todosOperadoresCadastrados = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-
-        renderizarTabelaFiltrada(); // Chama a função para renderizar a tabela (inicialmente sem filtro)
-        
-    } catch (error) {
-        console.error("Erro ao buscar operadores:", error);
-        tbody.innerHTML = "<tr><td colspan='5'>Erro ao carregar dados.</td></tr>";
-    }
+    if (maquinasPorSetor[setor]) {
+        maquinasPorSetor[setor].forEach(m => {
+            const option = document.createElement('option');
+            option.value = m;
+            datalist.appendChild(option);
+        });
+    }
 }
 
-function renderizarTabelaFiltrada() {
-    const tbody = document.querySelector("#tabelaOperadores tbody");
-    const termoPesquisa = document.getElementById('pesquisaOperador').value.toLowerCase();
-    
-    tbody.innerHTML = "";
-
-    const operadoresFiltrados = todosOperadoresCadastrados.filter(op => {
-        return op.nome.toLowerCase().includes(termoPesquisa) ||
-               op.setor.toLowerCase().includes(termoPesquisa) ||
-               op.turno.toLowerCase().includes(termoPesquisa);
-    });
-
-    if (operadoresFiltrados.length === 0) {
-        tbody.innerHTML = "<tr><td colspan='5'>Nenhum operador encontrado.</td></tr>";
-        return;
-    }
-
-    operadoresFiltrados.forEach(op => {
-        const tr = document.createElement("tr");
-        const dataFormatada = op.dataCadastro ? new Date(op.dataCadastro + 'T03:00:00').toLocaleDateString('pt-BR') : 'N/A';
-        tr.innerHTML = `
-            <td>${dataFormatada}</td>
-            <td>${op.nome}</td>
-            <td>${op.setor}</td>
-            <td>${op.turno}</td>
-            <td>
-                <button class="edit-btn" onclick="abrirModalOperador('${op.id}')">Editar</button>
-                <button class="delete-btn" onclick="deletarOperador('${op.id}')">Deletar</button>
-            </td>`;
-        tbody.appendChild(tr);
-    });
-}
-// =========================================================================================
 
 function mostrarPagina(pg){
-    document.querySelectorAll("section").forEach(s=>s.style.display="none");
-    document.getElementById(pg).style.display="block";
-    document.querySelectorAll(".nav a").forEach(a=>a.classList.remove("active"));
-    
-    const linkId = `#link${pg.charAt(0).toUpperCase()}${pg.slice(1,4)}`;
-    document.querySelector(linkId).classList.add("active");
-    
-    if(pg==="historico") filtrarHistorico(); 
-    if(pg==="dashboard") atualizarDashboard();
-    if(pg==="operadores") atualizarTabelaOperadores(); // Garante que a tabela carrega ao mudar de aba
+    document.querySelectorAll("section").forEach(s=>s.style.display="none");
+    document.getElementById(pg).style.display="block";
+    document.querySelectorAll(".nav a").forEach(a=>a.classList.remove("active"));
+    
+    const linkId = `#link${pg.charAt(0).toUpperCase()}${pg.slice(1,4)}`;
+    document.querySelector(linkId).classList.add("active");
+    
+    if(pg==="historico") filtrarHistorico(); 
+    if(pg==="dashboard") atualizarDashboard();
+    if(pg==="operadores") atualizarTabelaOperadores();
+}
+
+function toggleDetalhes(index) {
+    const detalhesRow = document.getElementById(`detalhes-${index}`);
+    const btn = event.target;
+    if (detalhesRow.style.display === "table-row") {
+        detalhesRow.style.display = "none";
+        btn.textContent = "+";
+    } else {
+        detalhesRow.style.display = "table-row";
+        btn.textContent = "-";
+    }
+}
+
+// ============== NOVAS FUNÇÕES DE EDIÇÃO (MODAL) ==============
+
+function fecharModal(modalId) {
+    document.getElementById(modalId).style.display = 'none';
+}
+
+async function abrirModalEdicao(docId) {
+    try {
+        const docRef = window.doc(db, "producoes", docId);
+        const docSnap = await window.getDoc(docRef);
+        if (docSnap.exists()) {
+            const data = docSnap.data();
+            document.getElementById('editDocId').value = docId;
+            document.getElementById('editData').value = data.data;
+            document.getElementById('editSetor').value = data.setor;
+            document.getElementById('editTurno').value = data.turno;
+            document.getElementById('editOperador').value = data.operador;
+            document.getElementById('editMaquina').value = data.maquina;
+            document.getElementById('editMassa').value = data.massa;
+            document.getElementById('editRefCpb').value = data.refCpb || '';
+            document.getElementById('editPrevista').value = data.prevista;
+            document.getElementById('editRealizada').value = data.realizada;
+            document.getElementById('editQuebras').value = data.quebras;
+            document.getElementById('editObservacao').value = data.observacao || '';
+            document.getElementById('modalEdicaoProducao').style.display = 'flex';
+        } else {
+            alert("Erro: Documento não encontrado.");
+        }
+    } catch (error) {
+        console.error("Erro ao abrir modal de edição:", error);
+        alert("Não foi possível carregar os dados para edição.");
+    }
+}
+
+async function salvarEdicaoProducao(e) {
+    e.preventDefault();
+    const docId = document.getElementById('editDocId').value;
+    const docRef = window.doc(db, "producoes", docId);
+    
+    const dadosAtualizados = {
+        data: document.getElementById('editData').value,
+        setor: document.getElementById('editSetor').value,
+        turno: document.getElementById('editTurno').value,
+        operador: document.getElementById('editOperador').value,
+        maquina: document.getElementById('editMaquina').value,
+        massa: document.getElementById('editMassa').value,
+        refCpb: document.getElementById('editRefCpb').value,
+        prevista: parseFloat(document.getElementById('editPrevista').value),
+        realizada: parseFloat(document.getElementById('editRealizada').value),
+        quebras: parseFloat(document.getElementById('editQuebras').value),
+        observacao: document.getElementById('editObservacao').value,
+    };
+
+    try {
+        await window.updateDoc(docRef, dadosAtualizados);
+        alert("Lançamento atualizado com sucesso!");
+        fecharModal('modalEdicaoProducao');
+        filtrarHistorico(); // Atualiza a tabela
+    } catch (error) {
+        console.error("Erro ao salvar alterações:", error);
+        alert("Erro ao salvar. Verifique o console.");
+    }
+}
+
+async function abrirModalOperador(docId) {
+    try {
+        const docRef = window.doc(db, "operadores", docId);
+        const docSnap = await window.getDoc(docRef);
+        if (docSnap.exists()) {
+            const data = docSnap.data();
+            document.getElementById('editOpDocId').value = docId;
+            document.getElementById('editOpData').value = data.dataCadastro;
+            document.getElementById('editOpNome').value = data.nome;
+            document.getElementById('editOpSetor').value = data.setor;
+            document.getElementById('editOpTurno').value = data.turno;
+            document.getElementById('modalEdicaoOperador').style.display = 'flex';
+        } else {
+            alert("Erro: Operador não encontrado.");
+        }
+    } catch (error) {
+        console.error("Erro ao abrir modal de operador:", error);
+        alert("Não foi possível carregar os dados para edição.");
+    }
+}
+
+async function salvarEdicaoOperador(e) {
+    e.preventDefault();
+    const docId = document.getElementById('editOpDocId').value;
+    const docRef = window.doc(db, "operadores", docId);
+
+    const dadosAtualizados = {
+        dataCadastro: document.getElementById('editOpData').value,
+        nome: document.getElementById('editOpNome').value,
+        setor: document.getElementById('editOpSetor').value,
+        turno: document.getElementById('editOpTurno').value,
+    };
+
+    try {
+        await window.updateDoc(docRef, dadosAtualizados);
+        alert("Operador atualizado com sucesso!");
+        fecharModal('modalEdicaoOperador');
+        atualizarTabelaOperadores(); // Atualiza a tabela de operadores
+    } catch (error) {
+        console.error("Erro ao salvar alterações do operador:", error);
+        alert("Erro ao salvar. Verifique o console.");
+    }
+}
+
+
+// ============== FIM DAS FUNÇÕES DE EDIÇÃO ==============
+
+
+// #################### FUNÇÃO CORRIGIDA ####################
+async function cadastrarOperador(e) {
+    e.preventDefault();
+    
+    const dataCadastro = document.getElementById("dataCadastroOp").value;
+    const nome = document.getElementById("nomeOperador").value.trim();
+    const setor = document.getElementById("setorOperador").value;
+    const turno = document.getElementById("turnoOperador").value;
+
+    if (!dataCadastro || !nome || !setor || !turno) {
+        alert("Por favor, preencha todos os campos.");
+        return;
+    }
+    
+    const novoOperador = {
+        dataCadastro: dataCadastro,
+        nome: nome,
+        setor: setor,
+        turno: turno
+    };
+
+    try {
+        await window.addDoc(operadoresCol, novoOperador);
+        alert(`Operador "${nome}" cadastrado com sucesso! ✅`);
+        document.getElementById("formOperador").reset();
+        document.getElementById("dataCadastroOp").value = obterDataLocalFormatada();
+        atualizarTabelaOperadores(); // Atualiza a lista na tela
+    } catch (error) {
+        console.error("Erro ao cadastrar operador: ", error);
+        alert("Erro ao cadastrar. Verifique o console. ❌");
+    }
+}
+// ########################################################
+
+async function atualizarTabelaOperadores() {
+    const tbody = document.querySelector("#tabelaOperadores tbody");
+    tbody.innerHTML = "<tr><td colspan='5'>Carregando...</td></tr>";
+
+    if (!operadoresCol) return;
+
+    try {
+        const q = window.query(operadoresCol, window.orderBy("nome"));
+        const snapshot = await window.getDocs(q);
+        
+        tbody.innerHTML = "";
+        if (snapshot.empty) {
+            tbody.innerHTML = "<tr><td colspan='5'>Nenhum operador cadastrado.</td></tr>";
+            return;
+        }
+
+        snapshot.forEach(doc => {
+            const op = doc.data();
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+                <td>${op.dataCadastro}</td>
+                <td>${op.nome}</td>
+                <td>${op.setor}</td>
+                <td>${op.turno}</td>
+                <td>
+                    <button class="edit-btn" onclick="abrirModalOperador('${doc.id}')">Editar</button>
+                    <button class="delete-btn" onclick="deletarOperador('${doc.id}')">Deletar</button>
+                </td>`;
+            tbody.appendChild(tr);
+        });
+    } catch (error) {
+        console.error("Erro ao buscar operadores:", error);
+        tbody.innerHTML = "<tr><td colspan='5'>Erro ao carregar dados.</td></tr>";
+    }
 }
 
 async function deletarOperador(docId) {
-    const senhaCorreta = "pb2025";
-    const senhaDigitada = prompt("Para confirmar a exclusão, digite a senha:");
+    const senhaCorreta = "pb2025";
+    const senhaDigitada = prompt("Para confirmar a exclusão, digite a senha:");
 
-    if (senhaDigitada === null) return; 
+    if (senhaDigitada === null) return; 
 
-    if (senhaDigitada === senhaCorreta) {
-        if (confirm("Tem certeza que deseja deletar este operador?")) {
-            try {
-                await window.deleteDoc(window.doc(db, "operadores", docId));
-                alert("Operador deletado com sucesso!");
-                atualizarTabelaOperadores();
-            } catch (error) {
-                console.error("Erro ao deletar operador:", error);
-                alert("Erro ao deletar. Verifique o console.");
-            }
-        }
-    } else {
-        alert("Senha incorreta. A exclusão foi cancelada.");
-    }
+    if (senhaDigitada === senhaCorreta) {
+        if (confirm("Tem certeza que deseja deletar este operador?")) {
+            try {
+                await window.deleteDoc(window.doc(db, "operadores", docId));
+                alert("Operador deletado com sucesso!");
+                atualizarTabelaOperadores();
+            } catch (error) {
+                console.error("Erro ao deletar operador:", error);
+                alert("Erro ao deletar. Verifique o console.");
+            }
+        }
+    } else {
+        alert("Senha incorreta. A exclusão foi cancelada.");
+    }
 }
 
-// ... Cole aqui o resto do seu código JavaScript (funções de histórico, dashboard, etc.) ...
-// As funções abaixo devem ser mantidas como estão no seu arquivo original.
-
-async function carregarOperadores() { /* ... seu código original ... */ }
-function limparFormulario() { /* ... seu código original ... */ }
-function deletarRegistro(docId) { /* ... seu código original ... */ }
-async function atualizarTabela(filtro, direcao = null) { /* ... seu código original ... */ }
-// E assim por diante para todas as outras funções.
-
-
-// Exemplo de como algumas funções devem ser mantidas:
 async function carregarOperadores() {
-    const setor = document.getElementById("setor").value;
-    const opSelect = document.getElementById("operadorSelect");
+    const setor = document.getElementById("setor").value;
+    const opSelect = document.getElementById("operadorSelect");
 
-    opSelect.innerHTML = '<option value="">Carregando...</option>';
-    opSelect.disabled = true;
+    opSelect.innerHTML = '<option value="">Carregando...</option>';
+    opSelect.disabled = true;
 
-    if (!setor) {
-        opSelect.innerHTML = '<option value="">Selecione o setor</option>';
-        opSelect.disabled = false;
-        return;
-    }
+    if (!setor) {
+        opSelect.innerHTML = '<option value="">Selecione o setor</option>';
+        opSelect.disabled = false;
+        return;
+    }
 
-    try {
-        const q = window.query(operadoresCol, 
-            window.where("setor", "==", setor),
-            window.orderBy("nome")
-        );
-        const snapshot = await window.getDocs(q);
-        
-        opSelect.innerHTML = '';
-        if (snapshot.empty) {
-            opSelect.innerHTML = '<option value="">Nenhum operador neste setor</option>';
-        } else {
-            opSelect.innerHTML = '<option value="">Selecione um operador</option>';
-            snapshot.forEach(doc => {
-                const nome = doc.data().nome;
-                opSelect.add(new Option(nome, nome));
-            });
-        }
-    } catch(error) {
-        console.error("Erro ao carregar operadores:", error);
-        opSelect.innerHTML = '<option value="">Erro ao carregar</option>';
-    } finally {
-        opSelect.disabled = false;
-    }
+    try {
+        const q = window.query(operadoresCol, 
+            window.where("setor", "==", setor),
+            window.orderBy("nome")
+        );
+        const snapshot = await window.getDocs(q);
+        
+        opSelect.innerHTML = '';
+        if (snapshot.empty) {
+            opSelect.innerHTML = '<option value="">Nenhum operador neste setor</option>';
+        } else {
+            opSelect.innerHTML = '<option value="">Selecione um operador</option>';
+            snapshot.forEach(doc => {
+                const nome = doc.data().nome;
+                opSelect.add(new Option(nome, nome));
+            });
+        }
+    } catch(error) {
+        console.error("Erro ao carregar operadores:", error);
+        opSelect.innerHTML = '<option value="">Erro ao carregar</option>';
+    } finally {
+        opSelect.disabled = false;
+    }
 }
-// Cole as outras funções aqui...
 
 
-// Adicione as funções ao escopo global para que os botões `onclick` funcionem
-window.mostrarPagina = mostrarPagina;
+document.getElementById("formProducao").addEventListener("submit", async (e)=>{
+    e.preventDefault();
+    if (!producoesCol || !window.addDoc) return;
+    const data = {
+        data:document.getElementById("data").value,
+        setor:document.getElementById("setor").value,
+        turno:document.getElementById("turno").value,
+        operador:document.getElementById("operadorSelect").value,
+        maquina:document.getElementById("maquinaSelect").value, 
+        massa:document.getElementById("massa").value,
+        refCpb:document.getElementById("refCpb").value,
+        prevista:parseFloat(document.getElementById("prevista").value),
+        realizada:parseFloat(document.getElementById("realizada").value),
+        quebras:parseFloat(document.getElementById("quebras").value),
+        observacao:document.getElementById("observacao").value,
+        timestamp: new Date().toISOString()
+    };
+    try {
+        await window.addDoc(producoesCol, data);
+        alert("Lançamento salvo com sucesso no Firebase! ✅");
+        limparFormulario();
+    } catch (error) {
+        console.error("Erro ao adicionar documento: ", error);
+        alert("Erro ao salvar o lançamento. Verifique o console. ❌"); 
+    }
+});
+
+function limparFormulario(){
+    document.getElementById("formProducao").reset();
+    document.getElementById("operadorSelect").innerHTML = '<option value="">Selecione o setor</option>';
+}
+
+function deletarRegistro(docId) {
+    const senhaCorreta = "pb2025";
+    const senhaDigitada = prompt("Para confirmar a exclusão, digite a senha:");
+
+    if (senhaDigitada === null) return;
+
+    if (senhaDigitada === senhaCorreta) {
+        if (confirm("Tem certeza que deseja deletar este registro de produção?")) {
+            try {
+                window.deleteDoc(window.doc(db, "producoes", docId))
+                    .then(() => {
+                        alert("Registro deletado com sucesso!");
+                        filtrarHistorico(); 
+                    });
+            } catch (error) {
+                console.error("Erro de execução na deleção: ", error);
+                alert("Erro ao deletar o registro. Verifique o console.");
+            }
+        }
+    } else {
+        alert("Senha incorreta. A exclusão foi cancelada.");
+    }
+}
+
+async function atualizarTabela(filtro, direcao = null) {
+    const tbody = document.querySelector("#tabelaHistorico tbody");
+    tbody.innerHTML = `<tr><td colspan="6">Carregando dados...</td></tr>`;
+
+    if (!producoesCol) {
+        tbody.innerHTML = `<tr><td colspan="6">Erro: O Firebase não está conectado.</td></tr>`;
+        return;
+    }
+
+    let queryConstraints = [];
+    if (filtro && filtro.dataInicio) queryConstraints.push(window.where("data", ">=", filtro.dataInicio));
+    if (filtro && filtro.dataFim) queryConstraints.push(window.where("data", "<=", filtro.dataFim));
+
+    const baseOrdering = [window.orderBy("data", "desc"), window.orderBy("timestamp", "desc")];
+    queryConstraints.push(...baseOrdering);
+    
+    if (direcao === 'proxima' && ultimoDocumentoVisivel) {
+        queryConstraints.push(window.startAfter(ultimoDocumentoVisivel));
+    } else if (direcao === 'anterior') {
+        primeiroDocumentoStack.pop();
+        const cursorAnterior = primeiroDocumentoStack[primeiroDocumentoStack.length - 1];
+        if(cursorAnterior){
+            queryConstraints.push(window.startAfter(cursorAnterior));
+        }
+    }
+    
+    queryConstraints.push(window.limit(ITENS_POR_PAGINA));
+    const q = window.query(producoesCol, ...queryConstraints);
+
+    try {
+        const querySnapshot = await window.getDocs(q);
+        const documentos = querySnapshot.docs;
+
+        let filtrados = documentos.map(doc => ({ id: doc.id, ...doc.data() }));
+        if (filtro) {
+            filtrados = filtrados.filter(r =>
+                (!filtro.setor || r.setor === filtro.setor) &&
+                (!filtro.turno || r.turno === filtro.turno) &&
+                (!filtro.maquina || (r.maquina && r.maquina.toLowerCase().includes(filtro.maquina.toLowerCase()))) &&
+                (!filtro.refCpb || (r.refCpb && r.refCpb.toLowerCase().includes(filtro.refCpb.toLowerCase())))
+            );
+        }
+
+        tbody.innerHTML = "";
+        if (filtrados.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="6">${paginaAtual > 1 ? 'Fim dos resultados.' : 'Nenhum registro encontrado.'}</td></tr>`;
+            document.getElementById('btnProxima').disabled = true;
+            return;
+        }
+
+        if(direcao === 'proxima'){
+            primeiroDocumentoStack.push(documentos[0]);
+        }
+        
+        ultimoDocumentoVisivel = documentos[documentos.length - 1];
+        
+        filtrados.forEach((r, index) => {
+            const prev = parseFloat(r.prevista) || 0;
+            const real = parseFloat(r.realizada) || 0;
+            const queb = parseFloat(r.quebras) || 0;
+            const percRealizadoPrevisto = prev > 0 ? ((real / prev) * 100).toFixed(2) + '%' : 'N/A';
+            const totalProd = real + queb;
+            const percQuebrasRealizado = totalProd > 0 ? ((queb / totalProd) * 100).toFixed(2) + '%' : 'N/A';
+            
+            const trPrincipal = document.createElement("tr");
+            trPrincipal.innerHTML = `<td><button class="expand-btn" onclick="toggleDetalhes(${index})">+</button></td><td>${r.data}</td><td>${r.setor}</td><td>${r.maquina}</td><td>${percRealizadoPrevisto}</td><td>${percQuebrasRealizado}</td>`;
+            
+            const trDetalhes = document.createElement("tr");
+            trDetalhes.classList.add("linha-detalhes");
+            trDetalhes.id = `detalhes-${index}`;
+            trDetalhes.innerHTML = `<td colspan="6"><div class="detalhe-grid"><div><span>Operador:</span> ${r.operador}</div><div><span>Turno:</span> ${r.turno}</div><div><span>Massa:</span> ${r.massa}</div><div><span>Ref/CPB:</span> ${r.refCpb || 'N/A'}</div><div><span>Prevista:</span> ${prev}</div><div><span>Realizada:</span> ${real}</div><div><span>Quebras:</span> ${queb}</div><div><span>Observação:</span> ${r.observacao || 'Nenhuma'}</div><div><span>Ações:</span> <button class="edit-btn" onclick="abrirModalEdicao('${r.id}')">Editar</button> <button class="delete-btn" onclick="deletarRegistro('${r.id}')">Deletar</button></div></div></td>`;
+            
+            tbody.appendChild(trPrincipal);
+            tbody.appendChild(trDetalhes);
+        });
+
+        document.getElementById('infoPagina').textContent = `Página ${paginaAtual}`;
+        document.getElementById('btnAnterior').disabled = (paginaAtual === 1);
+        document.getElementById('btnProxima').disabled = (documentos.length < ITENS_POR_PAGINA);
+
+    } catch (error) {
+       console.error("Erro ao buscar documentos: ", error);
+       tbody.innerHTML=`<tr><td colspan='6'>Erro ao carregar dados. Verifique o console.</td></tr>`;
+    }
+}
+
+function proximaPagina() {
+    paginaAtual++;
+    atualizarTabela(filtroAtual, 'proxima');
+}
+
+function paginaAnterior() {
+    if (paginaAtual > 1) {
+        paginaAtual--;
+        atualizarTabela(filtroAtual, 'anterior');
+    }
+}
+
+function filtrarHistorico(){
+    filtroAtual = {
+        dataInicio:document.getElementById("filtroDataInicio").value,
+        dataFim:document.getElementById("filtroDataFim").value,
+        setor:document.getElementById("filtroSetor").value,
+        turno:document.getElementById("filtroTurno").value,
+        maquina:document.getElementById("filtroMaquina").value,
+        refCpb:document.getElementById("filtroRefCpb").value
+    };
+    paginaAtual = 1;
+    ultimoDocumentoVisivel = null;
+    primeiroDocumentoStack = [null];
+    atualizarTabela(filtroAtual);
+}
+
+function buscarTodos(){
+    document.getElementById("filtroDataInicio").value = "";
+    document.getElementById("filtroDataFim").value = "";
+    document.getElementById("filtroSetor").value = "";
+    document.getElementById("filtroTurno").value = "";
+    document.getElementById("filtroMaquina").value = "";
+    document.getElementById("filtroRefCpb").value = "";
+    
+    filtroAtual = null;
+    paginaAtual = 1;
+    ultimoDocumentoVisivel = null;
+    primeiroDocumentoStack = [null];
+    atualizarTabela(null);
+}
+
+async function exportarExcel() {
+    alert("Preparando dados para exportação. Isso pode levar um momento...");
+    const filtro = {
+        dataInicio: document.getElementById("filtroDataInicio").value,
+        dataFim: document.getElementById("filtroDataFim").value,
+        setor: document.getElementById("filtroSetor").value,
+        turno: document.getElementById("filtroTurno").value,
+        maquina: document.getElementById("filtroMaquina").value,
+        refCpb: document.getElementById("filtroRefCpb").value
+    };
+    const conditions = [];
+    if(filtro.dataInicio) conditions.push(window.where("data", ">=", filtro.dataInicio));
+    if(filtro.dataFim) conditions.push(window.where("data", "<=", filtro.dataFim));
+    const baseOrdering = [window.orderBy("data", "desc"), window.orderBy("timestamp", "desc")];
+    let q = window.query(producoesCol, ...conditions, ...baseOrdering);
+    try {
+        const querySnapshot = await window.getDocs(q);
+        const regs = [];
+        querySnapshot.forEach(doc => regs.push({ id: doc.id, ...doc.data() }));
+        let filtrados = regs.filter(r => 
+            (!filtro.setor || r.setor === filtro.setor) &&
+            (!filtro.turno || r.turno === filtro.turno) &&
+            (!filtro.maquina || (r.maquina && r.maquina.toLowerCase().includes(filtro.maquina.toLowerCase()))) &&
+            (!filtro.refCpb || (r.refCpb && r.refCpb.toLowerCase().includes(filtro.refCpb.toLowerCase())))
+        );
+        if (filtrados.length === 0) {
+            alert("Nenhum dado para exportar com os filtros atuais.");
+            return;
+        }
+        const dataToExport = filtrados.map(r => {
+            const prev = parseFloat(r.prevista) || 0;
+            const real = parseFloat(r.realizada) || 0;
+            const queb = parseFloat(r.quebras) || 0;
+            const percRealizadoPrevisto = prev > 0 ? `${((real / prev) * 100).toFixed(2)}%` : 'N/A';
+            const totalProd = real + queb;
+            const percQuebrasRealizado = totalProd > 0 ? `${((queb / totalProd) * 100).toFixed(2)}%` : 'N/A';
+            return {
+                "Data": r.data, "Setor": r.setor, "Turno": r.turno, "Operador": r.operador,
+                "Máquina": r.maquina, "Massa": r.massa, "Ref/CPB": r.refCpb,
+                "Prevista": prev, "Realizada": real, "Quebras": queb, "Obs": r.observacao,
+                "% Realizado/Previsto": percRealizadoPrevisto, "% Quebras/Total": percQuebrasRealizado,
+            };
+        });
+        const ws = XLSX.utils.json_to_sheet(dataToExport);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Histórico");
+        XLSX.writeFile(wb, `Historico_Filtrado_${new Date().toISOString().split('T')[0]}.xlsx`);
+    } catch(error) {
+        console.error("Erro ao exportar para Excel:", error);
+        alert("Ocorreu um erro ao preparar os dados para exportação.");
+    }
+}
+
+
+function filtrarDadosDashboardLocal(dados, filtro) {
+    return dados.filter(d => 
+        (!filtro.setor || d.setor === filtro.setor) &&
+        (!filtro.turno || d.turno === filtro.turno) &&
+        (!filtro.maquina || (d.maquina && d.maquina.toLowerCase().includes(filtro.maquina.toLowerCase()))) &&
+        (!filtro.refCpb || (d.refCpb && d.refCpb.toLowerCase().includes(filtro.refCpb.toLowerCase()))) &&
+        (!filtro.operador || (d.operador && d.operador.toLowerCase().includes(filtro.operador.toLowerCase())))
+    );
+}
+
+function calcularKPIsEstatistica(dados, prefixo) {
+    let totalPrevisto = 0, totalRealizado = 0, totalQuebras = 0;
+    dados.forEach(d => {
+        totalPrevisto += parseFloat(d.prevista) || 0;
+        totalRealizado += parseFloat(d.realizada) || 0;
+        totalQuebras += parseFloat(d.quebras) || 0;
+    });
+    const totalProducao = totalRealizado + totalQuebras;
+    const percRealPrev = totalPrevisto > 0 ? `${((totalRealizado / totalPrevisto) * 100).toFixed(2)}%` : 'N/A';
+    const percQuebraTotal = totalProducao > 0 ? `${((totalQuebras / totalProducao) * 100).toFixed(2)}%` : 'N/A';
+    document.getElementById(`${prefixo}Previsto`).textContent = totalPrevisto.toLocaleString();
+    document.getElementById(`${prefixo}Realizado`).textContent = totalRealizado.toLocaleString();
+    document.getElementById(`${prefixo}Quebras`).textContent = totalQuebras.toLocaleString();
+    document.getElementById(`${prefixo}PercRealPrev`).textContent = percRealPrev;
+    document.getElementById(`${prefixo}PercQuebraTotal`).textContent = percQuebraTotal;
+    
+    if (prefixo === 'kpiOperador') {
+        const areaOperador = document.getElementById('analiseOperadorArea');
+        const operadorInput = document.getElementById('dashFiltroOperador').value.trim();
+        if (operadorInput && dados.length > 0) {
+            document.getElementById('operadorSelecionado').textContent = operadorInput.toUpperCase(); 
+            areaOperador.classList.remove('hidden');
+        } else {
+            document.getElementById('operadorSelecionado').textContent = "Nenhum";
+            areaOperador.classList.add('hidden'); 
+        }
+    }
+}
+
+async function atualizarDashboard(){
+    if (!producoesCol || !window.getDocs || !window.query) {
+        console.error("Firebase não conectado para o Dashboard."); return;
+    }
+    const filtro = {
+        dataInicio: document.getElementById("dashFiltroDataInicio").value,
+        dataFim: document.getElementById("dashFiltroDataFim").value,
+        setor: document.getElementById("dashFiltroSetor").value,
+        turno: document.getElementById("dashFiltroTurno").value,
+        maquina: document.getElementById("dashFiltroMaquina").value,
+        refCpb: document.getElementById("dashFiltroRefCpb").value.trim(),
+        operador: document.getElementById("dashFiltroOperador").value.trim()
+    };
+    const conditions = [];
+    if(filtro.dataInicio) conditions.push(window.where("data", ">=", filtro.dataInicio));
+    if(filtro.dataFim) conditions.push(window.where("data", "<=", filtro.dataFim));
+    const baseOrdering = [window.orderBy("data", "desc")];
+    let q = window.query(producoesCol, ...conditions, ...baseOrdering);
+    try {
+        const querySnapshot = await window.getDocs(q);
+        const dadosGerais = [];
+        querySnapshot.forEach(doc => dadosGerais.push(doc.data()));
+        const dadosFiltradosGeral = filtrarDadosDashboardLocal(dadosGerais, filtro);
+        calcularKPIsEstatistica(dadosFiltradosGeral, 'kpi');
+        
+        let dadosOperador = [];
+        if (filtro.operador) {
+            const filtroOperadorApenasData = { 
+                dataInicio: filtro.dataInicio, dataFim: filtro.dataFim, operador: filtro.operador,
+                setor: '', turno: '', maquina: '', refCpb: ''
+            };
+            dadosOperador = filtrarDadosDashboardLocal(dadosGerais, filtroOperadorApenasData); 
+        }
+        calcularKPIsEstatistica(dadosOperador, 'kpiOperador');
+        
+    } catch (error) {
+        console.error("Erro ao carregar dados para o Dashboard: ", error);
+    }
+}
+
+window.deletarRegistro = deletarRegistro;
 window.deletarOperador = deletarOperador;
-// E todas as outras funções que são chamadas pelo HTML
-window.abrirModalOperador = async function(docId) { /* ... seu código original ... */ }; // Coloque o corpo da função aqui
-// etc.
+window.filtrarHistorico = filtrarHistorico;
+window.buscarTodos = buscarTodos;
+window.exportarExcel = exportarExcel;
+window.atualizarDashboard = atualizarDashboard;
+window.limparFormulario = limparFormulario;
+window.mostrarPagina = mostrarPagina;
+window.toggleDetalhes = toggleDetalhes;
+window.proximaPagina = proximaPagina;
+window.paginaAnterior = paginaAnterior;
+// Adicionando as novas funções ao escopo global
+window.abrirModalEdicao = abrirModalEdicao;
+window.abrirModalOperador = abrirModalOperador;
+window.fecharModal = fecharModal;
+</script>
+<script>
+if ("serviceWorker" in navigator) {
+  // LINHA MODIFICADA
+  navigator.serviceWorker.register("service-worker.js?v=1.0.2")
+    .then(() => console.log("Service Worker registrado com sucesso."))
+    .catch(err => console.log("Erro ao registrar o Service Worker:", err));
+}
+</script>
+<script>
+let deferredPrompt;
+const installBtn = document.createElement("button");
+installBtn.textContent = "📥 Instalar Aplicativo";
+installBtn.style.display = "none";
+installBtn.style.position = "fixed";
+installBtn.style.bottom = "20px";
+installBtn.style.right = "20px";
+installBtn.style.padding = "10px 16px";
+installBtn.style.background = "#0077cc";
+installBtn.style.color = "#fff";
+installBtn.style.border = "none";
+installBtn.style.borderRadius = "8px";
+installBtn.style.cursor = "pointer";
+document.body.appendChild(installBtn);
 
+window.addEventListener("beforeinstallprompt", (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  installBtn.style.display = "block";
+
+  installBtn.addEventListener("click", () => {
+    installBtn.style.display = "none";
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then(choiceResult => {
+      if (choiceResult.outcome === "accepted") {
+        console.log("Usuário aceitou instalar o app");
+      } else {
+        console.log("Usuário recusou instalar o app");
+      }
+      deferredPrompt = null;
+    });
+  });
+});
 </script>
 </body>
 </html>
