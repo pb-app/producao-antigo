@@ -33,7 +33,6 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
         
-        /* ESTILO ADICIONADO PARA O BOTÃO VOLTAR */
         .nav-container {
             max-width: 1100px;
             margin: 0 auto;
@@ -233,10 +232,10 @@
         <div class="modal-content">
             <h3>Configurações de Pesos e Metas</h3>
             <div class="config-grid">
-                <div> <label for="pesoFiltro">Peso por Filtro Prensa (kg)</label> <input type="number" id="pesoFiltro" step="0.1" value="4100"> </div>
-                <div> <label for="pesoPlaca">Peso por Placa (kg)</label> <input type="number" id="pesoPlaca" step="0.1" value="39.1"> </div>
-                <div> <label for="metaKgFT">Meta KG (Filtro Prensa)</label> <input type="number" id="metaKgFT" step="100" value="12300"> </div>
-                <div> <label for="metaKgPalete">Meta KG (Paletes)</label> <input type="number" id="metaKgPalete" step="100" value="12500"> </div>
+                <div> <label for="pesoFiltro">Peso por Filtro Prensa (kg)</label> <input type="number" id="pesoFiltro" step="0.1"> </div>
+                <div> <label for="pesoPlaca">Peso por Placa (kg)</label> <input type="number" id="pesoPlaca" step="0.1"> </div>
+                <div> <label for="metaKgFT">Meta KG (Filtro Prensa)</label> <input type="number" id="metaKgFT" step="100"> </div>
+                <div> <label for="metaKgPalete">Meta KG (Paletes)</label> <input type="number" id="metaKgPalete" step="100"> </div>
             </div>
             <div class="modal-actions">
                 <input type="password" id="configSenha" placeholder="Senha para salvar" style="flex-grow: 1;">
@@ -248,7 +247,7 @@
     
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, getDocs, query, where, orderBy, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, getDocs, query, where, orderBy, deleteDoc, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyB2z4mFj5qVtb59uocKK8JXhMTfi8MGSTo",
@@ -262,7 +261,6 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         
-        // Disponibiliza as funções do Firebase globalmente para fácil acesso
         window.db = db;
         window.massaCol = collection(db, "producao_massa");
         window.addDoc = addDoc;
@@ -272,14 +270,34 @@
         window.orderBy = orderBy;
         window.deleteDoc = deleteDoc;
         window.doc = doc;
+        window.getDoc = getDoc;
+        window.setDoc = setDoc;
         
         console.log("Firebase conectado para a Fábrica de Massa!");
     </script>
     
     <script>
-    // --- FUNÇÕES DE CONFIGURAÇÃO (continuam usando localStorage) ---
-    function openConfigModal() { document.getElementById('configModal').style.display = 'flex'; }
-    function closeConfigModal(event, force = false) { if (force || event.target.id === 'configModal') { document.getElementById('configModal').style.display = 'none'; } }
+    // Variável global para armazenar as configurações
+    let appConfig = {
+        pesoFiltro: 4100, pesoPlaca: 39.1,
+        metaKgFT: 12300, metaKgPalete: 12500
+    };
+
+    function openConfigModal() {
+        // Popula o modal com as configurações atuais antes de abrir
+        document.getElementById('pesoFiltro').value = appConfig.pesoFiltro;
+        document.getElementById('pesoPlaca').value = appConfig.pesoPlaca;
+        document.getElementById('metaKgFT').value = appConfig.metaKgFT;
+        document.getElementById('metaKgPalete').value = appConfig.metaKgPalete;
+        document.getElementById('configModal').style.display = 'flex';
+    }
+
+    function closeConfigModal(event, force = false) {
+        if (force || event.target.id === 'configModal') {
+            document.getElementById('configModal').style.display = 'none';
+        }
+    }
+
     function obterDataLocalFormatada() {
         const data = new Date();
         const ano = data.getFullYear();
@@ -287,39 +305,63 @@
         const dia = String(data.getDate()).padStart(2, '0');
         return `${ano}-${mes}-${dia}`;
     }
-    function salvarConfiguracoes() {
-        if (document.getElementById('configSenha').value !== 'pb2025') { alert('Senha incorreta!'); return; }
-        const config = {
-            pesoFiltro: document.getElementById('pesoFiltro').value,
-            pesoPlaca: document.getElementById('pesoPlaca').value,
-            metaKgFT: document.getElementById('metaKgFT').value,
-            metaKgPalete: document.getElementById('metaKgPalete').value
+
+    // --- FUNÇÕES DE CONFIGURAÇÃO (AGORA COM FIREBASE) ---
+    async function salvarConfiguracoes() {
+        if (document.getElementById('configSenha').value !== 'pb2025') {
+            alert('Senha incorreta!');
+            return;
+        }
+
+        const newConfig = {
+            pesoFiltro: parseFloat(document.getElementById('pesoFiltro').value) || 0,
+            pesoPlaca: parseFloat(document.getElementById('pesoPlaca').value) || 0,
+            metaKgFT: parseFloat(document.getElementById('metaKgFT').value) || 0,
+            metaKgPalete: parseFloat(document.getElementById('metaKgPalete').value) || 0
         };
-        localStorage.setItem('configMassa', JSON.stringify(config));
-        alert('Configurações salvas com sucesso!');
-        document.getElementById('configSenha').value = '';
-        closeConfigModal({target: {id: 'configModal'}});
-        renderizarHistorico();
-    }
-    function carregarConfiguracoes() {
-        const configSalva = localStorage.getItem('configMassa');
-        if (configSalva) {
-            const config = JSON.parse(configSalva);
-            document.getElementById('pesoFiltro').value = config.pesoFiltro || '4100';
-            document.getElementById('pesoPlaca').value = config.pesoPlaca || '39.1';
-            document.getElementById('metaKgFT').value = config.metaKgFT || '12300';
-            document.getElementById('metaKgPalete').value = config.metaKgPalete || '12500';
+
+        try {
+            const configDocRef = window.doc(db, "configuracoes", "massaConfig");
+            await window.setDoc(configDocRef, newConfig, { merge: true }); // Cria ou atualiza o documento
+            
+            // Atualiza a variável global
+            appConfig = newConfig;
+
+            alert('Configurações salvas com sucesso no Firebase!');
+            document.getElementById('configSenha').value = '';
+            closeConfigModal({target: {id: 'configModal'}});
+            renderizarHistorico(); // Re-renderiza a tabela com as novas metas
+        } catch (error) {
+            console.error("Erro ao salvar configurações no Firebase: ", error);
+            alert("Erro ao salvar configurações. Verifique o console.");
         }
     }
 
-    // --- FUNÇÕES DE DADOS (AGORA COM FIREBASE) ---
+    async function carregarConfiguracoes() {
+        try {
+            const configDocRef = window.doc(db, "configuracoes", "massaConfig");
+            const docSnap = await window.getDoc(configDocRef);
+            if (docSnap.exists()) {
+                console.log("Configurações carregadas do Firebase.");
+                appConfig = docSnap.data();
+            } else {
+                console.log("Nenhum documento de configuração encontrado, usando valores padrão.");
+            }
+        } catch(error) {
+            console.error("Erro ao carregar configurações do Firebase: ", error);
+        }
+    }
 
-    // SALVAR DADOS NO FIREBASE
+
+    // --- FUNÇÕES DE DADOS (USANDO FIREBASE E appConfig) ---
+
     document.getElementById('formMassa').addEventListener('submit', async function(event) {
         event.preventDefault();
-        const config = JSON.parse(localStorage.getItem('configMassa')) || {};
-        const pesoFiltro = parseFloat(config.pesoFiltro || document.getElementById('pesoFiltro').value);
-        const pesoPlaca = parseFloat(config.pesoPlaca || document.getElementById('pesoPlaca').value);
+        
+        // Usa as configurações da variável global
+        const pesoFiltro = appConfig.pesoFiltro;
+        const pesoPlaca = appConfig.pesoPlaca;
+
         const qtdFT = parseInt(document.getElementById('qtdFT').value);
         const qtdPlacas = parseInt(document.getElementById('qtdPlacas').value);
         const kgCalculado = (qtdFT * pesoFiltro) + (qtdPlacas * pesoPlaca);
@@ -347,7 +389,6 @@
         }
     });
     
-    // BUSCAR E RENDERIZAR DADOS DO FIREBASE
     async function renderizarHistorico() {
         const tbody = document.getElementById('tabelaHistoricoBody');
         tbody.innerHTML = '<tr><td colspan="5">Carregando dados do Firebase...</td></tr>';
@@ -359,16 +400,16 @@
         let queryConstraints = [window.orderBy("data", "desc"), window.orderBy("timestamp", "desc")];
         if (filtroDataInicio) queryConstraints.push(window.where("data", ">=", filtroDataInicio));
         if (filtroDataFim) queryConstraints.push(window.where("data", "<=", filtroDataFim));
-        if (filtroTurno) queryConstraints.push(window.where("data", "==", filtroTurno));
+        if (filtroTurno) queryConstraints.push(window.where("turno", "==", filtroTurno));
 
         try {
             const q = window.query(window.massaCol, ...queryConstraints);
             const querySnapshot = await window.getDocs(q);
             const dadosFiltrados = querySnapshot.docs;
 
-            const config = JSON.parse(localStorage.getItem('configMassa')) || {};
-            const metaKgFT = parseFloat(config.metaKgFT || 1);
-            const metaKgPalete = parseFloat(config.metaKgPalete || 1);
+            // Usa as metas da variável global
+            const metaKgFT = appConfig.metaKgFT || 1;
+            const metaKgPalete = appConfig.metaKgPalete || 1;
             
             tbody.innerHTML = '';
             if (dadosFiltrados.length === 0) {
@@ -422,7 +463,6 @@
         }
     }
 
-    // EXPORTAR DADOS DO FIREBASE PARA EXCEL
     async function exportarExcel() {
         alert('Preparando o arquivo Excel com dados do Firebase...');
         
@@ -433,7 +473,7 @@
         let queryConstraints = [window.orderBy("data", "desc"), window.orderBy("timestamp", "desc")];
         if (filtroDataInicio) queryConstraints.push(window.where("data", ">=", filtroDataInicio));
         if (filtroDataFim) queryConstraints.push(window.where("data", "<=", filtroDataFim));
-        if (filtroTurno) queryConstraints.push(window.where("data", "==", filtroTurno));
+        if (filtroTurno) queryConstraints.push(window.where("turno", "==", filtroTurno));
         
         try {
             const q = window.query(window.massaCol, ...queryConstraints);
@@ -445,9 +485,8 @@
                 return;
             }
             
-            const config = JSON.parse(localStorage.getItem('configMassa')) || {};
-            const metaKgFT = parseFloat(config.metaKgFT || 1);
-            const metaKgPalete = parseFloat(config.metaKgPalete || 1);
+            const metaKgFT = appConfig.metaKgFT || 1;
+            const metaKgPalete = appConfig.metaKgPalete || 1;
 
             const dadosFormatados = dadosParaExportar.map(reg => ({
                 'Data': new Date(reg.data + 'T03:00:00').toLocaleDateString('pt-BR'),
@@ -481,7 +520,6 @@
         }
     }
     
-    // DELETAR REGISTRO DO FIREBASE
     async function deletarRegistro(docId) {
         const senhaDigitada = prompt("Para confirmar a exclusão, digite a senha:");
         if (senhaDigitada === null) return;
@@ -503,7 +541,7 @@
     }
     
     // INICIALIZAÇÃO DA PÁGINA
-    document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', async () => {
         const hoje = obterDataLocalFormatada();
         document.getElementById('data').value = hoje;
         document.getElementById('filtroDataInicio').value = hoje;
@@ -513,7 +551,10 @@
         document.getElementById('filtroDataFim').addEventListener('change', renderizarHistorico);
         document.getElementById('filtroTurno').addEventListener('change', renderizarHistorico);
         
-        carregarConfiguracoes();
+        // Carrega as configs do Firebase primeiro
+        await carregarConfiguracoes(); 
+        
+        // Depois renderiza o histórico
         renderizarHistorico();
     });
 
