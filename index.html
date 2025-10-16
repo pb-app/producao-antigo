@@ -650,11 +650,42 @@ async function salvarEdicaoOperador(e) {
 
 // ============== FIM DAS FUNÇÕES DE EDIÇÃO ==============
 
-
 async function cadastrarOperador(e) {
     e.preventDefault();
-    // ... (código existente sem alterações)
+
+    // Pega os valores dos campos do formulário
+    const dataCadastro = document.getElementById("dataCadastroOp").value;
+    const nome = document.getElementById("nomeOperador").value.trim();
+    const setor = document.getElementById("setorOperador").value;
+    const turno = document.getElementById("turnoOperador").value;
+
+    // Verifica se todos os campos foram preenchidos
+    if (!dataCadastro || !nome || !setor || !turno) {
+        alert("Por favor, preencha todos os campos.");
+        return;
+    }
+
+    // Cria o objeto com os dados do novo operador
+    const novoOperador = {
+        dataCadastro: dataCadastro,
+        nome: nome,
+        setor: setor,
+        turno: turno
+    };
+
+    // Tenta salvar os dados no Firebase
+    try {
+        await window.addDoc(operadoresCol, novoOperador);
+        alert(`Operador "${nome}" cadastrado com sucesso! ✅`);
+        document.getElementById("formOperador").reset(); // Limpa o formulário
+        document.getElementById("dataCadastroOp").value = obterDataLocalFormatada(); // Volta a data para hoje
+        atualizarTabelaOperadores(); // Atualiza a lista de operadores na tela
+    } catch (error) {
+        console.error("Erro ao cadastrar operador: ", error);
+        alert("Erro ao cadastrar. Verifique o console. ❌");
+    }
 }
+
 
 async function atualizarTabelaOperadores() {
     const tbody = document.querySelector("#tabelaOperadores tbody");
@@ -1089,7 +1120,7 @@ window.fecharModal = fecharModal;
 <script>
 if ("serviceWorker" in navigator) {
   // LINHA MODIFICADA
-  navigator.serviceWorker.register("service-worker.js?v=1.0.2")
+  navigator.serviceWorker.register("service-worker.js?v=2.0.2")
     .then(() => console.log("Service Worker registrado com sucesso."))
     .catch(err => console.log("Erro ao registrar o Service Worker:", err));
 }
