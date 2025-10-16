@@ -5,7 +5,9 @@
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>Lançamento - Fábrica de Massa</title>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+
     <style>
         :root {
             --primary: #0077cc;
@@ -33,7 +35,7 @@
             text-align: center;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
-        
+
         .nav-container {
             max-width: 1100px;
             margin: 0 auto;
@@ -498,6 +500,9 @@
     };
     let paletesDisponiveis = new Map();
 
+    // ### REGISTRO DO PLUGIN DE RÓTULOS (DATALABELS) ###
+    Chart.register(ChartDataLabels);
+
     function showTab(tabName) {
         document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
         document.querySelectorAll('.tab-link').forEach(link => link.classList.remove('active'));
@@ -726,9 +731,6 @@
         }
     }
 
-    window.toggleDetalhes = (docId) => { /* ... */ };
-    window.deletarRegistro = async (docId) => { /* ... */ };
-
     document.getElementById('formPesagem').addEventListener('submit', async function(event) {
         event.preventDefault();
         const novoRegistro = {
@@ -754,11 +756,6 @@
         }
     });
 
-    async function renderizarHistoricoPesagem() { /* ... */ };
-    window.editarRegistroPesagem = async (docId, dadosAtuais) => { /* ... */ };
-    window.deletarRegistroPesagem = async (docId) => { /* ... */ };
-    async function exportarExcel() { /* ... */ };
-    
     // --- LÓGICA DO DASHBOARD ---
     let pieChartTurnosInstance, barChartMensalInstance;
 
@@ -817,7 +814,22 @@
                     backgroundColor: ['#0077cc', '#28a745', '#ff9900', '#dc3545', '#6c757d', '#17a2b8', '#f012be'],
                 }]
             },
-            options: { responsive: true, plugins: { legend: { position: 'top' } } }
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { position: 'top' },
+                    datalabels: {
+                        formatter: (value, ctx) => {
+                            const sum = ctx.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
+                            if (sum === 0) return '0.00%';
+                            const percentage = (value * 100 / sum).toFixed(2) + '%';
+                            return percentage;
+                        },
+                        color: '#fff',
+                        font: { weight: 'bold', size: 14 }
+                    }
+                }
+            }
         });
     }
 
@@ -829,7 +841,8 @@
         try {
             let qConstraints = [where("data", ">=", dataInicioStr)];
             if (turnoFiltro) qConstraints.push(where("turno", "==", turnoFiltro));
-            const q = query(massaCol, ...qConstraints);
+            // ### CORREÇÃO AQUI: Usando window.massaCol em vez de massaCol ###
+            const q = query(window.massaCol, ...qConstraints);
             const querySnapshot = await getDocs(q);
             const dados = querySnapshot.docs.map(doc => doc.data());
             const producaoPorMes = {};
@@ -858,7 +871,20 @@
                         borderWidth: 1
                     }]
                 },
-                options: { scales: { y: { beginAtZero: true } } }
+                options: { 
+                    scales: { y: { beginAtZero: true } },
+                    plugins: {
+                        datalabels: {
+                            anchor: 'end',
+                            align: 'top',
+                            color: '#444',
+                            font: { weight: 'bold' },
+                            formatter: (value) => {
+                                return value > 0 ? value.toLocaleString('pt-BR') : '';
+                            }
+                        }
+                    }
+                }
             });
         } catch (error) { console.error("Erro ao gerar gráfico mensal:", error); }
     }
