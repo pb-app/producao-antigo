@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -115,7 +114,6 @@
         button.secondary { background: #6c757d; color: white; }
         button.secondary:hover { background: #5a6268; }
         button.delete-btn { background: var(--danger); padding: 0.3rem 0.6rem; font-size: 0.8rem; }
-        button.edit-btn { background: var(--accent); padding: 0.3rem 0.6rem; font-size: 0.8rem; margin-right: 5px; }
         button.excel-btn { background: var(--secondary); }
 
         #openConfigBtn {
@@ -190,35 +188,6 @@
             line-height: 1.4;
         }
         .expand-btn:hover { background-color: #ced4da; }
-
-        /* --- ESTILOS DAS ABAS --- */
-        .tab-nav {
-            display: flex;
-            border-bottom: 2px solid var(--border-color);
-            margin-bottom: 1.5rem;
-        }
-        .tab-link {
-            padding: 0.75rem 1.25rem;
-            cursor: pointer;
-            border: none;
-            background: none;
-            font-size: 1rem;
-            font-weight: 600;
-            color: var(--text-light);
-            border-bottom: 3px solid transparent;
-            margin-bottom: -2px; /* Alinha com a borda do container */
-        }
-        .tab-link.active {
-            color: var(--primary);
-            border-bottom-color: var(--primary);
-        }
-        .tab-content {
-            display: none;
-        }
-        .tab-content.active {
-            display: block;
-        }
-
     </style>
 </head>
 <body>
@@ -232,78 +201,31 @@
 
     <div class="container">
         <button id="openConfigBtn" title="Configurações de Pesos e Metas" onclick="openConfigModal()">⚙️</button>
-        
-        <div class="tab-nav">
-            <button class="tab-link active" onclick="showTab('producao')">Produção de Massa</button>
-            <button class="tab-link" onclick="showTab('pesagem')">Pesagem de Paletes</button>
-        </div>
-
-        <div id="tabProducao" class="tab-content active">
-            <section>
-                <h2>Lançar Produção</h2>
-                <form id="formMassa">
-                    <div> <label for="data">Data</label> <input type="date" id="data" required> </div> <div> <label for="turno">Turno</label> <select id="turno" required> <option value="">Selecione um turno</option> <option>Comercial</option> <option>Turno 1 (6x2)</option> <option>Turno 2 (6x2)</option> <option>Turno 3 (6x2)</option> <option>Turno 4 (6x2)</option> <option>Turno 1 (5x2)</option> <option>Turno 2 (5x2)</option> </select> </div> <div> <label for="qtdFT">Quantidade de Filtro-prensagem (FT)</label> <input type="number" id="qtdFT" min="0" required> </div> <div> <label for="qtdPlacas">Quantidade de Placas</label> <input type="number" id="qtdPlacas" min="0" value="0" required> </div> <div class="full-width"> <label for="kgPalete">Kg de Massa no Palete (Peso Real)</label> <input type="number" id="kgPalete" step="0.1" min="0" required> </div> <div class="full-width"> <label for="observacao">Observação</label> <textarea id="observacao" placeholder="Alguma observação sobre a produção..."></textarea> </div> <div class="form-actions"> <button type="button" class="secondary" onclick="document.getElementById('formMassa').reset(); document.getElementById('data').value = obterDataLocalFormatada();">Limpar</button> <button type="submit">Lançar Produção</button> </div>
-                </form>
-            </section>
-            <section class="history-section">
-                <h2>Histórico de Produção</h2>
-                <div class="filters">
-                    <div> <label for="filtroDataInicio">Data Início</label> <input type="date" id="filtroDataInicio"> </div> <div> <label for="filtroDataFim">Data Fim</label> <input type="date" id="filtroDataFim"> </div> <div> <label for="filtroTurno">Turno</label> <select id="filtroTurno"> <option value="">Todos os Turnos</option> <option>Comercial</option> <option>Turno 1 (6x2)</option> <option>Turno 2 (6x2)</option> <option>Turno 3 (6x2)</option> <option>Turno 4 (6x2)</option> <option>Turno 1 (5x2)</option> <option>Turno 2 (5x2)</option> </select> </div>
-                    <button class="excel-btn" onclick="exportarExcel()">Exportar Excel</button>
-                </div>
-                <table>
-                    <thead>
-                        <tr>
-                            <th></th>
-                            <th>Data</th>
-                            <th>Turno</th>
-                            <th>% FT</th>
-                            <th>% Palete</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tabelaHistoricoBody"></tbody>
-                </table>
-            </section>
-        </div>
-
-        <div id="tabPesagem" class="tab-content">
-            <section>
-                <h2>Lançar Peso de Palete/Mesa</h2>
-                <form id="formPesagem">
-                    <div>
-                        <label for="dataPesagem">Data</label>
-                        <input type="date" id="dataPesagem" required>
-                    </div>
-                    <div>
-                        <label for="codigoPalete">Código do Palete/Mesa</label>
-                        <input type="text" id="codigoPalete" required placeholder="Ex: P01, MESA-A">
-                    </div>
-                    <div>
-                        <label for="pesoTotalPalete">Peso Total (kg)</label>
-                        <input type="number" id="pesoTotalPalete" step="0.1" min="0" required>
-                    </div>
-                    <div class="form-actions">
-                        <button type="button" class="secondary" onclick="document.getElementById('formPesagem').reset(); document.getElementById('dataPesagem').value = obterDataLocalFormatada();">Limpar</button>
-                        <button type="submit">Lançar Peso</button>
-                    </div>
-                </form>
-            </section>
-
-            <section class="history-section">
-                <h2>Histórico de Pesagem</h2>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Data</th>
-                            <th>Código</th>
-                            <th>Peso Total (kg)</th>
-                            <th>Ações</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tabelaPesagemBody"></tbody>
-                </table>
-            </section>
-        </div>
+        <section>
+            <h2>Lançar Produção</h2>
+            <form id="formMassa">
+                <div> <label for="data">Data</label> <input type="date" id="data" required> </div> <div> <label for="turno">Turno</label> <select id="turno" required> <option value="">Selecione um turno</option> <option>Comercial</option> <option>Turno 1 (6x2)</option> <option>Turno 2 (6x2)</option> <option>Turno 3 (6x2)</option> <option>Turno 4 (6x2)</option> <option>Turno 1 (5x2)</option> <option>Turno 2 (5x2)</option> </select> </div> <div> <label for="qtdFT">Quantidade de Filtro-prensagem (FT)</label> <input type="number" id="qtdFT" min="0" required> </div> <div> <label for="qtdPlacas">Quantidade de Placas</label> <input type="number" id="qtdPlacas" min="0" value="0" required> </div> <div class="full-width"> <label for="kgPalete">Kg de Massa no Palete (Peso Real)</label> <input type="number" id="kgPalete" step="0.1" min="0" required> </div> <div class="full-width"> <label for="observacao">Observação</label> <textarea id="observacao" placeholder="Alguma observação sobre a produção..."></textarea> </div> <div class="form-actions"> <button type="button" class="secondary" onclick="document.getElementById('formMassa').reset(); document.getElementById('data').value = obterDataLocalFormatada();">Limpar</button> <button type="submit">Lançar Produção</button> </div>
+            </form>
+        </section>
+        <section class="history-section">
+            <h2>Histórico de Produção</h2>
+            <div class="filters">
+                <div> <label for="filtroDataInicio">Data Início</label> <input type="date" id="filtroDataInicio"> </div> <div> <label for="filtroDataFim">Data Fim</label> <input type="date" id="filtroDataFim"> </div> <div> <label for="filtroTurno">Turno</label> <select id="filtroTurno"> <option value="">Todos os Turnos</option> <option>Comercial</option> <option>Turno 1 (6x2)</option> <option>Turno 2 (6x2)</option> <option>Turno 3 (6x2)</option> <option>Turno 4 (6x2)</option> <option>Turno 1 (5x2)</option> <option>Turno 2 (5x2)</option> </select> </div>
+                <button class="excel-btn" onclick="exportarExcel()">Exportar Excel</button>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>Data</th>
+                        <th>Turno</th>
+                        <th>% FT</th>
+                        <th>% Palete</th>
+                    </tr>
+                </thead>
+                <tbody id="tabelaHistoricoBody"></tbody>
+            </table>
+        </section>
     </div>
 
     <div id="configModal" class="modal-overlay" onclick="closeConfigModal(event)">
@@ -325,7 +247,7 @@
     
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, getDocs, query, where, orderBy, deleteDoc, doc, getDoc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, getDocs, query, where, orderBy, deleteDoc, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyB2z4mFj5qVtb59uocKK8JXhMTfi8MGSTo",
@@ -341,7 +263,6 @@
         
         window.db = db;
         window.massaCol = collection(db, "producao_massa");
-        window.pesagemCol = collection(db, "pesagem_paletes"); // <-- Nova coleção
         window.addDoc = addDoc;
         window.getDocs = getDocs;
         window.query = query;
@@ -351,7 +272,6 @@
         window.doc = doc;
         window.getDoc = getDoc;
         window.setDoc = setDoc;
-        window.updateDoc = updateDoc;
         
         console.log("Firebase conectado para a Fábrica de Massa!");
     </script>
@@ -363,16 +283,8 @@
         metaKgFT: 12300, metaKgPalete: 12500
     };
 
-    // --- FUNÇÕES DE NAVEGAÇÃO E UI ---
-    function showTab(tabName) {
-        document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-        document.querySelectorAll('.tab-link').forEach(link => link.classList.remove('active'));
-        
-        document.getElementById(`tab${tabName.charAt(0).toUpperCase() + tabName.slice(1)}`).classList.add('active');
-        event.target.classList.add('active');
-    }
-
     function openConfigModal() {
+        // Popula o modal com as configurações atuais antes de abrir
         document.getElementById('pesoFiltro').value = appConfig.pesoFiltro;
         document.getElementById('pesoPlaca').value = appConfig.pesoPlaca;
         document.getElementById('metaKgFT').value = appConfig.metaKgFT;
@@ -394,7 +306,7 @@
         return `${ano}-${mes}-${dia}`;
     }
 
-    // --- FUNÇÕES DE CONFIGURAÇÃO (FIREBASE) ---
+    // --- FUNÇÕES DE CONFIGURAÇÃO (AGORA COM FIREBASE) ---
     async function salvarConfiguracoes() {
         if (document.getElementById('configSenha').value !== 'pb2025') {
             alert('Senha incorreta!');
@@ -410,13 +322,15 @@
 
         try {
             const configDocRef = window.doc(db, "configuracoes", "massaConfig");
-            await window.setDoc(configDocRef, newConfig, { merge: true });
+            await window.setDoc(configDocRef, newConfig, { merge: true }); // Cria ou atualiza o documento
             
+            // Atualiza a variável global
             appConfig = newConfig;
+
             alert('Configurações salvas com sucesso no Firebase!');
             document.getElementById('configSenha').value = '';
             closeConfigModal({target: {id: 'configModal'}});
-            renderizarHistorico();
+            renderizarHistorico(); // Re-renderiza a tabela com as novas metas
         } catch (error) {
             console.error("Erro ao salvar configurações no Firebase: ", error);
             alert("Erro ao salvar configurações. Verifique o console.");
@@ -438,10 +352,13 @@
         }
     }
 
-    // --- ABA DE PRODUÇÃO DE MASSA ---
+
+    // --- FUNÇÕES DE DADOS (USANDO FIREBASE E appConfig) ---
+
     document.getElementById('formMassa').addEventListener('submit', async function(event) {
         event.preventDefault();
         
+        // Usa as configurações da variável global
         const pesoFiltro = appConfig.pesoFiltro;
         const pesoPlaca = appConfig.pesoPlaca;
 
@@ -474,7 +391,7 @@
     
     async function renderizarHistorico() {
         const tbody = document.getElementById('tabelaHistoricoBody');
-        tbody.innerHTML = '<tr><td colspan="5">Carregando dados...</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="5">Carregando dados do Firebase...</td></tr>';
         
         const filtroDataInicio = document.getElementById('filtroDataInicio').value;
         const filtroDataFim = document.getElementById('filtroDataFim').value;
@@ -489,7 +406,8 @@
             const q = window.query(window.massaCol, ...queryConstraints);
             const querySnapshot = await window.getDocs(q);
             const dadosFiltrados = querySnapshot.docs;
-            
+
+            // Usa as metas da variável global
             const metaKgFT = appConfig.metaKgFT || 1;
             const metaKgPalete = appConfig.metaKgPalete || 1;
             
@@ -541,7 +459,7 @@
             });
         } catch (error) {
             console.error("Erro ao buscar dados do Firebase: ", error);
-            tbody.innerHTML = '<tr><td colspan="5">Erro ao carregar dados.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="5">Erro ao carregar dados. Verifique o console.</td></tr>';
         }
     }
 
@@ -590,7 +508,7 @@
         }
     }
     
-    window.toggleDetalhes = function(docId) {
+    function toggleDetalhes(docId) {
         const detalhesRow = document.getElementById(`detalhes-${docId}`);
         const btn = event.target;
         if (detalhesRow.style.display === "table-row") {
@@ -602,7 +520,7 @@
         }
     }
     
-    window.deletarRegistro = async function(docId) {
+    async function deletarRegistro(docId) {
         const senhaDigitada = prompt("Para confirmar a exclusão, digite a senha:");
         if (senhaDigitada === null) return;
         if (senhaDigitada !== 'pb2025') {
@@ -621,132 +539,13 @@
             }
         }
     }
-
-    // --- ABA DE PESAGEM DE PALETES (NOVO) ---
-    document.getElementById('formPesagem').addEventListener('submit', async function(event) {
-        event.preventDefault();
-        const novoRegistro = {
-            data: document.getElementById('dataPesagem').value,
-            codigo: document.getElementById('codigoPalete').value,
-            peso: parseFloat(document.getElementById('pesoTotalPalete').value),
-            timestamp: new Date().toISOString()
-        };
-
-        try {
-            await window.addDoc(window.pesagemCol, novoRegistro);
-            alert('Pesagem lançada com sucesso! ✅');
-            renderizarHistoricoPesagem();
-            this.reset();
-            document.getElementById('dataPesagem').value = obterDataLocalFormatada();
-        } catch (error) {
-            console.error("Erro ao salvar pesagem no Firebase: ", error);
-            alert("Erro ao salvar a pesagem. Verifique o console. ❌");
-        }
-    });
-
-    async function renderizarHistoricoPesagem() {
-        const tbody = document.getElementById('tabelaPesagemBody');
-        tbody.innerHTML = '<tr><td colspan="4">Carregando dados...</td></tr>';
-
-        try {
-            const q = window.query(window.pesagemCol, window.orderBy("data", "desc"), window.orderBy("timestamp", "desc"));
-            const querySnapshot = await window.getDocs(q);
-            
-            tbody.innerHTML = '';
-            if (querySnapshot.empty) {
-                tbody.innerHTML = '<tr><td colspan="4">Nenhum registro de pesagem encontrado.</td></tr>';
-                return;
-            }
-
-            querySnapshot.forEach(doc => {
-                const reg = doc.data();
-                const docId = doc.id;
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td>${new Date(reg.data + 'T03:00:00').toLocaleDateString('pt-BR')}</td>
-                    <td>${reg.codigo}</td>
-                    <td>${reg.peso.toFixed(2)} kg</td>
-                    <td>
-                        <button class="edit-btn" onclick='editarRegistroPesagem("${docId}", ${JSON.stringify(reg)})'>Editar</button>
-                        <button class="delete-btn" onclick="deletarRegistroPesagem('${docId}')">Excluir</button>
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
-        } catch (error) {
-            console.error("Erro ao buscar histórico de pesagem: ", error);
-            tbody.innerHTML = '<tr><td colspan="4">Erro ao carregar dados.</td></tr>';
-        }
-    }
-
-    window.editarRegistroPesagem = async function(docId, dadosAtuais) {
-        const senha = prompt("Para editar, por favor, insira a senha:");
-        if (senha !== 'pb2025') {
-            alert("Senha incorreta. Operação cancelada.");
-            return;
-        }
-
-        const novaData = prompt("Editar Data (AAAA-MM-DD):", dadosAtuais.data);
-        if (novaData === null) return;
-        
-        const novoCodigo = prompt("Editar Código:", dadosAtuais.codigo);
-        if (novoCodigo === null) return;
-
-        const novoPeso = prompt("Editar Peso (kg):", dadosAtuais.peso);
-        if (novoPeso === null) return;
-
-        const dadosAtualizados = {
-            ...dadosAtuais, // Mantém o timestamp original
-            data: novaData,
-            codigo: novoCodigo,
-            peso: parseFloat(novoPeso)
-        };
-
-        if (isNaN(dadosAtualizados.peso)) {
-            alert("Peso inválido. A edição foi cancelada.");
-            return;
-        }
-
-        try {
-            const docRef = window.doc(db, "pesagem_paletes", docId);
-            await window.setDoc(docRef, dadosAtualizados);
-            alert("Registro atualizado com sucesso!");
-            renderizarHistoricoPesagem();
-        } catch(error) {
-            console.error("Erro ao atualizar registro: ", error);
-            alert("Falha ao atualizar o registro.");
-        }
-    }
     
-    window.deletarRegistroPesagem = async function(docId) {
-        const senha = prompt("Para excluir, por favor, insira a senha:");
-        if (senha !== 'pb2025') {
-            alert("Senha incorreta. Operação cancelada.");
-            return;
-        }
-
-        if (confirm("Tem certeza que deseja excluir este registro de pesagem?")) {
-            try {
-                await window.deleteDoc(window.doc(db, "pesagem_paletes", docId));
-                alert("Registro excluído com sucesso!");
-                renderizarHistoricoPesagem();
-            } catch (error) {
-                console.error("Erro ao excluir registro de pesagem:", error);
-                alert("Falha ao excluir o registro.");
-            }
-        }
-    }
-    
-    // --- INICIALIZAÇÃO DA PÁGINA ---
+    // INICIALIZAÇÃO DA PÁGINA
     document.addEventListener('DOMContentLoaded', async () => {
         const hoje = obterDataLocalFormatada();
-        // Aba de Produção
         document.getElementById('data').value = hoje;
         document.getElementById('filtroDataInicio').value = hoje;
         document.getElementById('filtroDataFim').value = hoje;
-        
-        // Aba de Pesagem
-        document.getElementById('dataPesagem').value = hoje;
         
         document.getElementById('filtroDataInicio').addEventListener('change', renderizarHistorico);
         document.getElementById('filtroDataFim').addEventListener('change', renderizarHistorico);
@@ -755,11 +554,10 @@
         // Carrega as configs do Firebase primeiro
         await carregarConfiguracoes(); 
         
-        // Depois renderiza os históricos das duas abas
+        // Depois renderiza o histórico
         renderizarHistorico();
-        renderizarHistoricoPesagem();
     });
 
-    </script>
+</script>
 </body>
 </html>
