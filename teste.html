@@ -224,7 +224,6 @@
                 </div>
                 <div class="full" style="text-align:right;">
                    <button type="submit">Cadastrar Operador</button>
-                  
                 </div>
             </form>
             
@@ -651,10 +650,9 @@ async function salvarEdicaoOperador(e) {
 
 // ============== FIM DAS FUNÇÕES DE EDIÇÃO ==============
 
-
 async function cadastrarOperador(e) {
     e.preventDefault();
-    
+
     // Pega os valores dos campos do formulário
     const dataCadastro = document.getElementById("dataCadastroOp").value;
     const nome = document.getElementById("nomeOperador").value.trim();
@@ -666,7 +664,7 @@ async function cadastrarOperador(e) {
         alert("Por favor, preencha todos os campos.");
         return;
     }
-    
+
     // Cria o objeto com os dados do novo operador
     const novoOperador = {
         dataCadastro: dataCadastro,
@@ -687,8 +685,7 @@ async function cadastrarOperador(e) {
         alert("Erro ao cadastrar. Verifique o console. ❌");
     }
 }
-    // ... (código existente sem alterações)
-}
+
 
 async function atualizarTabelaOperadores() {
     const tbody = document.querySelector("#tabelaOperadores tbody");
