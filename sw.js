@@ -1,9 +1,9 @@
-const CACHE_NAME = 'producao-app-v2'; // Mude a versão aqui para forçar a atualização
+const CACHE_NAME = 'producao-app-v6'; // Mude a versão aqui para forçar a atualização
 const urlsToCache = [
-  '/',
+ '/',
   '/index.html',
-  '/style.css',
-  '/app.js'
+  '/manifest.json',
+  '/Massa.html'
   // Adicione aqui todos os outros arquivos importantes (imagens, etc.)
 ];
 
