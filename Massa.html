@@ -617,40 +617,46 @@
         calcularPesoTotalPaletes();
     }
 
-    document.getElementById('formMassa').addEventListener('submit', async function(event) {
-        event.preventDefault();
-        const kgPaleteReal = parseFloat(document.getElementById('kgPalete').value);
-        if (kgPaleteReal <= 0) {
-            alert("O KG Total de Paletes deve ser maior que zero. Lance ao menos um palete.");
-            return;
-        }
-        const qtdFT = parseInt(document.getElementById('qtdFT').value);
-        const qtdPlacas = parseInt(document.getElementById('qtdPlacas').value);
-        const kgCalculado = (qtdFT * appConfig.pesoFiltro) + (qtdPlacas * appConfig.pesoPlaca);
-        const retrabalhoKg = kgPaleteReal - kgCalculado;
-        const novoRegistro = {
-            data: document.getElementById('data').value,
-            turno: document.getElementById('turno').value,
-            qtdFT,
-            qtdPlacas,
-            kgPalete: kgPaleteReal,
-            observacao: document.getElementById('observacao').value,
-            kgCalculado,
-            retrabalhoKg,
-            timestamp: new Date().toISOString(),
-            metaKgFT: appConfig.metaKgFT,
-            metaKgPalete: appConfig.metaKgPalete
-        };
-        try {
-            await window.addDoc(window.massaCol, novoRegistro);
-            alert('Produção lançada com sucesso! ✅');
-            renderizarHistorico();
-            limparFormMassa();
-        } catch (error) {
-            console.error("Erro ao salvar no Firebase: ", error);
-            alert("Erro ao salvar. Verifique o console. ❌");
-        }
-    });
+   document.getElementById('formMassa').addEventListener('submit', async function(event) {
+        event.preventDefault();
+        const kgPaleteReal = parseFloat(document.getElementById('kgPalete').value);
+        if (kgPaleteReal <= 0) {
+            alert("O KG Total de Paletes deve ser maior que zero. Lance ao menos um palete.");
+            return;
+        }
+        const qtdFT = parseInt(document.getElementById('qtdFT').value);
+        const qtdPlacas = parseInt(document.getElementById('qtdPlacas').value);
+        const kgCalculado = (qtdFT * appConfig.pesoFiltro) + (qtdPlacas * appConfig.pesoPlaca);
+        
+        // 1. O cálculo original é feito
+        const retrabalhoCalculado = kgPaleteReal - kgCalculado;
+
+        // 2. AQUI GARANTIMOS QUE O VALOR A SER SALVO SEJA 0 SE FOR NEGATIVO
+        const retrabalhoKg = Math.max(0, retrabalhoCalculado);
+
+        const novoRegistro = {
+            data: document.getElementById('data').value,
+            turno: document.getElementById('turno').value,
+            qtdFT,
+            qtdPlacas,
+            kgPalete: kgPaleteReal,
+            observacao: document.getElementById('observacao').value,
+            kgCalculado,
+            retrabalhoKg, // É este valor (já corrigido) que é enviado ao banco de dados
+            timestamp: new Date().toISOString(),
+            metaKgFT: appConfig.metaKgFT,
+            metaKgPalete: appConfig.metaKgPalete
+        };
+        try {
+            await window.addDoc(window.massaCol, novoRegistro);
+            alert('Produção lançada com sucesso! ✅');
+            renderizarHistorico();
+            limparFormMassa();
+        } catch (error) {
+            console.error("Erro ao salvar no Firebase: ", error);
+            alert("Erro ao salvar. Verifique o console. ❌");
+        }
+    });
     
     async function renderizarHistorico() {
         const tbody = document.getElementById('tabelaHistoricoBody');
