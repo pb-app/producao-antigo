@@ -109,31 +109,52 @@ h3 { font-size: 1.1rem; color: var(--text-light); }
     box-shadow: 0 8px 24px var(--shadow-color); /* Sombra mais suave */
 }
 
-/* --- NAVEGAÇÃO MODERNA --- */
+/* --- NAVEGAÇÃO EM BOTÕES --- */
 .nav {
     display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
-    justify-content: flex-start;
+    flex-wrap: wrap; /* Permite que os botões quebrem a linha em telas pequenas */
+    gap: 0.75rem;    /* Espaço entre os botões */
+    justify-content: center; /* Centraliza o conjunto de botões */
     margin-bottom: 2rem;
-    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border-color); /* Mantém a linha de separação */
 }
+
 .nav a {
-    color: var(--text-light);
+    /* Estilo base do botão */
+    background-color: var(--primary);
+    color: white;
     text-decoration: none;
     font-weight: 500;
-    padding: 0.75rem 0.25rem;
-    border-bottom: 3px solid transparent;
-    transition: all 0.2s ease-in-out;
+    padding: 0.4rem 0.8rem; /* <-- VALORES MENORES AQUI */
+    font-size: 0.85rem;      /* <-- LINHA ADICIONADA PARA DIMINUIR O TEXTO */
+    border-radius: 8px;    /* Cantos arredondados */
+    border-bottom: none;   /* Remove a borda antiga */
+    transition: background-color 0.2s ease-in-out, transform 0.2s ease;
+    text-align: center;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1); /* Sombra suave */
 }
+
 .nav a:hover {
-    color: var(--primary);
-    background: none;
+    /* Efeito ao passar o mouse */
+    background-color: var(--primary-dark);
+    transform: translateY(-2px); /* Efeito de "levantar" o botão */
 }
+
 .nav a.active {
-    color: var(--primary);
+    /* Estilo do botão ativo (página selecionada) */
+    background-color: var(--primary-dark);
     font-weight: 700;
-    border-bottom-color: var(--primary);
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.2); /* Sombra interna para dar profundidade */
+    transform: translateY(1px);
+}
+
+/* Estilo específico para o botão "Fábrica de Massa" */
+.nav a[href="Massa.html"] {
+    background-color: var(--success); /* Cor verde para destacar */
+}
+.nav a[href="Massa.html"]:hover {
+     background-color: #218838; /* Verde mais escuro no hover */
 }
 
 /* --- FORMULÁRIOS MODERNOS --- */
@@ -329,8 +350,7 @@ tbody tr:hover { background-color: var(--primary-light); }
             <a href="#" id="linkOper" onclick="mostrarPagina('operadores')">Operadores</a>
             <a href="#" id="linkHist" onclick="mostrarPagina('historico')">Histórico</a>
             <a href="#" id="linkDash" onclick="mostrarPagina('dashboard')">Dashboard</a>
-            <a href="Massa.html" style="background-color: ; color: #0077cc;">Fábrica de Massa</a>
-        </div>
+            <a href="Massa.html">Fábrica de Massa</a>        </div>
 
         <section id="lancamento">
             <h2>Lançamento de Produção</h2>
