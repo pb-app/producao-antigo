@@ -1,5 +1,5 @@
 // 1. MUDE A VERSÃO AQUI PARA FORÇAR A ATUALIZAÇÃO
-const CACHE_NAME = 'producao-app-v15'; 
+const CACHE_NAME = 'producao-app-v16'; 
 
 // 2. ADICIONE AQUI SEUS ÍCONES E OUTROS ARQUIVOS IMPORTANTES
 const urlsToCache = [
