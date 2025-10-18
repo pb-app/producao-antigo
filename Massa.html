@@ -152,10 +152,12 @@ form {
     gap: 1.5rem;
 }
 /* ================================================================ */
-/* ===== AJUSTE PARA 2 COLUNAS EM TODAS AS TELAS (MÓVEL INCLUSO) ==== */
+/* ============= NOVO: AJUSTE PARA 2 COLUNAS NOS FORMS ============ */
 /* ================================================================ */
-#formMassa, #formPesagem {
+@media (min-width: 768px) {
+  #formMassa, #formPesagem {
     grid-template-columns: repeat(2, 1fr);
+  }
 }
 label {
     font-size: 0.8rem; font-weight: 700; margin-bottom: 0.5rem;
