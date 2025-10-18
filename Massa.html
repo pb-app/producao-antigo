@@ -151,6 +151,12 @@ form {
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     gap: 1.5rem;
 }
+/* ================================================================ */
+/* ===== AJUSTE PARA 2 COLUNAS EM TODAS AS TELAS (MÓVEL INCLUSO) ==== */
+/* ================================================================ */
+#formMassa, #formPesagem {
+    grid-template-columns: repeat(2, 1fr);
+}
 label {
     font-size: 0.8rem; font-weight: 700; margin-bottom: 0.5rem;
     display: block; color: var(--text-light); text-transform: uppercase;
