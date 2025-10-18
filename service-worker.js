@@ -3,11 +3,12 @@ const CACHE_NAME = 'app-cache-v2';
 
 // Lista de arquivos que serão cacheados
 const urlsToCache = [
-  '/',
-  '/index.html',
-  '/manifest.json',
-  '/icons/icon-192x192.png',
-  '/icons/icon-512x512.png'
+  'index.html',
+  'Massa.html',
+  'manifest.json',
+  'icons/icon-180x180.png',
+  'icons/icon-192x192.png',
+  'icons/icon-512x512.png',
 ];
 
 // Evento de Instalação: Salva os arquivos no cache
