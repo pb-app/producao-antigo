@@ -247,11 +247,28 @@ tbody tr:not(.linha-detalhes):hover { background-color: var(--primary-light); }
     font-weight: bold; color: var(--primary);
     display: block; margin-bottom: 0.25rem;
 }
-.expand-btn { 
-    cursor: pointer; font-weight: bold; font-size: 1.1rem; 
-    width: 30px; height: 30px; border-radius: 50%; 
-    background-color: #e0e6ef; border: none;
-    line-height: 1; display:flex; align-items:center; justify-content:center;
+/* --- NOVO ESTILO PARA O BOTÃO EXPANDIR --- */
+.expand-btn {
+    background: transparent;
+    border: none;
+    padding: 4px;
+    cursor: pointer;
+    display: flex; /* Essencial para alinhar o ícone SVG */
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto; /* Centraliza o botão na célula da tabela */
+    transition: transform 0.2s ease-in-out; /* Animação de rotação */
+}
+.expand-btn svg {
+    width: 14px; /* Tamanho do ícone (você pode diminuir aqui se quiser) */
+    height: 14px;
+    color: var(--text-light); /* Cor padrão do ícone */
+}
+.expand-btn:hover svg {
+    color: var(--primary); /* Cor do ícone ao passar o mouse */
+}
+.expand-btn.open {
+    transform: rotate(90deg); /* Gira o ícone 90 graus quando a classe 'open' é adicionada */
 }
 
 /* --- DASHBOARD E GRÁFICOS --- */
@@ -339,11 +356,28 @@ tbody tr:not(.linha-detalhes):hover { background-color: var(--primary-light); }
     font-size: 0.75rem;     /* Tamanho da fonte um pouco menor */
 }
 
-/* Alvo: Botão de expandir/recolher do histórico (+) */
+/* --- NOVO ESTILO PARA O BOTÃO EXPANDIR --- */
 .expand-btn {
-    width: 15px;       /* Reduzido de 30px */
-    height: 15px;      /* Reduzido de 30px */
-    font-size: 1rem;   /* Tamanho do "+" reduzido */
+    background: transparent;
+    border: none;
+    padding: 4px;
+    cursor: pointer;
+    display: flex; /* Essencial para alinhar o ícone SVG */
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto; /* Centraliza o botão na célula da tabela */
+    transition: transform 0.2s ease-in-out; /* Animação de rotação */
+}
+.expand-btn svg {
+    width: 14px; /* Tamanho do ícone (você pode diminuir aqui se quiser) */
+    height: 14px;
+    color: var(--text-light); /* Cor padrão do ícone */
+}
+.expand-btn:hover svg {
+    color: var(--primary); /* Cor do ícone ao passar o mouse */
+}
+.expand-btn.open {
+    transform: rotate(90deg); /* Gira o ícone 90 graus quando a classe 'open' é adicionada */
 }
 </style>
 </head>
@@ -764,8 +798,8 @@ tbody tr:not(.linha-detalhes):hover { background-color: var(--primary-light); }
                 }
                 const trPrincipal = document.createElement('tr');
                 trPrincipal.innerHTML = `
-                    <td><button class="expand-btn" onclick="toggleDetalhes('${docId}')">+</button></td>
-                    <td>${new Date(reg.data + 'T03:00:00').toLocaleDateString('pt-BR')}</td>
+    <td><button class="expand-btn" onclick="toggleDetalhes('${docId}')"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"/></svg></button></td>
+    <td>${new Date(reg.data + 'T03:00:00').toLocaleDateString('pt-BR')}</td>
                     <td>${reg.turno}</td>
                     <td class="${getEficClass(eficFT)}">${eficFT.toFixed(2)}%</td>
                     <td class="${getEficClass(eficPalete)}">${eficPalete.toFixed(2)}%</td>
@@ -979,8 +1013,18 @@ tbody tr:not(.linha-detalhes):hover { background-color: var(--primary-light); }
     });
 
     // --- Funções que não mudaram ---
-    window.toggleDetalhes = function(docId){const d=document.getElementById(`detalhes-${docId}`),t=event.target;d.style.display="table-row"===d.style.display?(d.style.display="none",t.textContent="+"):(d.style.display="table-row",t.textContent="-")};
-    window.deletarRegistro=async function(d){const t=prompt("Para confirmar a exclusão, digite a senha:");if(null!==t&&"pb2025"!==t)alert("Senha incorreta. Exclusão cancelada.");else if(confirm("Tem certeza que deseja excluir este lançamento do banco de dados?"))try{await window.deleteDoc(window.doc(db,"producao_massa",d)),alert("Registro excluído com sucesso!"),renderizarHistorico()}catch(d){console.error("Erro ao deletar do Firebase: ",d),alert("Erro ao excluir. Verifique o console.")}};
+window.toggleDetalhes = function(docId) {
+    const detalhesRow = document.getElementById(`detalhes-${docId}`);
+    const btn = event.target.closest('.expand-btn'); // Pega o botão clicado
+    
+    if (detalhesRow.style.display === "table-row") {
+        detalhesRow.style.display = "none";
+        btn.classList.remove('open'); // Remove a classe que gira o ícone
+    } else {
+        detalhesRow.style.display = "table-row";
+        btn.classList.add('open'); // Adiciona a classe que gira o ícone
+    }
+};    window.deletarRegistro=async function(d){const t=prompt("Para confirmar a exclusão, digite a senha:");if(null!==t&&"pb2025"!==t)alert("Senha incorreta. Exclusão cancelada.");else if(confirm("Tem certeza que deseja excluir este lançamento do banco de dados?"))try{await window.deleteDoc(window.doc(db,"producao_massa",d)),alert("Registro excluído com sucesso!"),renderizarHistorico()}catch(d){console.error("Erro ao deletar do Firebase: ",d),alert("Erro ao excluir. Verifique o console.")}};
     async function renderizarHistoricoPesagem(){const d=document.getElementById("tabelaPesagemBody");d.innerHTML='<tr><td colspan="4">Carregando dados...</td></tr>';try{const t=await window.getDocs(window.query(window.pesagemCol,window.orderBy("codigo")));if(d.innerHTML="",t.empty){d.innerHTML='<tr><td colspan="4">Nenhum registro de pesagem encontrado.</td></tr>';return}t.forEach(t=>{const o=t.data(),e=t.id,n=document.createElement("tr");n.innerHTML=`\n <td>${new Date(o.data+"T03:00:00").toLocaleDateString("pt-BR")}</td>\n <td>${o.codigo}</td>\n <td>${o.peso.toFixed(2)} kg</td>\n <td>\n <button class="edit-btn" onclick='editarRegistroPesagem("${e}", ${JSON.stringify(o)})'>Editar</button>\n <button class="delete-btn" onclick="deletarRegistroPesagem('${e}')">Excluir</button>\n </td>\n `,d.appendChild(n)})}catch(t){console.error("Erro ao buscar histórico de pesagem: ",t),d.innerHTML='<tr><td colspan="4">Erro ao carregar dados.</td></tr>'}};
     window.editarRegistroPesagem=async function(d,t){const o=prompt("Para editar, por favor, insira a senha:");if("pb2025"!==o)return void alert("Senha incorreta. Operação cancelada.");const e=prompt("Editar Data (AAAA-MM-DD):",t.data);if(null===e)return;const n=prompt("Editar Código:",t.codigo);if(null===n)return;const a=prompt("Editar Peso (kg):",t.peso);if(null===a)return;const r={...t,data:e,codigo:n.trim().toUpperCase(),peso:parseFloat(a)};if(isNaN(r.peso)||!r.codigo)return void alert("Dados inválidos. A edição foi cancelada.");try{await window.setDoc(window.doc(db,"pesagem_paletes",d),r),alert("Registro atualizado com sucesso!"),renderizarHistoricoPesagem(),carregarOpcoesPaletes()}catch(d){console.error("Erro ao atualizar registro: ",d),alert("Falha ao atualizar o registro.")}};
     window.deletarRegistroPesagem=async function(d){const t=prompt("Para excluir, por favor, insira a senha:");if("pb2025"!==t)return void alert("Senha incorreta. Operação cancelada.");if(confirm("Tem certeza que deseja excluir este registro de pesagem?"))try{await window.deleteDoc(window.doc(db,"pesagem_paletes",d)),alert("Registro excluído com sucesso!"),renderizarHistoricoPesagem(),carregarOpcoesPaletes()}catch(d){console.error("Erro ao excluir registro de pesagem:",d),alert("Falha ao excluir o registro.")}};
