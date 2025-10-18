@@ -18,7 +18,45 @@
     <style>/* ================================================================ */
 /* =================== NOVO CSS - LAYOUT MODERNO ================== */
 /* ================================================================ */
-/* --- NOVA REGRA PARA TABELA ROLÁVEL --- */
+/* ================================================================ */
+/* =========== ESTILO PLANILHA PARA TABELAS ESPECÍFICAS =========== */
+/* ================================================================ */
+
+/* Remove o wrapper da tabela de operadores também, se houver */
+#operadores table {
+    margin-top: 1rem;
+}
+
+/* Aplica o estilo de borda e centralização apenas nas tabelas de histórico e operadores */
+#historico table th, #historico table td,
+#operadores table th, #operadores table td {
+    border: 1px solid var(--border-color); /* ADICIONA BORDAS EM TUDO */
+    text-align: center; /* Centraliza o texto */
+    white-space: normal; /* Permite que o texto quebre a linha novamente */
+    padding: 0.5rem; /* Um pouco menos de padding para ficar mais compacto */
+}
+
+/* Estiliza o cabeçalho para ter fundo azul e texto branco */
+#historico table th,
+#operadores table th {
+    background-color: var(--primary);
+    color: white;
+    font-weight: bold;
+}
+
+/* Adiciona o efeito de "zebra" (linhas alternadas) no corpo da tabela */
+#historico tbody tr:nth-child(2n),
+#operadores tbody tr:nth-child(2n) {
+    background-color: var(--bg-color);
+}
+
+/* Garante que o efeito hover continue funcionando, exceto na linha de detalhes */
+#historico tbody tr:not(.linha-detalhes):hover,
+#operadores tbody tr:hover {
+    background-color: hsl(var(--primary-hue), 80%, 90%);
+}
+        
+        /* --- NOVA REGRA PARA TABELA ROLÁVEL --- */
 .table-wrapper {
     overflow-x: auto; /* Habilita a rolagem horizontal */
     -webkit-overflow-scrolling: touch; /* Melhora a rolagem em iOS */
@@ -416,7 +454,6 @@ tbody tr:hover { background-color: var(--primary-light); }
                 <button class="secondary" onclick="buscarTodos()">Mostrar todos</button>
                 <button style="background:green;" onclick="exportarExcel()">Exportar Excel</button>
             </div>
-            <div class="table-wrapper">
             <table id="tabelaHistorico">
                 <thead>
                     <tr>
