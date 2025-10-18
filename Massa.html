@@ -16,6 +16,45 @@
 /* =========== LAYOUT MODERNO PARA A FÁBRICA DE MASSA =========== */
 /* ================================================================ */
 
+        /* ================================================================ */
+/* =========== ESTILO PLANILHA PARA TABELAS DA PÁGINA =========== */
+/* ================================================================ */
+
+/* Remove a borda inferior do estilo moderno para estas tabelas */
+#tabProducao table th, #tabProducao table td,
+#tabPesagem table th, #tabPesagem table td {
+    border-bottom: none;
+}
+
+/* Aplica o estilo de borda e centralização nas tabelas de histórico e pesagem */
+#tabProducao table th, #tabProducao table td,
+#tabPesagem table th, #tabPesagem table td {
+    border: 1px solid var(--border-color);
+    text-align: center;
+    white-space: normal; /* Permite que o texto quebre a linha */
+    padding: 0.5rem;
+}
+
+/* Estiliza o cabeçalho para ter fundo azul e texto branco */
+#tabProducao table th,
+#tabPesagem table th {
+    background-color: var(--primary);
+    color: white;
+    font-weight: bold;
+}
+
+/* Adiciona o efeito de "zebra" (linhas alternadas) no corpo da tabela */
+#tabProducao tbody tr:nth-child(2n),
+#tabPesagem tbody tr:nth-child(2n) {
+    background-color: var(--bg-color);
+}
+
+/* Mantém o efeito hover, exceto na linha de detalhes */
+#tabProducao tbody tr:not(.linha-detalhes):hover,
+#tabPesagem tbody tr:hover {
+    background-color: hsl(var(--primary-hue), 80%, 90%);
+}
+
 :root {
     --primary-hue: 210; /* Tom de azul */
     --primary: hsl(var(--primary-hue), 80%, 55%);
