@@ -1,4 +1,4 @@
-const CACHE_NAME = 'producao-app-v13'; // Mude a versão aqui para forçar a atualização
+const CACHE_NAME = 'producao-app-v14'; // Mude a versão aqui para forçar a atualização
 const urlsToCache = [
  '/',
   '/index.html',
