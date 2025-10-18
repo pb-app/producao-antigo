@@ -1,5 +1,5 @@
 // 1. Defina um nome de cache versionado. Mude este nome a cada atualização!
-const CACHE_NAME = 'app-cache-v5'; 
+const CACHE_NAME = 'app-cache-v6'; 
 
 // Lista de arquivos que serão cacheados
 const urlsToCache = [
