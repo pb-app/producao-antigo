@@ -2,8 +2,8 @@
 <html lang="pt-BR">
 <head>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>Acompanhamento de Produção</title>
@@ -15,6 +15,9 @@
     <link rel="apple-touch-icon" href="icons/icon-180x180.png?v=2.0.2" />
 
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+
     <style>/* ================================================================ */
 /* =================== NOVO CSS - LAYOUT MODERNO ================== */
 /* ================================================================ */
@@ -127,9 +130,9 @@ h3 { font-size: 1.1rem; color: var(--text-light); }
     text-decoration: none;
     font-weight: 500;
     padding: 0.3rem 0.7rem; /* <-- VALORES MENORES AQUI */
-    font-size: 0.85rem;      /* <-- LINHA ADICIONADA PARA DIMINUIR O TEXTO */
-    border-radius: 8px;    /* Cantos arredondados */
-    border-bottom: none;   /* Remove a borda antiga */
+    font-size: 0.85rem;       /* <-- LINHA ADICIONADA PARA DIMINUIR O TEXTO */
+    border-radius: 8px;     /* Cantos arredondados */
+    border-bottom: none;    /* Remove a borda antiga */
     transition: background-color 0.2s ease-in-out, transform 0.2s ease;
     text-align: center;
     box-shadow: 0 4px 6px rgba(0,0,0,0.1); /* Sombra suave */
@@ -288,6 +291,21 @@ tbody tr:hover { background-color: var(--primary-light); }
 }
 .kpi-card.percent p { color: var(--success); }
 
+/* --- NOVO: Estilos para os Gráficos --- */
+.charts-container {
+    display: grid;
+    grid-template-columns: 1fr; /* Começa com uma coluna para telas pequenas */
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+@media (min-width: 900px) { /* Em telas maiores, usa duas colunas */
+    .charts-container {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+
 /* --- Outros estilos --- */
 .paginacao { display: flex; justify-content: center; align-items: center; margin-top: 1.5rem; gap: 1rem; }
 .linha-detalhes { 
@@ -302,10 +320,34 @@ tbody tr:hover { background-color: var(--primary-light); }
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
     background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 1000;
 }
+/* ================================================================ */
+/* ============== CSS DO POP-UP (MODAL) ATUALIZADO ================ */
+/* ================================================================ */
 .modal-content {
-    background: white; padding: 2rem; border-radius: 16px;
-    width: 90%; max-width: 800px;
+    background: white;
+    padding: 1.5rem; /* Diminuído para economizar espaço */
+    border-radius: 16px;
+    width: 90%; 
+    max-width: 600px;
+    max-height: 85vh; /* Garante que a altura não passe de 85% da tela */
+    overflow-y: auto; /* Adiciona barra de rolagem se o conteúdo for maior */
 }
+
+/* Deixa os formulários dentro do pop-up mais compactos */
+.modal-content form {
+    gap: 0.8rem;
+}
+.modal-content form label {
+    margin-bottom: 0.2rem;
+}
+.modal-content form input,
+.modal-content form select,
+.modal-content form textarea {
+    padding: 0.7rem;
+    font-size: 0.95rem;
+}
+/* ================================================================ */
+
         /* ================================================================ */
 /* ============== REDUÇÃO DE TAMANHO BOTÕES DE AÇÃO =============== */
 /* ================================================================ */
@@ -562,7 +604,7 @@ tbody tr:hover { background-color: var(--primary-light); }
                 <input type="text" id="dashFiltroMaquina" placeholder="Máquina..." list="listaMaquinasDash" />
                 <datalist id="listaMaquinasDash"></datalist>
                 <input type="text" id="dashFiltroRefCpb" placeholder="Ref/CPB..."/>
-                <input type="text" id="dashFiltroOperador" placeholder="Operador..." /> 
+                <input type="text" id="dashFiltroOperador" placeholder="Operador..." />
                 <button onclick="atualizarDashboard()">Aplicar Filtro</button>
             </div>
             <h3>Resumo Geral da Produção (Filtros Aplicados)</h3>
@@ -573,14 +615,15 @@ tbody tr:hover { background-color: var(--primary-light); }
                 <div class="kpi-card percent"><h3>% Realizado/Previsto</h3><p id="kpiPercRealPrev">N/A</p></div>
                 <div class="kpi-card percent"><h3>% Quebras/Total</h3><p id="kpiPercQuebraTotal">N/A</p></div>
             </div>
-            <div id="analiseOperadorArea">
-                <h3>Análise do Operador: <span id="operadorSelecionado">Nenhum</span></h3>
-                <div class="kpis" id="kpisOperador">
-                    <div class="kpi-card"><h3>Previsto Operador</h3><p id="kpiOperadorPrevisto">0</p></div>
-                    <div class="kpi-card"><h3>Realizado Operador</h3><p id="kpiOperadorRealizado">0</p></div>
-                    <div class="kpi-card"><h3>Quebras Operador</h3><p id="kpiOperadorQuebras">0</p></div>
-                    <div class="kpi-card percent"><h3>% Realizado/Previsto</h3><p id="kpiOperadorPercRealPrev">N/A</p></div>
-                    <div class="kpi-card percent"><h3>% Quebras/Total</h3><p id="kpiOperadorPercQuebraTotal">N/A</p></div>
+
+            <div class="charts-container">
+                <div>
+                    <h3 style="text-align:center;">Produção por Turno no Período (%)</h3>
+                    <canvas id="pieChartTurno"></canvas>
+                </div>
+                <div>
+                    <h3 style="text-align:center;">Produção Acumulada (12 Meses)</h3>
+                    <canvas id="barChartMensal"></canvas>
                 </div>
             </div>
         </section>
@@ -674,18 +717,18 @@ let ultimoDocumentoVisivel = null;
 let primeiroDocumentoStack = [null];
 let paginaAtual = 1;
 let filtroAtual = null;
+let pieChart = null; 
+let barChart = null; 
 
 // ======================= FUNÇÃO CORRIGIDA =======================
 /**
  * Retorna a data local atual no formato AAAA-MM-DD, evitando problemas de fuso horário.
  * @returns {string} A data formatada.
  */
-function obterDataLocalFormatada() {
-    const data = new Date();
-    const ano = data.getFullYear();
-    const mes = String(data.getMonth() + 1).padStart(2, '0'); // Mês é 0-indexado, por isso +1
-    const dia = String(data.getDate()).padStart(2, '0');
-    return `${ano}-${mes}-${dia}`;
+function obterDataLocalFormatada(d = new Date()) { // MODIFICADO: Aceita uma data como argumento
+    const data = new Date(d); // Garante que estamos trabalhando com uma cópia
+    data.setMinutes(data.getMinutes() - data.getTimezoneOffset()); // Ajusta para o fuso local
+    return data.toISOString().split('T')[0];
 }
 // ================================================================
 
@@ -694,9 +737,7 @@ document.addEventListener("DOMContentLoaded", ()=>{
     producoesCol = window.producoesCol; 
     operadoresCol = window.operadoresCol;
     
-    // ======== LINHA ALTERADA PARA USAR A NOVA FUNÇÃO ========
     const today = obterDataLocalFormatada();
-    // ======================================================
 
     document.getElementById("data").value = today;
     document.getElementById("dataCadastroOp").value = today;
@@ -715,9 +756,10 @@ document.addEventListener("DOMContentLoaded", ()=>{
         atualizarDatalistMaquina('dashFiltroSetor', 'listaMaquinasDash');
     });
 
-    // LISTENERS PARA OS FORMULÁRIOS DE EDIÇÃO
     document.getElementById('formEdicaoProducao').addEventListener('submit', salvarEdicaoProducao);
     document.getElementById('formEdicaoOperador').addEventListener('submit', salvarEdicaoOperador);
+
+    Chart.register(ChartDataLabels);
 });
 
 const maquinasPorSetor = {
@@ -771,18 +813,17 @@ function mostrarPagina(pg){
 
 function toggleDetalhes(index) {
     const detalhesRow = document.getElementById(`detalhes-${index}`);
-    const btn = event.target.closest('.expand-btn'); // Pega o botão clicado
+    const btn = event.target.closest('.expand-btn'); 
     
     if (detalhesRow.style.display === "table-row") {
         detalhesRow.style.display = "none";
-        btn.classList.remove('open'); // Remove a classe que gira o ícone
+        btn.classList.remove('open');
     } else {
         detalhesRow.style.display = "table-row";
-        btn.classList.add('open'); // Adiciona a classe que gira o ícone
+        btn.classList.add('open');
     }
 }
 
-// ============== NOVAS FUNÇÕES DE EDIÇÃO (MODAL) ==============
 
 function fecharModal(modalId) {
     document.getElementById(modalId).style.display = 'none';
@@ -839,7 +880,7 @@ async function salvarEdicaoProducao(e) {
         await window.updateDoc(docRef, dadosAtualizados);
         alert("Lançamento atualizado com sucesso!");
         fecharModal('modalEdicaoProducao');
-        filtrarHistorico(); // Atualiza a tabela
+        filtrarHistorico();
     } catch (error) {
         console.error("Erro ao salvar alterações:", error);
         alert("Erro ao salvar. Verifique o console.");
@@ -883,7 +924,7 @@ async function salvarEdicaoOperador(e) {
         await window.updateDoc(docRef, dadosAtualizados);
         alert("Operador atualizado com sucesso!");
         fecharModal('modalEdicaoOperador');
-        atualizarTabelaOperadores(); // Atualiza a tabela de operadores
+        atualizarTabelaOperadores();
     } catch (error) {
         console.error("Erro ao salvar alterações do operador:", error);
         alert("Erro ao salvar. Verifique o console.");
@@ -891,24 +932,18 @@ async function salvarEdicaoOperador(e) {
 }
 
 
-// ============== FIM DAS FUNÇÕES DE EDIÇÃO ==============
-
 async function cadastrarOperador(e) {
     e.preventDefault();
-
-    // Pega os valores dos campos do formulário
     const dataCadastro = document.getElementById("dataCadastroOp").value;
     const nome = document.getElementById("nomeOperador").value.trim();
     const setor = document.getElementById("setorOperador").value;
     const turno = document.getElementById("turnoOperador").value;
 
-    // Verifica se todos os campos foram preenchidos
     if (!dataCadastro || !nome || !setor || !turno) {
         alert("Por favor, preencha todos os campos.");
         return;
     }
 
-    // Cria o objeto com os dados do novo operador
     const novoOperador = {
         dataCadastro: dataCadastro,
         nome: nome,
@@ -916,13 +951,12 @@ async function cadastrarOperador(e) {
         turno: turno
     };
 
-    // Tenta salvar os dados no Firebase
     try {
         await window.addDoc(operadoresCol, novoOperador);
         alert(`Operador "${nome}" cadastrado com sucesso! ✅`);
-        document.getElementById("formOperador").reset(); // Limpa o formulário
-        document.getElementById("dataCadastroOp").value = obterDataLocalFormatada(); // Volta a data para hoje
-        atualizarTabelaOperadores(); // Atualiza a lista de operadores na tela
+        document.getElementById("formOperador").reset();
+        document.getElementById("dataCadastroOp").value = obterDataLocalFormatada();
+        atualizarTabelaOperadores();
     } catch (error) {
         console.error("Erro ao cadastrar operador: ", error);
         alert("Erro ao cadastrar. Verifique o console. ❌");
@@ -1263,6 +1297,9 @@ async function exportarExcel() {
     }
 }
 
+// ================================================================
+// =================== LÓGICA DO DASHBOARD ATUALIZADA =================
+// ================================================================
 
 function filtrarDadosDashboardLocal(dados, filtro) {
     return dados.filter(d => 
@@ -1274,7 +1311,7 @@ function filtrarDadosDashboardLocal(dados, filtro) {
     );
 }
 
-function calcularKPIsEstatistica(dados, prefixo) {
+function calcularKPIsEstatistica(dados) {
     let totalPrevisto = 0, totalRealizado = 0, totalQuebras = 0;
     dados.forEach(d => {
         totalPrevisto += parseFloat(d.prevista) || 0;
@@ -1284,64 +1321,200 @@ function calcularKPIsEstatistica(dados, prefixo) {
     const totalProducao = totalRealizado + totalQuebras;
     const percRealPrev = totalPrevisto > 0 ? `${((totalRealizado / totalPrevisto) * 100).toFixed(2)}%` : 'N/A';
     const percQuebraTotal = totalProducao > 0 ? `${((totalQuebras / totalProducao) * 100).toFixed(2)}%` : 'N/A';
-    document.getElementById(`${prefixo}Previsto`).textContent = totalPrevisto.toLocaleString();
-    document.getElementById(`${prefixo}Realizado`).textContent = totalRealizado.toLocaleString();
-    document.getElementById(`${prefixo}Quebras`).textContent = totalQuebras.toLocaleString();
-    document.getElementById(`${prefixo}PercRealPrev`).textContent = percRealPrev;
-    document.getElementById(`${prefixo}PercQuebraTotal`).textContent = percQuebraTotal;
     
-    if (prefixo === 'kpiOperador') {
-        const areaOperador = document.getElementById('analiseOperadorArea');
-        const operadorInput = document.getElementById('dashFiltroOperador').value.trim();
-        if (operadorInput && dados.length > 0) {
-            document.getElementById('operadorSelecionado').textContent = operadorInput.toUpperCase(); 
-            areaOperador.classList.remove('hidden');
-        } else {
-            document.getElementById('operadorSelecionado').textContent = "Nenhum";
-            areaOperador.classList.add('hidden'); 
-        }
+    document.getElementById('kpiPrevisto').textContent = totalPrevisto.toLocaleString();
+    document.getElementById('kpiRealizado').textContent = totalRealizado.toLocaleString();
+    document.getElementById('kpiQuebras').textContent = totalQuebras.toLocaleString();
+    document.getElementById('kpiPercRealPrev').textContent = percRealPrev;
+    document.getElementById('kpiPercQuebraTotal').textContent = percQuebraTotal;
+}
+
+function renderizarGraficoPizzaTurno(dados) {
+    if (pieChart) {
+        pieChart.destroy();
     }
+
+    const totaisTurno = { '1': 0, '2': 0, '3': 0, '4': 0 };
+    
+    dados.forEach(d => {
+        const turnoStr = d.turno || "";
+        const realizada = parseFloat(d.realizada) || 0;
+        if (turnoStr.includes("Turno 1")) { totaisTurno['1'] += realizada; }
+        else if (turnoStr.includes("Turno 2")) { totaisTurno['2'] += realizada; }
+        else if (turnoStr.includes("Turno 3")) { totaisTurno['3'] += realizada; }
+        else if (turnoStr.includes("Turno 4")) { totaisTurno['4'] += realizada; }
+    });
+    
+    const totalProducaoTurnos = Object.values(totaisTurno).reduce((a, b) => a + b, 0);
+    const ctx = document.getElementById('pieChartTurno').getContext('2d');
+    
+    if (totalProducaoTurnos === 0) {
+      ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+      return;
+    }
+
+    pieChart = new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: ['Turno 1', 'Turno 2', 'Turno 3', 'Turno 4'],
+            datasets: [{
+                label: 'Produção Realizada',
+                data: [totaisTurno['1'], totaisTurno['2'], totaisTurno['3'], totaisTurno['4']],
+                backgroundColor: ['#36A2EB', '#FFCE56', '#FF6384', '#4BC0C0'],
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { position: 'top' },
+                tooltip: { enabled: false },
+                datalabels: {
+                    formatter: (value, ctx) => {
+                        let sum = 0;
+                        let dataArr = ctx.chart.data.datasets[0].data;
+                        dataArr.map(data => { sum += data; });
+                        let percentage = (value*100 / sum).toFixed(2) + "%";
+                        return value > 0 ? percentage : '';
+                    },
+                    color: '#fff',
+                    font: { weight: 'bold', size: 14 }
+                }
+            }
+        }
+    });
+}
+
+function renderizarGraficoBarrasMensal(dados) {
+    if (barChart) {
+        barChart.destroy();
+    }
+
+    const totaisMensais = {};
+    const labelsMeses = [];
+    const hoje = new Date();
+
+    for (let i = 11; i >= 0; i--) {
+        const d = new Date(hoje.getFullYear(), hoje.getMonth() - i, 1);
+        const mesAno = d.toLocaleString('pt-BR', { month: 'short', year: '2-digit' });
+        const chave = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+        labelsMeses.push({ label: mesAno, chave: chave });
+        totaisMensais[chave] = 0;
+    }
+    
+    dados.forEach(d => {
+        const [ano, mes] = d.data.split('-');
+        const chave = `${ano}-${mes}`;
+        if (totaisMensais.hasOwnProperty(chave)) {
+            totaisMensais[chave] += parseFloat(d.realizada) || 0;
+        }
+    });
+    
+    const dataValues = labelsMeses.map(item => totaisMensais[item.chave]);
+    const labelValues = labelsMeses.map(item => item.label);
+
+    const ctx = document.getElementById('barChartMensal').getContext('2d');
+    barChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labelValues,
+            datasets: [{
+                label: 'Produção Realizada',
+                data: dataValues,
+                backgroundColor: 'hsla(var(--primary-hue), 80%, 55%, 0.7)',
+                borderColor: 'hsl(var(--primary-hue), 80%, 55%)',
+                borderWidth: 1,
+                barPercentage: 0.7,
+                categoryPercentage: 0.8
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { 
+                legend: { display: false },
+                datalabels: {
+                    anchor: 'end',
+                    align: 'top',
+                    color: '#444',
+                    font: { weight: 'bold' },
+                    formatter: (value) => value > 0 ? value.toLocaleString() : null
+                }
+            },
+            scales: { 
+                y: { 
+                    beginAtZero: true,
+                    ticks: {
+                       callback: function(value) {
+                           if (value >= 1000) {
+                               return value / 1000 + 'k';
+                           }
+                           return value;
+                       }
+                    } 
+                } 
+            }
+        }
+    });
 }
 
 async function atualizarDashboard(){
     if (!producoesCol || !window.getDocs || !window.query) {
         console.error("Firebase não conectado para o Dashboard."); return;
     }
-    const filtro = {
+    
+    const filtroGeral = {
         dataInicio: document.getElementById("dashFiltroDataInicio").value,
         dataFim: document.getElementById("dashFiltroDataFim").value,
         setor: document.getElementById("dashFiltroSetor").value,
         turno: document.getElementById("dashFiltroTurno").value,
         maquina: document.getElementById("dashFiltroMaquina").value,
         refCpb: document.getElementById("dashFiltroRefCpb").value.trim(),
-        operador: document.getElementById("dashFiltroOperador").value.trim()
+        operador: document.getElementById("dashFiltroOperador").value.trim().toLowerCase()
     };
-    const conditions = [];
-    if(filtro.dataInicio) conditions.push(window.where("data", ">=", filtro.dataInicio));
-    if(filtro.dataFim) conditions.push(window.where("data", "<=", filtro.dataFim));
-    const baseOrdering = [window.orderBy("data", "desc")];
-    let q = window.query(producoesCol, ...conditions, ...baseOrdering);
+    
     try {
-        const querySnapshot = await window.getDocs(q);
-        const dadosGerais = [];
-        querySnapshot.forEach(doc => dadosGerais.push(doc.data()));
-        const dadosFiltradosGeral = filtrarDadosDashboardLocal(dadosGerais, filtro);
-        calcularKPIsEstatistica(dadosFiltradosGeral, 'kpi');
+        const conditionsPeriodo = [];
+        if(filtroGeral.dataInicio) conditionsPeriodo.push(window.where("data", ">=", filtroGeral.dataInicio));
+        if(filtroGeral.dataFim) conditionsPeriodo.push(window.where("data", "<=", filtroGeral.dataFim));
         
-        let dadosOperador = [];
-        if (filtro.operador) {
-            const filtroOperadorApenasData = { 
-                dataInicio: filtro.dataInicio, dataFim: filtro.dataFim, operador: filtro.operador,
-                setor: '', turno: '', maquina: '', refCpb: ''
-            };
-            dadosOperador = filtrarDadosDashboardLocal(dadosGerais, filtroOperadorApenasData); 
-        }
-        calcularKPIsEstatistica(dadosOperador, 'kpiOperador');
+        const qPeriodo = window.query(producoesCol, ...conditionsPeriodo, window.orderBy("data", "desc"));
+        const snapshotPeriodo = await window.getDocs(qPeriodo);
         
+        const dadosGeraisPeriodo = [];
+        snapshotPeriodo.forEach(doc => dadosGeraisPeriodo.push(doc.data()));
+        
+        const dadosFiltradosGeral = filtrarDadosDashboardLocal(dadosGeraisPeriodo, filtroGeral);
+        
+        calcularKPIsEstatistica(dadosFiltradosGeral);
+        renderizarGraficoPizzaTurno(dadosFiltradosGeral);
+
     } catch (error) {
-        console.error("Erro ao carregar dados para o Dashboard: ", error);
+        console.error("Erro ao carregar dados para KPIs e Gráfico de Pizza: ", error);
+    }
+    
+    try {
+        const hoje = new Date();
+        const dozeMesesAtras = new Date(hoje.getFullYear() - 1, hoje.getMonth(), hoje.getDate());
+        const dataInicio12M = obterDataLocalFormatada(dozeMesesAtras);
+
+        const conditions12M = [window.where("data", ">=", dataInicio12M)];
+        if (filtroGeral.setor) {
+            conditions12M.push(window.where("setor", "==", filtroGeral.setor));
+        }
+        
+        const q12M = window.query(producoesCol, ...conditions12M);
+        const snapshot12M = await window.getDocs(q12M);
+
+        const dados12Meses = [];
+        snapshot12M.forEach(doc => dados12Meses.push(doc.data()));
+        
+        const dadosFiltrados12M = filtrarDadosDashboardLocal(dados12Meses, filtroGeral);
+        renderizarGraficoBarrasMensal(dadosFiltrados12M);
+
+    } catch (error) {
+        console.error("Erro ao carregar dados para Gráfico de Barras: ", error);
     }
 }
+
 
 window.deletarRegistro = deletarRegistro;
 window.deletarOperador = deletarOperador;
@@ -1354,14 +1527,12 @@ window.mostrarPagina = mostrarPagina;
 window.toggleDetalhes = toggleDetalhes;
 window.proximaPagina = proximaPagina;
 window.paginaAnterior = paginaAnterior;
-// Adicionando as novas funções ao escopo global
 window.abrirModalEdicao = abrirModalEdicao;
 window.abrirModalOperador = abrirModalOperador;
 window.fecharModal = fecharModal;
 </script>
 <script>
 if ("serviceWorker" in navigator) {
-  // LINHA MODIFICADA
   navigator.serviceWorker.register("service-worker.js?v=2.0.2")
     .then(() => console.log("Service Worker registrado com sucesso."))
     .catch(err => console.log("Erro ao registrar o Service Worker:", err));
@@ -1412,8 +1583,5 @@ window.addEventListener("beforeinstallprompt", (e) => {
         });
       }
     </script>
-</body>
-</html>
-</script>
 </body>
 </html>
