@@ -1471,7 +1471,8 @@ function renderizarGraficoBarrasMensal(dados) {
         },
         options: {
             responsive: true,
-            // Dentro de renderizarGraficoBarrasMensal
+            plugins: { 
+                         // Dentro de renderizarGraficoBarrasMensal
 barChart = new Chart(ctx, {
     type: 'bar',
     data: { /* ... seus dados ... */ },
@@ -1491,7 +1492,6 @@ barChart = new Chart(ctx, {
         scales: { /* ... suas escalas ... */ }
     }
 });
-            plugins: { 
                 legend: { display: false },
                 datalabels: {
                     anchor: 'end',
