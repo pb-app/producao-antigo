@@ -288,6 +288,7 @@ tbody tr:hover { background-color: var(--primary-light); }
     font-weight: 700;
     margin: 0;
     color: var(--primary);
+    text-align: left; /* <-- ADICIONE ESTA LINHA */
 }
 .kpi-card.percent p { color: var(--success); }
 
@@ -1470,6 +1471,26 @@ function renderizarGraficoBarrasMensal(dados) {
         },
         options: {
             responsive: true,
+            // Dentro de renderizarGraficoBarrasMensal
+barChart = new Chart(ctx, {
+    type: 'bar',
+    data: { /* ... seus dados ... */ },
+    options: {
+        responsive: true,
+        layout: {       /* <-- ADICIONE ESTE BLOCO */
+            padding: {
+                top: 20 // Adiciona 20px de espaço no topo
+            }
+        },              /* FIM DO BLOCO */
+        plugins: { 
+            legend: { display: false },
+            datalabels: {
+                /* ... suas configurações de datalabels ... */
+            }
+        },
+        scales: { /* ... suas escalas ... */ }
+    }
+});
             plugins: { 
                 legend: { display: false },
                 datalabels: {
