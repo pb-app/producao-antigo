@@ -1469,30 +1469,21 @@ function renderizarGraficoBarrasMensal(dados) {
                 categoryPercentage: 0.8
             }]
         },
+// ...
         options: {
             responsive: true,
+            
+            /* VV COLE ESTE BLOCO NOVO AQUI VV */
+            layout: {      
+                padding: {
+                    top: 20 // Adiciona 20px de espaço no topo
+                }
+            },  
+            /* ^^ ATÉ AQUI ^^ */
+            
             plugins: { 
-                         // Dentro de renderizarGraficoBarrasMensal
-barChart = new Chart(ctx, {
-    type: 'bar',
-    data: { /* ... seus dados ... */ },
-    options: {
-        responsive: true,
-        layout: {       /* <-- ADICIONE ESTE BLOCO */
-            padding: {
-                top: 20 // Adiciona 20px de espaço no topo
-            }
-        },              /* FIM DO BLOCO */
-        plugins: { 
-            legend: { display: false },
-            datalabels: {
-                /* ... suas configurações de datalabels ... */
-            }
-        },
-        scales: { /* ... suas escalas ... */ }
-    }
-});
                 legend: { display: false },
+// ...
                 datalabels: {
                     anchor: 'end',
                     align: 'top',
