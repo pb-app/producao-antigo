@@ -1526,9 +1526,13 @@ async function atualizarDashboard(){
         if(filtroGeral.dataFim) conditionsPeriodo.push(window.where("data", "<=", filtroGeral.dataFim));
         
         // Otimização: Se houver filtro de setor geral, aplica no Firestore
+        // MODIFICAÇÃO: Removido filtro de 'setor' da query principal para evitar erro de índice.
+        // O filtro de setor será aplicado localmente.
+        /*
         if (filtroGeral.setor) {
              conditionsPeriodo.push(window.where("setor", "==", filtroGeral.setor));
         }
+        */
 
         const qPeriodo = window.query(producoesCol, ...conditionsPeriodo, window.orderBy("data", "desc"));
         const snapshotPeriodo = await window.getDocs(qPeriodo);
@@ -1539,7 +1543,8 @@ async function atualizarDashboard(){
         // Filtra localmente o restante (turno, maquina, ref, op)
         const dadosFiltradosGeral = filtrarDadosDashboardLocal(dadosGeraisPeriodo, {
             ...filtroGeral,
-            setor: null // Já filtrado na query (se existir), não precisa filtrar local de novo
+            // MODIFICAÇÃO: 'setor: null' removido para que o filtro local de setor seja aplicado.
+            // setor: null // Já filtrado na query (se existir), não precisa filtrar local de novo
         });
         
         calcularKPIsEstatistica(dadosFiltradosGeral);
@@ -1559,9 +1564,12 @@ async function atualizarDashboard(){
         
         // ***** MUDANÇA PRINCIPAL *****
         // Usa o filtroSetorMensal específico do gráfico
+        // MODIFICAÇÃO: Removido filtro de 'setor' da query para evitar erro de índice. Será filtrado localmente.
+        /*
         if (filtroSetorMensal) {
             conditions12M.push(window.where("setor", "==", filtroSetorMensal));
         }
+        */
         
         const q12M = window.query(producoesCol, ...conditions12M);
         const snapshot12M = await window.getDocs(q12M);
@@ -1575,7 +1583,8 @@ async function atualizarDashboard(){
             ...filtroGeral,
             dataInicio: null, // Filtro de data não se aplica aqui (já pegamos 12M)
             dataFim: null,    // "
-            setor: null       // Filtro de setor não se aplica (usamos o filtroSetorMensal na query)
+            // MODIFICAÇÃO: Aplicar o filtro de setor do gráfico localmente.
+            setor: filtroSetorMensal
         });
         
         renderizarGraficoBarrasMensal(dadosFiltrados12M);
