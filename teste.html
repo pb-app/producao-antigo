@@ -284,11 +284,10 @@ tbody tr:hover { background-color: var(--primary-light); }
     font-weight: 500;
 }
 .kpi-card p {
-    font-size: 2.2rem;
+    font-size: 2.0rem;
     font-weight: 700;
     margin: 0;
     color: var(--primary);
-    text-align: left; /* <-- ADICIONE ESTA LINHA */
 }
 .kpi-card.percent p { color: var(--success); }
 
@@ -624,21 +623,6 @@ tbody tr:hover { background-color: var(--primary-light); }
                 </div>
                 <div>
                     <h3 style="text-align:center;">Produção Acumulada (12 Meses)</h3>
-                    
-                    <!-- FILTRO DE SETOR ESPECÍFICO PARA ESTE GRÁFICO -->
-                    <div style="padding: 0.5rem 0; text-align: center;">
-                        <label for="dashFiltroSetorMensal" style="font-size: 0.8rem; font-weight: 700; margin-right: 0.5rem; color: var(--text-light); text-transform: uppercase;">Filtrar Setor:</label>
-                        <select id="dashFiltroSetorMensal" onchange="atualizarDashboard()" style="padding: 0.4rem; border-radius: 8px; border: 1px solid var(--border-color); background-color: var(--bg-color); font-size: 0.9rem;">
-                            <option value="">Todos os Setores</option>
-                            <option>Conformação</option>
-                            <option>Esmaltação</option>
-                            <option>Embalagem</option>
-                            <option>Forno Vidrado</option>
-                            <option>Forno chacote</option>
-                        </select>
-                    </div>
-                    <!-- FIM DO NOVO FILTRO -->
-                    
                     <canvas id="barChartMensal"></canvas>
                 </div>
             </div>
@@ -1297,7 +1281,7 @@ async function exportarExcel() {
             const totalProd = real + queb;
             const percQuebrasRealizado = totalProd > 0 ? `${((queb / totalProd) * 100).toFixed(2)}%` : 'N/A';
             return {
-                "Data": r.data, "Setor": r.setor, "Turno": r.turno, "Operador": r.operador,
+                "Data": r.data.split('-').reverse().join('/'), "Setor": r.setor, "Turno": r.turno, "Operador": r.operador,
                 "Máquina": r.maquina, "Massa": r.massa, "Ref/CPB": r.refCpb,
                 "Prevista": prev, "Realizada": real, "Quebras": queb, "Obs": r.observacao,
                 "% Realizado/Previsto": percRealizadoPrevisto, "% Quebras/Total": percQuebrasRealizado,
@@ -1312,14 +1296,11 @@ async function exportarExcel() {
         alert("Ocorreu um erro ao preparar os dados para exportação.");
     }
 }
+
 // ================================================================
 // =================== LÓGICA DO DASHBOARD ATUALIZADA =================
 // ================================================================
 
-/**
- * Filtra um array de dados localmente com base no objeto de filtro.
- * Permite que qualquer propriedade do filtro seja nula ou vazia para ignorá-la.
- */
 function filtrarDadosDashboardLocal(dados, filtro) {
     return dados.filter(d => 
         (!filtro.setor || d.setor === filtro.setor) &&
@@ -1330,9 +1311,6 @@ function filtrarDadosDashboardLocal(dados, filtro) {
     );
 }
 
-/**
- * Calcula e exibe os KPIs de resumo com base nos dados filtrados.
- */
 function calcularKPIsEstatistica(dados) {
     let totalPrevisto = 0, totalRealizado = 0, totalQuebras = 0;
     dados.forEach(d => {
@@ -1351,9 +1329,6 @@ function calcularKPIsEstatistica(dados) {
     document.getElementById('kpiPercQuebraTotal').textContent = percQuebraTotal;
 }
 
-/**
- * Renderiza (ou atualiza) o gráfico de pizza de produção por turno.
- */
 function renderizarGraficoPizzaTurno(dados) {
     if (pieChart) {
         pieChart.destroy();
@@ -1375,16 +1350,6 @@ function renderizarGraficoPizzaTurno(dados) {
     
     if (totalProducaoTurnos === 0) {
       ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-      // Opcional: Desenhar texto "Sem dados"
-      /*
-      ctx.save();
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillStyle = '#aaa';
-      ctx.font = '16px Inter';
-      ctx.fillText("Sem dados para o período", ctx.canvas.width / 2, ctx.canvas.height / 2);
-      ctx.restore();
-      */
       return;
     }
 
@@ -1408,7 +1373,6 @@ function renderizarGraficoPizzaTurno(dados) {
                         let sum = 0;
                         let dataArr = ctx.chart.data.datasets[0].data;
                         dataArr.map(data => { sum += data; });
-                        if (sum === 0) return '0%';
                         let percentage = (value*100 / sum).toFixed(2) + "%";
                         return value > 0 ? percentage : '';
                     },
@@ -1420,9 +1384,6 @@ function renderizarGraficoPizzaTurno(dados) {
     });
 }
 
-/**
- * Renderiza (ou atualiza) o gráfico de barras da produção mensal (últimos 12 meses).
- */
 function renderizarGraficoBarrasMensal(dados) {
     if (barChart) {
         barChart.destroy();
@@ -1432,17 +1393,14 @@ function renderizarGraficoBarrasMensal(dados) {
     const labelsMeses = [];
     const hoje = new Date();
 
-    // Cria labels e chaves para os últimos 12 meses
     for (let i = 11; i >= 0; i--) {
         const d = new Date(hoje.getFullYear(), hoje.getMonth() - i, 1);
         const mesAno = d.toLocaleString('pt-BR', { month: 'short', year: '2-digit' });
-        // Chave no formato AAAA-MM
         const chave = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
         labelsMeses.push({ label: mesAno, chave: chave });
         totaisMensais[chave] = 0;
     }
     
-    // Soma a produção de acordo com os dados recebidos
     dados.forEach(d => {
         const [ano, mes] = d.data.split('-');
         const chave = `${ano}-${mes}`;
@@ -1469,21 +1427,10 @@ function renderizarGraficoBarrasMensal(dados) {
                 categoryPercentage: 0.8
             }]
         },
-// ...
         options: {
             responsive: true,
-            
-            /* VV COLE ESTE BLOCO NOVO AQUI VV */
-            layout: {      
-                padding: {
-                    top: 40 // Adiciona 20px de espaço no topo
-                }
-            },  
-            /* ^^ ATÉ AQUI ^^ */
-            
             plugins: { 
                 legend: { display: false },
-// ...
                 datalabels: {
                     anchor: 'end',
                     align: 'top',
@@ -1509,15 +1456,11 @@ function renderizarGraficoBarrasMensal(dados) {
     });
 }
 
-/**
- * Função principal que busca dados e atualiza todos os elementos do dashboard.
- */
 async function atualizarDashboard(){
     if (!producoesCol || !window.getDocs || !window.query) {
         console.error("Firebase não conectado para o Dashboard."); return;
     }
     
-    // 1. Filtros Gerais (para KPIs e Gráfico de Pizza)
     const filtroGeral = {
         dataInicio: document.getElementById("dashFiltroDataInicio").value,
         dataFim: document.getElementById("dashFiltroDataFim").value,
@@ -1528,36 +1471,18 @@ async function atualizarDashboard(){
         operador: document.getElementById("dashFiltroOperador").value.trim().toLowerCase()
     };
     
-    // 2. Filtro Específico (para Gráfico de Barras Mensal)
-    const filtroSetorMensal = document.getElementById("dashFiltroSetorMensal").value;
-    
-    // --- Lógica para KPIs e Gráfico de Pizza (usa filtroGeral) ---
     try {
         const conditionsPeriodo = [];
         if(filtroGeral.dataInicio) conditionsPeriodo.push(window.where("data", ">=", filtroGeral.dataInicio));
         if(filtroGeral.dataFim) conditionsPeriodo.push(window.where("data", "<=", filtroGeral.dataFim));
         
-        // Otimização: Se houver filtro de setor geral, aplica no Firestore
-        // MODIFICAÇÃO: Removido filtro de 'setor' da query principal para evitar erro de índice.
-        // O filtro de setor será aplicado localmente.
-        /*
-        if (filtroGeral.setor) {
-             conditionsPeriodo.push(window.where("setor", "==", filtroGeral.setor));
-        }
-        */
-
         const qPeriodo = window.query(producoesCol, ...conditionsPeriodo, window.orderBy("data", "desc"));
         const snapshotPeriodo = await window.getDocs(qPeriodo);
         
         const dadosGeraisPeriodo = [];
         snapshotPeriodo.forEach(doc => dadosGeraisPeriodo.push(doc.data()));
         
-        // Filtra localmente o restante (turno, maquina, ref, op)
-        const dadosFiltradosGeral = filtrarDadosDashboardLocal(dadosGeraisPeriodo, {
-            ...filtroGeral,
-            // MODIFICAÇÃO: 'setor: null' removido para que o filtro local de setor seja aplicado.
-            // setor: null // Já filtrado na query (se existir), não precisa filtrar local de novo
-        });
+        const dadosFiltradosGeral = filtrarDadosDashboardLocal(dadosGeraisPeriodo, filtroGeral);
         
         calcularKPIsEstatistica(dadosFiltradosGeral);
         renderizarGraficoPizzaTurno(dadosFiltradosGeral);
@@ -1566,22 +1491,15 @@ async function atualizarDashboard(){
         console.error("Erro ao carregar dados para KPIs e Gráfico de Pizza: ", error);
     }
     
-    // --- Lógica para Gráfico de Barras (usa filtroSetorMensal e filtros gerais exceto data e setor) ---
     try {
         const hoje = new Date();
         const dozeMesesAtras = new Date(hoje.getFullYear() - 1, hoje.getMonth(), hoje.getDate());
         const dataInicio12M = obterDataLocalFormatada(dozeMesesAtras);
 
         const conditions12M = [window.where("data", ">=", dataInicio12M)];
-        
-        // ***** MUDANÇA PRINCIPAL *****
-        // Usa o filtroSetorMensal específico do gráfico
-        // MODIFICAÇÃO: Removido filtro de 'setor' da query para evitar erro de índice. Será filtrado localmente.
-        /*
-        if (filtroSetorMensal) {
-            conditions12M.push(window.where("setor", "==", filtroSetorMensal));
+        if (filtroGeral.setor) {
+            conditions12M.push(window.where("setor", "==", filtroGeral.setor));
         }
-        */
         
         const q12M = window.query(producoesCol, ...conditions12M);
         const snapshot12M = await window.getDocs(q12M);
@@ -1589,16 +1507,7 @@ async function atualizarDashboard(){
         const dados12Meses = [];
         snapshot12M.forEach(doc => dados12Meses.push(doc.data()));
         
-        // Filtra localmente os dados dos 12 meses com os *outros* filtros gerais
-        // (turno, maquina, ref, op)
-        const dadosFiltrados12M = filtrarDadosDashboardLocal(dados12Meses, {
-            ...filtroGeral,
-            dataInicio: null, // Filtro de data não se aplica aqui (já pegamos 12M)
-            dataFim: null,    // "
-            // MODIFICAÇÃO: Aplicar o filtro de setor do gráfico localmente.
-            setor: filtroSetorMensal
-        });
-        
+        const dadosFiltrados12M = filtrarDadosDashboardLocal(dados12Meses, filtroGeral);
         renderizarGraficoBarrasMensal(dadosFiltrados12M);
 
     } catch (error) {
@@ -1606,10 +1515,6 @@ async function atualizarDashboard(){
     }
 }
 
-
-// ================================================================
-// ============= EXPOSIÇÃO DAS FUNÇÕES GLOBAIS ====================
-// ================================================================
 
 window.deletarRegistro = deletarRegistro;
 window.deletarOperador = deletarOperador;
@@ -1627,10 +1532,6 @@ window.abrirModalOperador = abrirModalOperador;
 window.fecharModal = fecharModal;
 </script>
 <script>
-// ================================================================
-// =================== SERVICE WORKER & PWA =======================
-// ================================================================
-
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("service-worker.js?v=2.0.2")
     .then(() => console.log("Service Worker registrado com sucesso."))
@@ -1638,7 +1539,6 @@ if ("serviceWorker" in navigator) {
 }
 </script>
 <script>
-// Lógica para o botão de instalação PWA (Progressive Web App)
 let deferredPrompt;
 const installBtn = document.createElement("button");
 installBtn.textContent = "📥 Instalar Aplicativo";
@@ -1655,19 +1555,13 @@ installBtn.style.cursor = "pointer";
 document.body.appendChild(installBtn);
 
 window.addEventListener("beforeinstallprompt", (e) => {
-  // Impede o mini-infobar de aparecer no Chrome
   e.preventDefault();
-  // Guarda o evento para que possa ser disparado mais tarde.
   deferredPrompt = e;
-  // Mostra o botão de instalação customizado
   installBtn.style.display = "block";
 
   installBtn.addEventListener("click", () => {
-    // Esconde o botão
     installBtn.style.display = "none";
-    // Mostra o prompt de instalação
     deferredPrompt.prompt();
-    // Espera o usuário responder ao prompt
     deferredPrompt.userChoice.then(choiceResult => {
       if (choiceResult.outcome === "accepted") {
         console.log("Usuário aceitou instalar o app");
@@ -1679,16 +1573,15 @@ window.addEventListener("beforeinstallprompt", (e) => {
   });
 });
     <script>
-      // Fallback ou registro adicional do SW (se sw.js for diferente de service-worker.js)
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
           navigator.serviceWorker.register('/sw.js').then(registration => {
-            console.log('Service Worker (sw.js) registrado com sucesso:', registration.scope);
+            console.log('Service Worker registrado com sucesso:', registration.scope);
           }).catch(error => {
-            console.log('Falha ao registrar o Service Worker (sw.js):', error);
+            console.log('Falha ao registrar o Service Worker:', error);
           });
         });
       }
     </script>
 </body>
-</html>
+</html>exportarExcel
