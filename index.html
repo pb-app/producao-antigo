@@ -1281,7 +1281,7 @@ async function exportarExcel() {
             const totalProd = real + queb;
             const percQuebrasRealizado = totalProd > 0 ? `${((queb / totalProd) * 100).toFixed(2)}%` : 'N/A';
             return {
-                "Data": r.data, "Setor": r.setor, "Turno": r.turno, "Operador": r.operador,
+                "Data": r.data.split('-').reverse().join('/'), "Setor": r.setor, "Turno": r.turno, "Operador": r.operador,
                 "Máquina": r.maquina, "Massa": r.massa, "Ref/CPB": r.refCpb,
                 "Prevista": prev, "Realizada": real, "Quebras": queb, "Obs": r.observacao,
                 "% Realizado/Previsto": percRealizadoPrevisto, "% Quebras/Total": percQuebrasRealizado,
@@ -1584,4 +1584,4 @@ window.addEventListener("beforeinstallprompt", (e) => {
       }
     </script>
 </body>
-</html>
+</html>exportarExcel
