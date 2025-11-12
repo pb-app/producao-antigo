@@ -8,7 +8,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>Acompanhamento de Produção</title>
 
-    <link rel="manifest" href="manifest.json?v=4.0.8" />
+    <link rel="manifest" href="manifest.json?v=4.0.9" />
     
     <meta name="theme-color" content="#0077cc">
     
@@ -1273,18 +1273,41 @@ async function exportarExcel() {
             alert("Nenhum dado para exportar com os filtros atuais.");
             return;
         }
-        const dataToExport = filtrados.map(r => {
+const dataToExport = filtrados.map(r => {
             const prev = parseFloat(r.prevista) || 0;
             const real = parseFloat(r.realizada) || 0;
             const queb = parseFloat(r.quebras) || 0;
             const percRealizadoPrevisto = prev > 0 ? `${((real / prev) * 100).toFixed(2)}%` : 'N/A';
             const totalProd = real + queb;
-            const percQuebrasRealizado = totalProd > 0 ? `${((queb / totalProd) * 100).toFixed(2)}%` : 'N/A';
+            const percQuebrasRealizado = totalProd > 0 ? `${((totalProd > 0 ? (queb / totalProd) : 0) * 100).toFixed(2)}%` : 'N/A';
+            
+            // --- INÍCIO DA CORREÇÃO ---
+            let dataObj = null; // Começa como nulo por segurança
+
+            // 1. VERIFICA se r.data existe E se é uma string antes de tentar o .split()
+            if (r.data && typeof r.data === 'string') { 
+                const parts = r.data.split('-');
+                // 2. Garante que o split gerou 3 partes (Ano, Mês, Dia)
+                if (parts.length === 3) {
+                    dataObj = new Date(parts[0], parts[1] - 1, parts[2]);
+                }
+            }
+            // --- FIM DA CORREÇÃO ---
+
             return {
-                "Data": r.data.split('-').reverse().join('/'), "Setor": r.setor, "Turno": r.turno, "Operador": r.operador,
-                "Máquina": r.maquina, "Massa": r.massa, "Ref/CPB": r.refCpb,
-                "Prevista": prev, "Realizada": real, "Quebras": queb, "Obs": r.observacao,
-                "% Realizado/Previsto": percRealizadoPrevisto, "% Quebras/Total": percQuebrasRealizado,
+                "Data": dataObj, // Passa o objeto Date (se existir) ou null (se não existir)
+                "Setor": r.setor,
+                "Turno": r.turno,
+                "Operador": r.operador,
+                "Máquina": r.maquina,
+                "Massa": r.massa,
+                "Ref/CPB": r.refCpb,
+                "Prevista": prev,
+                "Realizada": real,
+                "Quebras": queb,
+                "Obs": r.observacao,
+                "% Realizado/Previsto": percRealizadoPrevisto,
+                "% Quebras/Total": percQuebrasRealizado,
             };
         });
         const ws = XLSX.utils.json_to_sheet(dataToExport);
