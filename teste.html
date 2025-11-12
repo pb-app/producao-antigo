@@ -1273,15 +1273,23 @@ async function exportarExcel() {
             alert("Nenhum dado para exportar com os filtros atuais.");
             return;
         }
-        const dataToExport = filtrados.map(r => {
+const dataToExport = filtrados.map(r => {
             const prev = parseFloat(r.prevista) || 0;
             const real = parseFloat(r.realizada) || 0;
-            const queb = parseFloat(r.quebras) || 0;
-            const percRealizadoPrevisto = prev > 0 ? `${((real / prev) * 100).toFixed(2)}%` : 'N/A';
-            const totalProd = real + queb;
-            const percQuebrasRealizado = totalProd > 0 ? `${((queb / totalProd) * 100).toFixed(2)}%` : 'N/A';
+            // ... (mais variáveis) ...
+
+            // --- INÍCIO DA CORREÇÃO ---
+            // 1. Pega a string "AAAA-MM-DD" e quebra em partes
+            const parts = r.data.split('-'); 
+            // 2. Cria um objeto Date local (Ano, Mês-1, Dia)
+            const dataObj = new Date(parts[0], parts[1] - 1, parts[2]); 
+            // --- FIM DA CORREÇÃO ---
+
             return {
-                "Data": r.data.split('-').reverse().join('/'), "Setor": r.setor, "Turno": r.turno, "Operador": r.operador,
+                // V CORREÇÃO APLICADA AQUI V
+                "Data": dataObj, 
+                // ^^^^^^^^^^^^^^
+                "Setor": r.setor, "Turno": r.turno, "Operador": r.operador,
                 "Máquina": r.maquina, "Massa": r.massa, "Ref/CPB": r.refCpb,
                 "Prevista": prev, "Realizada": real, "Quebras": queb, "Obs": r.observacao,
                 "% Realizado/Previsto": percRealizadoPrevisto, "% Quebras/Total": percQuebrasRealizado,
