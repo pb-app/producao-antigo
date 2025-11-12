@@ -1276,23 +1276,38 @@ async function exportarExcel() {
 const dataToExport = filtrados.map(r => {
             const prev = parseFloat(r.prevista) || 0;
             const real = parseFloat(r.realizada) || 0;
-            // ... (mais variáveis) ...
-
+            const queb = parseFloat(r.quebras) || 0;
+            const percRealizadoPrevisto = prev > 0 ? `${((real / prev) * 100).toFixed(2)}%` : 'N/A';
+            const totalProd = real + queb;
+            const percQuebrasRealizado = totalProd > 0 ? `${((totalProd > 0 ? (queb / totalProd) : 0) * 100).toFixed(2)}%` : 'N/A';
+            
             // --- INÍCIO DA CORREÇÃO ---
-            // 1. Pega a string "AAAA-MM-DD" e quebra em partes
-            const parts = r.data.split('-'); 
-            // 2. Cria um objeto Date local (Ano, Mês-1, Dia)
-            const dataObj = new Date(parts[0], parts[1] - 1, parts[2]); 
+            let dataObj = null; // Começa como nulo por segurança
+
+            // 1. VERIFICA se r.data existe E se é uma string antes de tentar o .split()
+            if (r.data && typeof r.data === 'string') { 
+                const parts = r.data.split('-');
+                // 2. Garante que o split gerou 3 partes (Ano, Mês, Dia)
+                if (parts.length === 3) {
+                    dataObj = new Date(parts[0], parts[1] - 1, parts[2]);
+                }
+            }
             // --- FIM DA CORREÇÃO ---
 
             return {
-                // V CORREÇÃO APLICADA AQUI V
-                "Data": dataObj, 
-                // ^^^^^^^^^^^^^^
-                "Setor": r.setor, "Turno": r.turno, "Operador": r.operador,
-                "Máquina": r.maquina, "Massa": r.massa, "Ref/CPB": r.refCpb,
-                "Prevista": prev, "Realizada": real, "Quebras": queb, "Obs": r.observacao,
-                "% Realizado/Previsto": percRealizadoPrevisto, "% Quebras/Total": percQuebrasRealizado,
+                "Data": dataObj, // Passa o objeto Date (se existir) ou null (se não existir)
+                "Setor": r.setor,
+                "Turno": r.turno,
+                "Operador": r.operador,
+                "Máquina": r.maquina,
+                "Massa": r.massa,
+                "Ref/CPB": r.refCpb,
+                "Prevista": prev,
+                "Realizada": real,
+                "Quebras": queb,
+                "Obs": r.observacao,
+                "% Realizado/Previsto": percRealizadoPrevisto,
+                "% Quebras/Total": percQuebrasRealizado,
             };
         });
         const ws = XLSX.utils.json_to_sheet(dataToExport);
