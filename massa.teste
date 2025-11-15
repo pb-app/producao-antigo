@@ -22,13 +22,15 @@
 
 /* Remove a borda inferior do estilo moderno para estas tabelas */
 #tabProducao table th, #tabProducao table td,
-#tabPesagem table th, #tabPesagem table td {
+#tabPesagem table th, #tabPesagem table td,
+#tabMoagem table th, #tabMoagem table td { /* <-- ADICIONADO #tabMoagem */
     border-bottom: none;
 }
 
 /* Aplica o estilo de borda e centralização nas tabelas de histórico e pesagem */
 #tabProducao table th, #tabProducao table td,
-#tabPesagem table th, #tabPesagem table td {
+#tabPesagem table th, #tabPesagem table td,
+#tabMoagem table th, #tabMoagem table td { /* <-- ADICIONADO #tabMoagem */
     border: 1px solid var(--border-color);
     text-align: center;
     white-space: normal; /* Permite que o texto quebre a linha */
@@ -37,7 +39,8 @@
 
 /* Estiliza o cabeçalho para ter fundo azul e texto branco */
 #tabProducao table th,
-#tabPesagem table th {
+#tabPesagem table th,
+#tabMoagem table th { /* <-- ADICIONADO #tabMoagem */
     background-color: var(--primary);
     color: white;
     font-weight: bold;
@@ -45,13 +48,15 @@
 
 /* Adiciona o efeito de "zebra" (linhas alternadas) no corpo da tabela */
 #tabProducao tbody tr:nth-child(2n),
-#tabPesagem tbody tr:nth-child(2n) {
+#tabPesagem tbody tr:nth-child(2n),
+#tabMoagem tbody tr:nth-child(2n) { /* <-- ADICIONADO #tabMoagem */
     background-color: var(--bg-color);
 }
 
 /* Mantém o efeito hover, exceto na linha de detalhes */
 #tabProducao tbody tr:not(.linha-detalhes):hover,
-#tabPesagem tbody tr:hover {
+#tabPesagem tbody tr:hover,
+#tabMoagem tbody tr:hover { /* <-- ADICIONADO #tabMoagem */
     background-color: hsl(var(--primary-hue), 80%, 90%);
 }
 
@@ -155,7 +160,7 @@ form {
 /* ============= NOVO: AJUSTE PARA 2 COLUNAS NOS FORMS ============ */
 /* ================================================================ */
 
-  #formMassa, #formPesagem {
+  #formMassa, #formPesagem, #formMoagem { /* <-- ADICIONADO #formMoagem */
     grid-template-columns: repeat(2, 1fr);
   }
         
@@ -219,7 +224,7 @@ tbody tr:not(.linha-detalhes):hover { background-color: var(--primary-light); }
 .efficiency-ok { color: var(--accent); font-weight: bold; }
 .efficiency-bad { color: var(--danger); font-weight: bold; }
 
-/* --- SEÇÃO DE PALETES --- */
+/* --- SEÇÃO DE PALETES (Filtro Prensa) --- */
 .paletes-fieldset {
     grid-column: 1 / -1; border: 1px solid var(--border-color);
     border-radius: 12px; padding: 1.5rem; margin-top: 1rem;
@@ -324,7 +329,7 @@ tbody tr:not(.linha-detalhes):hover { background-color: var(--primary-light); }
 @page { size: landscape; margin: 15mm; }
 @media print {
     body { background: #fff !important; font-size: 10pt; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-    body > header, .nav-container, #openConfigBtn, .tab-nav, #tabProducao, #tabPesagem, .dashboard-filters, .expand-btn, .delete-btn, .edit-btn, .excel-btn, .form-actions, #printDashboardBtn {
+    body > header, .nav-container, #openConfigBtn, .tab-nav, #tabProducao, #tabPesagem, #tabMoagem, .dashboard-filters, .expand-btn, .delete-btn, .edit-btn, .excel-btn, .form-actions, #printDashboardBtn { /* <-- ADICIONADO #tabMoagem */
         display: none !important;
     }
     .tab-content, #tabDashboard { display: block !important; }
@@ -393,15 +398,28 @@ tbody tr:not(.linha-detalhes):hover { background-color: var(--primary-light); }
     <div class="container">
         <button id="openConfigBtn" title="Configurações de Pesos e Metas" onclick="openConfigModal()">⚙️</button>
         
+        <!-- ================================================================ -->
+        <!-- =================== NAVEGAÇÃO DE ABAS ATUALIZADA =================== -->
+        <!-- ================================================================ -->
         <div class="tab-nav">
-            <button class="tab-link active" onclick="showTab('producao')">Lançamentos</button>
+            <!-- 1. Antiga aba 'Lançamentos' agora é 'Filtro Prensa'. O onclick e o ID do conteúdo (tabProducao) são mantidos. -->
+            <button class="tab-link active" onclick="showTab('producao')">Filtro Prensa</button>
+            
+            <!-- 2. Nova aba 'Moagem' adicionada. -->
+            <button class="tab-link" onclick="showTab('moagem')">Moagem</button>
+            
+            <!-- 3. Abas existentes mantidas. -->
             <button class="tab-link" onclick="showTab('pesagem')">Pesagem</button>
             <button class="tab-link" onclick="showTab('dashboard')">Dashboard</button>
         </div>
+        <!-- ================================================================ -->
+        <!-- ================================================================ -->
 
+        <!-- 1. CONTEÚDO FILTRO PRENSA (ANTIGO 'PRODUÇÃO') -->
+        <!-- O ID 'tabProducao' é mantido para que o showTab('producao') funcione -->
         <div id="tabProducao" class="tab-content active">
             <section>
-                <h2>Lançar Produção</h2>
+                <h2>Lançar Produção (Filtro Prensa)</h2> <!-- Título H2 atualizado -->
                 <form id="formMassa">
                     <div> <label for="data">Data</label> <input type="date" id="data" required> </div>
                     <div> <label for="turno">Turno</label> <select id="turno" required> <option value="">Selecione um turno</option> <option>Comercial</option> <option>Turno 1 (6x2)</option> <option>Turno 2 (6x2)</option> <option>Turno 3 (6x2)</option> <option>Turno 4 (6x2)</option> <option>Turno 1 (5x2)</option> <option>Turno 2 (5x2)</option> </select> </div>
@@ -437,7 +455,7 @@ tbody tr:not(.linha-detalhes):hover { background-color: var(--primary-light); }
                 </form>
             </section>
             <section class="history-section">
-                <h2>Histórico de Produção</h2>
+                <h2>Histórico de Produção (Filtro Prensa)</h2> <!-- Título H2 atualizado -->
                 <div class="filters">
                     <div> <label for="filtroDataInicio">Data Início</label> <input type="date" id="filtroDataInicio"> </div> <div> <label for="filtroDataFim">Data Fim</label> <input type="date" id="filtroDataFim"> </div> <div> <label for="filtroTurno">Turno</label> <select id="filtroTurno"> <option value="">Todos os Turnos</option> <option>Comercial</option> <option>Turno 1 (6x2)</option> <option>Turno 2 (6x2)</option> <option>Turno 3 (6x2)</option> <option>Turno 4 (6x2)</option> <option>Turno 1 (5x2)</option> <option>Turno 2 (5x2)</option> </select> </div>
                     <button class="excel-btn" onclick="exportarExcel()">Exportar Excel</button>
@@ -453,6 +471,64 @@ tbody tr:not(.linha-detalhes):hover { background-color: var(--primary-light); }
             </section>
         </div>
 
+        <!-- ================================================================ -->
+        <!-- =================== 2. NOVO CONTEÚDO PARA MOAGEM ================= -->
+        <!-- ================================================================ -->
+        <div id="tabMoagem" class="tab-content">
+            <section>
+                <h2>Lançar Moagem</h2>
+                <form id="formMoagem">
+                    <div>
+                        <label for="dataMoagem">Data</label>
+                        <input type="date" id="dataMoagem" required>
+                    </div>
+                    <div>
+                        <label for="turnoMoagem">Turno</label>
+                        <select id="turnoMoagem" required>
+                             <option value="">Selecione um turno</option>
+                             <option>Comercial</option>
+                             <option>Turno 1 (6x2)</option>
+                             <option>Turno 2 (6x2)</option>
+                             <option>Turno 3 (6x2)</option>
+                             <option>Turno 4 (6x2)</option>
+                             <option>Turno 1 (5x2)</option>
+                             <option>Turno 2 (5x2)</option>
+                        </select>
+                    </div>
+                    <!-- Adicionar mais campos conforme necessário -->
+                     <div class="full-width">
+                        <label for="observacaoMoagem">Observação</label>
+                        <textarea id="observacaoMoagem" placeholder="Alguma observação sobre a moagem..."></textarea>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="secondary" onclick="limparFormMoagem()">Limpar</button>
+                        <button type="submit">Lançar Moagem</button>
+                    </div>
+                </form>
+            </section>
+            <section class="history-section">
+                <h2>Histórico de Moagem</h2>
+                <!-- Adicionar filtros se necessário -->
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Data</th>
+                            <th>Turno</th>
+                            <th>Observação</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabelaHistoricoMoagem">
+                         <tr><td colspan="4">Nenhum lançamento de moagem ainda.</td></tr>
+                    </tbody>
+                </table>
+            </section>
+        </div>
+        <!-- ================================================================ -->
+        <!-- ================================================================ -->
+
+
+        <!-- 3. CONTEÚDO PESAGEM (Existente) -->
         <div id="tabPesagem" class="tab-content">
             <section>
                 <h2>Lançar Peso de Palete/Mesa</h2>
@@ -488,6 +564,7 @@ tbody tr:not(.linha-detalhes):hover { background-color: var(--primary-light); }
             </section>
         </div>
 
+        <!-- 4. CONTEÚDO DASHBOARD (Existente) -->
         <div id="tabDashboard" class="tab-content">
             <h2>Dashboard de Produção</h2>
             <div class="dashboard-filters">
@@ -541,6 +618,7 @@ tbody tr:not(.linha-detalhes):hover { background-color: var(--primary-light); }
         </div>
     </div>
 
+    <!-- MODAL DE CONFIGURAÇÃO (Existente) -->
     <div id="configModal" class="modal-overlay" onclick="closeConfigModal(event)">
         <div class="modal-content">
             <h3>Configurações de Pesos e Metas</h3>
@@ -577,6 +655,7 @@ tbody tr:not(.linha-detalhes):hover { background-color: var(--primary-light); }
         window.db = db;
         window.massaCol = collection(db, "producao_massa");
         window.pesagemCol = collection(db, "pesagem_paletes");
+        window.moagemCol = collection(db, "producao_moagem"); // <-- Nova coleção para Moagem
         window.addDoc = addDoc;
         window.getDocs = getDocs;
         window.query = query;
@@ -604,7 +683,13 @@ tbody tr:not(.linha-detalhes):hover { background-color: var(--primary-light); }
     function showTab(tabName) {
         document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
         document.querySelectorAll('.tab-link').forEach(link => link.classList.remove('active'));
+        
+        // O ID do conteúdo é `tabName` com a primeira letra maiúscula
+        // Ex: showTab('producao') -> ID 'tabProducao'
+        // Ex: showTab('moagem')   -> ID 'tabMoagem'
         document.getElementById(`tab${tabName.charAt(0).toUpperCase() + tabName.slice(1)}`).classList.add('active');
+        
+        // Adiciona 'active' ao botão que foi clicado
         event.target.classList.add('active');
     }
 
@@ -714,6 +799,13 @@ tbody tr:not(.linha-detalhes):hover { background-color: var(--primary-light); }
         document.getElementById('data').value = obterDataLocalFormatada();
         calcularPesoTotalPaletes();
     }
+    
+    // --- NOVA FUNÇÃO PARA LIMPAR FORM MOAGEM ---
+    function limparFormMoagem() {
+        document.getElementById('formMoagem').reset();
+        document.getElementById('dataMoagem').value = obterDataLocalFormatada();
+    }
+
 
    document.getElementById('formMassa').addEventListener('submit', async function(event) {
         event.preventDefault();
@@ -747,7 +839,7 @@ tbody tr:not(.linha-detalhes):hover { background-color: var(--primary-light); }
         };
         try {
             await window.addDoc(window.massaCol, novoRegistro);
-            alert('Produção lançada com sucesso! ✅');
+            alert('Produção (Filtro Prensa) lançada com sucesso! ✅');
             renderizarHistorico();
             limparFormMassa();
         } catch (error) {
@@ -755,6 +847,31 @@ tbody tr:not(.linha-detalhes):hover { background-color: var(--primary-light); }
             alert("Erro ao salvar. Verifique o console. ❌");
         }
     });
+    
+    // --- LÓGICA PARA FORMULÁRIO DE MOAGEM (A SER IMPLEMENTADA) ---
+    document.getElementById('formMoagem').addEventListener('submit', async function(event) {
+        event.preventDefault();
+        alert("Lógica para salvar moagem ainda não implementada.");
+        // Exemplo de como seria:
+        /*
+        const novoRegistroMoagem = {
+            data: document.getElementById('dataMoagem').value,
+            turno: document.getElementById('turnoMoagem').value,
+            observacao: document.getElementById('observacaoMoagem').value,
+            timestamp: new Date().toISOString()
+            // ... outros campos ...
+        };
+        try {
+            await window.addDoc(window.moagemCol, novoRegistroMoagem);
+            alert('Lançamento de Moagem salvo com sucesso! ✅');
+            renderizarHistoricoMoagem(); // <-- Criar esta função
+            limparFormMoagem();
+        } catch (error) {
+            console.error("Erro ao salvar moagem: ", error);
+            alert("Erro ao salvar. ❌");
+        }
+        */
+    });
     
     async function renderizarHistorico() {
         const tbody = document.getElementById('tabelaHistoricoBody');
@@ -833,6 +950,41 @@ tbody tr:not(.linha-detalhes):hover { background-color: var(--primary-light); }
             console.error("Erro ao buscar dados:", error);
             tbody.innerHTML = `<tr><td colspan="6">Erro ao carregar dados.</td></tr>`;
         }
+    }
+    
+    // --- NOVA FUNÇÃO PARA RENDERIZAR HISTÓRICO MOAGEM (A SER IMPLEMENTADA) ---
+    async function renderizarHistoricoMoagem() {
+        const tbody = document.getElementById('tabelaHistoricoMoagem');
+        tbody.innerHTML = `<tr><td colspan="4">Carregando...</td></tr>`;
+        // Exemplo de como seria:
+        /*
+        try {
+            const q = query(window.moagemCol, orderBy("data", "desc"));
+            const querySnapshot = await getDocs(q);
+            tbody.innerHTML = '';
+            if (querySnapshot.empty) {
+                 tbody.innerHTML = `<tr><td colspan="4">Nenhum lançamento de moagem ainda.</td></tr>`;
+                 return;
+            }
+            querySnapshot.forEach(doc => {
+                const reg = doc.data();
+                const docId = doc.id;
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${new Date(reg.data + 'T03:00:00').toLocaleDateString('pt-BR')}</td>
+                    <td>${reg.turno}</td>
+                    <td>${reg.observacao || 'N/A'}</td>
+                    <td>
+                        <button class="delete-btn" onclick="deletarRegistroMoagem('${docId}')">Excluir</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        } catch(error) {
+             console.error("Erro ao carregar histórico de moagem:", error);
+             tbody.innerHTML = `<tr><td colspan="4">Erro ao carregar dados.</td></tr>`;
+        }
+        */
     }
 
     document.getElementById('formPesagem').addEventListener('submit', async function(event) {
@@ -995,7 +1147,12 @@ tbody tr:not(.linha-detalhes):hover { background-color: var(--primary-light); }
     
     document.addEventListener('DOMContentLoaded', async () => {
         const hojeStr = obterDataLocalFormatada();
-        ['data', 'filtroDataInicio', 'filtroDataFim', 'dataPesagem', 'dashFiltroDataInicio', 'dashFiltroDataFim'].forEach(id => document.getElementById(id).value = hojeStr);
+        // Adicionado 'dataMoagem' à lista de campos de data
+        ['data', 'filtroDataInicio', 'filtroDataFim', 'dataPesagem', 'dashFiltroDataInicio', 'dashFiltroDataFim', 'dataMoagem'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.value = hojeStr;
+        });
+        
         document.querySelectorAll('.palete-select, .palete-qtd').forEach(el => el.addEventListener('input', calcularPesoTotalPaletes));
         ['filtroDataInicio', 'filtroDataFim', 'filtroTurno'].forEach(id => document.getElementById(id).addEventListener('change', renderizarHistorico));
         ['dashFiltroDataInicio', 'dashFiltroDataFim', 'dashFiltroTurno'].forEach(id => document.getElementById(id).addEventListener('change', atualizarDashboard));
@@ -1006,6 +1163,8 @@ tbody tr:not(.linha-detalhes):hover { background-color: var(--primary-light); }
         
         renderizarHistorico();
         renderizarHistoricoPesagem();
+        renderizarHistoricoMoagem(); // <-- Chamada para renderizar histórico da nova aba
+        
         calcularPesoTotalPaletes();
         
         await atualizarDashboard();
@@ -1025,7 +1184,15 @@ window.toggleDetalhes = function(docId) {
         btn.classList.add('open'); // Adiciona a classe que gira o ícone
     }
 };    window.deletarRegistro=async function(d){const t=prompt("Para confirmar a exclusão, digite a senha:");if(null!==t&&"pb2025"!==t)alert("Senha incorreta. Exclusão cancelada.");else if(confirm("Tem certeza que deseja excluir este lançamento do banco de dados?"))try{await window.deleteDoc(window.doc(db,"producao_massa",d)),alert("Registro excluído com sucesso!"),renderizarHistorico()}catch(d){console.error("Erro ao deletar do Firebase: ",d),alert("Erro ao excluir. Verifique o console.")}};
-    async function renderizarHistoricoPesagem(){const d=document.getElementById("tabelaPesagemBody");d.innerHTML='<tr><td colspan="4">Carregando dados...</td></tr>';try{const t=await window.getDocs(window.query(window.pesagemCol,window.orderBy("codigo")));if(d.innerHTML="",t.empty){d.innerHTML='<tr><td colspan="4">Nenhum registro de pesagem encontrado.</td></tr>';return}t.forEach(t=>{const o=t.data(),e=t.id,n=document.createElement("tr");n.innerHTML=`\n <td>${new Date(o.data+"T03:00:00").toLocaleDateString("pt-BR")}</td>\n <td>${o.codigo}</td>\n <td>${o.peso.toFixed(2)} kg</td>\n <td>\n <button class="edit-btn" onclick='editarRegistroPesagem("${e}", ${JSON.stringify(o)})'>Editar</button>\n <button class="delete-btn" onclick="deletarRegistroPesagem('${e}')">Excluir</button>\n </td>\n `,d.appendChild(n)})}catch(t){console.error("Erro ao buscar histórico de pesagem: ",t),d.innerHTML='<tr><td colspan="4">Erro ao carregar dados.</td></tr>'}};
+    async function renderizarHistoricoPesagem(){const d=document.getElementById("tabelaPesagemBody");d.innerHTML='<tr><td colspan="4">Carregando dados...</td></tr>';try{const t=await window.getDocs(window.query(window.pesagemCol,window.orderBy("codigo")));if(d.innerHTML="",t.empty){d.innerHTML='<tr><td colspan="4">Nenhum registro de pesagem encontrado.</td></tr>';return}t.forEach(t=>{const o=t.data(),e=t.id,n=document.createElement("tr");n.innerHTML=`
+ <td>${new Date(o.data+"T03:00:00").toLocaleDateString("pt-BR")}</td>
+ <td>${o.codigo}</td>
+ <td>${o.peso.toFixed(2)} kg</td>
+ <td>
+ <button class="edit-btn" onclick='editarRegistroPesagem("${e}", ${JSON.stringify(o)})'>Editar</button>
+ <button class="delete-btn" onclick="deletarRegistroPesagem('${e}')">Excluir</button>
+ </td>
+ `,d.appendChild(n)})}catch(t){console.error("Erro ao buscar histórico de pesagem: ",t),d.innerHTML='<tr><td colspan="4">Erro ao carregar dados.</td></tr>'}};
     window.editarRegistroPesagem=async function(d,t){const o=prompt("Para editar, por favor, insira a senha:");if("pb2025"!==o)return void alert("Senha incorreta. Operação cancelada.");const e=prompt("Editar Data (AAAA-MM-DD):",t.data);if(null===e)return;const n=prompt("Editar Código:",t.codigo);if(null===n)return;const a=prompt("Editar Peso (kg):",t.peso);if(null===a)return;const r={...t,data:e,codigo:n.trim().toUpperCase(),peso:parseFloat(a)};if(isNaN(r.peso)||!r.codigo)return void alert("Dados inválidos. A edição foi cancelada.");try{await window.setDoc(window.doc(db,"pesagem_paletes",d),r),alert("Registro atualizado com sucesso!"),renderizarHistoricoPesagem(),carregarOpcoesPaletes()}catch(d){console.error("Erro ao atualizar registro: ",d),alert("Falha ao atualizar o registro.")}};
     window.deletarRegistroPesagem=async function(d){const t=prompt("Para excluir, por favor, insira a senha:");if("pb2025"!==t)return void alert("Senha incorreta. Operação cancelada.");if(confirm("Tem certeza que deseja excluir este registro de pesagem?"))try{await window.deleteDoc(window.doc(db,"pesagem_paletes",d)),alert("Registro excluído com sucesso!"),renderizarHistoricoPesagem(),carregarOpcoesPaletes()}catch(d){console.error("Erro ao excluir registro de pesagem:",d),alert("Falha ao excluir o registro.")}};
     async function exportarExcel(){alert("Preparando o arquivo Excel com dados do Firebase...");const d=document.getElementById("filtroDataInicio").value,t=document.getElementById("filtroDataFim").value,o=document.getElementById("filtroTurno").value;let e=[window.orderBy("data","desc"),window.orderBy("timestamp","desc")];d&&e.push(window.where("data",">=",d)),t&&e.push(window.where("data","<=",t)),o&&e.push(window.where("turno","==",o));try{const d=await window.getDocs(window.query(window.massaCol,...e)),t=d.docs.map(d=>d.data());if(0===t.length)return void alert("Nenhum dado encontrado para exportar.");const o=t.map(d=>{var t;const o=d.metaKgFT||appConfig.metaKgFT,e=d.metaKgPalete||appConfig.metaKgPalete,n=(null!==(t=d.retrabalhoKg)?t:d.kgPalete-d.kgCalculado);return{'Data':new Date(d.data+"T03:00:00").toLocaleDateString("pt-BR"),'Turno':d.turno,'Qtd Filtros (FT)':d.qtdFT,'Qtd Placas':d.qtdPlacas,'KG Calculado':d.kgCalculado.toFixed(2),'KG Palete (Real)':d.kgPalete.toFixed(2),'Retrabalho (kg)':n.toFixed(2),'Meta FT (kg)':o.toFixed(2),'Meta Palete (kg)':e.toFixed(2),'% Eficiência FT':(d.kgCalculado/(o||1)*100).toFixed(2)+"%",'% Eficiência Palete':(d.kgPalete/(e||1)*100).toFixed(2)+"%",'Observação':d.observacao}}),n=XLSX.utils.json_to_sheet(o),a=XLSX.utils.book_new();XLSX.utils.book_append_sheet(a,n,"Histórico de Massa"),XLSX.writeFile(a,`Historico_Massa_${obterDataLocalFormatada()}.xlsx`)}catch(d){console.error("Erro ao exportar dados do Firebase: ",d),alert("Ocorreu um erro ao preparar o arquivo.")}};
