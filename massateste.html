@@ -610,6 +610,11 @@ tbody tr:not(.linha-detalhes):hover { background-color: var(--primary-light); }
                             <input type="number" id="qtdDescargaMoagem" min="0" value="0">
                         </div>
                         <div>
+                            <!-- NOVO CAMPO "CARGAS SUBIDAS" -->
+                            <label for="qtdCargasSubidasMoagem">Cargas Subidas (Qtd)</label>
+                            <input type="number" id="qtdCargasSubidasMoagem" min="0" value="0">
+                        </div>
+                        <div>
                             <label for="arrumouBoxMoagem">Arrumou o Box?</label>
                             <select id="arrumouBoxMoagem"> <option value="nao">Não</option> <option value="sim">Sim</option> </select>
                         </div>
@@ -699,7 +704,20 @@ tbody tr:not(.linha-detalhes):hover { background-color: var(--primary-light); }
             </section>
             <section class="history-section">
                 <h2>Histórico de Moagem</h2>
-                <!-- Adicionar filtros se necessário -->
+                <!-- FILTROS ADICIONADOS -->
+                <div class="filters">
+                    <div> <label for="filtroDataInicioMoagem">Data Início</label> <input type="date" id="filtroDataInicioMoagem"> </div>
+                    <div> <label for="filtroDataFimMoagem">Data Fim</label> <input type="date" id="filtroDataFimMoagem"> </div>
+                    <div> <label for="filtroTurnoMoagem">Turno</label>
+                        <select id="filtroTurnoMoagem">
+                            <option value="">Todos os Turnos</option>
+                            <option>Turno 1 (6x2)</option>
+                            <option>Turno 2 (6x2)</option>
+                            <option>Turno 3 (6x2)</option>
+                            <option>Turno 4 (6x2)</option>
+                        </select>
+                    </div>
+                </div>
                 <table>
                     <thead>
                         <tr>
@@ -710,11 +728,12 @@ tbody tr:not(.linha-detalhes):hover { background-color: var(--primary-light); }
                             <th>Cargas (Qtd)</th>
                             <th>Peso Total (kg)</th>
                             <th>Pontos</th>
+                            <th>% Meta</th> <!-- COLUNA ADICIONADA -->
                             <th>Ações</th>
                         </tr>
                     </thead>
                     <tbody id="tabelaHistoricoMoagem">
-                         <tr><td colspan="8">Nenhum lançamento de moagem ainda.</td></tr>
+                         <tr><td colspan="9">Nenhum lançamento de moagem ainda.</td></tr> <!-- COLSPAN ATUALIZADO -->
                     </tbody>
                 </table>
             </section>
@@ -886,7 +905,13 @@ tbody tr:not(.linha-detalhes):hover { background-color: var(--primary-light); }
         <div class="modal-content">
             <h3>Configurar Pontuação (Moagem)</h3>
             
-            <h4>Pontos por Produção</h4>
+            <!-- CAMPO DE META ADICIONADO -->
+            <h4>Meta de Pontos</h4>
+            <div class="config-grid">
+                 <div> <label for="metaPontosMoagem">Meta de Pontos (por dia)</label> <input type="number" id="metaPontosMoagem" step="1"> </div>
+            </div>
+
+            <h4 style="margin-top: 1.5rem;">Pontos por Produção</h4>
             <div class="config-grid">
                  <div> <label for="pontosPorKgMoagem">Pontos por KG (carga)</label> <input type="number" id="pontosPorKgMoagem" step="0.01"> </div>
             </div>
@@ -900,6 +925,8 @@ tbody tr:not(.linha-detalhes):hover { background-color: var(--primary-light); }
                 <div> <label for="pontosSubiuMassa">Subiu Massa (por un.)</label> <input type="number" id="pontosSubiuMassa" step="1"> </div>
                 <div> <label for="pontosDesceuCacamba">Desceu Caçamba (por un.)</label> <input type="number" id="pontosDesceuCacamba" step="1"> </div>
                 <div> <label for="pontosVirouCacamba">Virou Caçamba (por un.)</label> <input type="number" id="pontosVirouCacamba" step="1"> </div>
+                <!-- PONTO PARA NOVO CAMPO ADICIONADO -->
+                <div> <label for="pontosCargasSubidas">Cargas Subidas (por un.)</label> <input type="number" id="pontosCargasSubidas" step="1"> </div>
             </div>
             
             <h4 style="margin-top: 1.5rem;">Pontos por Atividade (Auxiliar)</h4>
@@ -956,11 +983,11 @@ tbody tr:not(.linha-detalhes):hover { background-color: var(--primary-light); }
     <script>
     // Config Filtro Prensa
     let appConfig = {
-        pesoFiltro: 4100, pesoPlaca: 39.1,
-        metaKgFT: 12300, metaKgPalete: 12500
+// ... existing code ... -->
     };
     // Config Moagem (Pontos)
     let appConfigMoagem = {
+        metaPontosMoagem: 100, // <-- META ADICIONADA
         pontosPorKgMoagem: 0.01,
         pontosDescarga: 1,
         pontosGuardouMateria: 1,
@@ -969,15 +996,23 @@ tbody tr:not(.linha-detalhes):hover { background-color: var(--primary-light); }
         pontosSubiuMassa: 1,
         pontosDesceuCacamba: 1,
         pontosVirouCacamba: 1,
+        pontosCargasSubidas: 1, // <-- PONTO PARA NOVO CAMPO
         pontosLavouPeneira: 3,
         pontosLimpouMoinho: 3,
         pontosLavouPeneiraDosador: 3
     };
     
     let paletesDisponiveis = new Map();
-
+// ... existing code ... -->
     // ### REGISTRO DO PLUGIN DE RÓTULOS (DATALABELS) ###
     Chart.register(ChartDataLabels);
+
+    // FUNÇÃO GLOBAL DE CLASSE DE EFICIÊNCIA
+    function getEficClass(perc) {
+        if (perc >= 98) return 'efficiency-good';
+        if (perc >= 90) return 'efficiency-ok';
+        return 'efficiency-bad';
+    };
 
     function showTab(tabName) {
         document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
@@ -1205,7 +1240,8 @@ tbody tr:not(.linha-detalhes):hover { background-color: var(--primary-light); }
                 const metaPaleteDoRegistro = reg.metaKgPalete || appConfig.metaKgPalete;
                 const eficFT = (reg.kgCalculado / (metaFTDoRegistro || 1)) * 100;
                 const eficPalete = (reg.kgPalete / (metaPaleteDoRegistro || 1)) * 100;
-                const getEficClass = (perc) => {
+                // getEficClass MOVIDO PARA ESCOPO GLOBAL
+                const getEficClassFT = (perc) => {
                     if (perc >= 98) return 'efficiency-good';
                     if (perc >= 90) return 'efficiency-ok';
                     return 'efficiency-bad';
@@ -1337,6 +1373,7 @@ tbody tr:not(.linha-detalhes):hover { background-color: var(--primary-light); }
         // 2. Coletar Dados Sim/Não e Quantidades
         const dadosOperador = {
             qtdDescarga: parseInt(document.getElementById('qtdDescargaMoagem').value) || 0,
+            qtdCargasSubidas: parseInt(document.getElementById('qtdCargasSubidasMoagem').value) || 0, // <-- NOVO CAMPO COLETADO
             guardouMateria: document.getElementById('guardouMateriaMoagem').value === 'sim',
             qtdGuardouMateria: parseInt(document.getElementById('qtdGuardouMateriaMoagem').value) || 0,
             arrumouBox: document.getElementById('arrumouBoxMoagem').value === 'sim',
@@ -1366,6 +1403,7 @@ tbody tr:not(.linha-detalhes):hover { background-color: var(--primary-light); }
         pontosAtividades += dadosOperador.qtdSubiuMassa * appConfigMoagem.pontosSubiuMassa;
         pontosAtividades += dadosOperador.qtdDesceuCacamba * appConfigMoagem.pontosDesceuCacamba;
         pontosAtividades += dadosOperador.qtdVirouCacamba * appConfigMoagem.pontosVirouCacamba;
+        pontosAtividades += dadosOperador.qtdCargasSubidas * appConfigMoagem.pontosCargasSubidas; // <-- PONTOS DO NOVO CAMPO
         
         pontosAtividades += dadosAuxiliar.lavouPeneira ? appConfigMoagem.pontosLavouPeneira : 0;
         pontosAtividades += dadosAuxiliar.limpouMoinho ? appConfigMoagem.pontosLimpouMoinho : 0;
@@ -1766,69 +1804,32 @@ tbody tr:not(.linha-detalhes):hover { background-color: var(--primary-light); }
             });
         } catch (error) { console.error("Erro ao gerar gráfico mensal:", error); }
     }
-    
-    document.addEventListener('DOMContentLoaded', async () => {
-        const hojeStr = obterDataLocalFormatada();
-        // Adicionado 'dataCadastroOperador' à lista de campos de data
-        ['data', 'filtroDataInicio', 'filtroDataFim', 'dataPesagem', 'dashFiltroDataInicio', 'dashFiltroDataFim', 'dataMoagem', 'dataCadastroOperador'].forEach(id => {
-            const el = document.getElementById(id);
-            if (el) el.value = hojeStr;
-        });
-        
-        // Listeners Filtro Prensa
-        document.querySelectorAll('.palete-select, .palete-qtd').forEach(el => el.addEventListener('input', calcularPesoTotalPaletes));
-        ['filtroDataInicio', 'filtroDataFim', 'filtroTurno'].forEach(id => document.getElementById(id).addEventListener('change', renderizarHistorico));
-        
-        // Listeners Moagem
-        document.getElementById('qtdCargasMoagem').addEventListener('input', atualizarCamposCargaMoagem);
-        
-        // Listeners Dashboard
-        ['dashFiltroDataInicio', 'dashFiltroDataFim', 'dashFiltroTurno'].forEach(id => document.getElementById(id).addEventListener('change', atualizarDashboard));
-        document.getElementById('filtroTurnoGraficoMes').addEventListener('change', gerarGraficoProducaoMensal);
-        
-        // Carregar Configs
-        await carregarConfiguracoes(); // Filtro Prensa
-        await carregarConfigPontosMoagem(); // Moagem
-        
-        // Carregar Dados Iniciais
-        await carregarOpcoesPaletes();
-        await carregarOperadoresDropdown(); // <-- Carrega operadores no dropdown
-        
-        renderizarHistorico();
-        renderizarHistoricoPesagem();
-        renderizarHistoricoMoagem(); 
-        renderizarHistoricoOperadores(); // <-- Renderiza tabela de operadores
-        
-        calcularPesoTotalPaletes();
-        limparFormMoagem(); 
-        limparFormOperador();
-        
-        await atualizarDashboard();
-        await gerarGraficoProducaoMensal();
-    });
 
-    // --- Funções Globais (Detalhes, Excluir) ---
-    
-    // Função genérica para expandir/recolher
-    window.toggleDetalhes = function(detalhesId, botao) {
-        const detalhesRow = document.getElementById(detalhesId);
-        const btn = botao.closest('.expand-btn');
+    // --- FUNÇÃO GLOBAL DE EXPANDIR/RECOLHER ---
+    // rowId é o ID da TR de detalhes (ex: 'detalhes-fp-123' ou 'detalhes-moagem-456')
+    // btn é o elemento <button> clicado (passado com 'this')
+    window.toggleDetalhes = function(rowId, btn) {
+        const detalhesRow = document.getElementById(rowId);
+        if (!detalhesRow || !btn) return;
         
         if (detalhesRow.style.display === "table-row") {
             detalhesRow.style.display = "none";
-            btn.classList.remove('open');
+            btn.classList.remove('open'); // Remove a classe que gira o ícone
         } else {
             detalhesRow.style.display = "table-row";
-            btn.classList.add('open');
+            btn.classList.add('open'); // Adiciona a classe que gira o ícone
         }
     };
     
-    window.deletarRegistro = async function(d){
+    // --- FUNÇÕES DE DELEÇÃO (ESPECÍFICAS) ---
+    
+    // Deletar Filtro Prensa
+    window.deletarRegistro = async function(docId) { // 'd' renomeado para 'docId'
         const t=prompt("Para confirmar a exclusão, digite a senha:");
         if(null!==t&&"pb2025"!==t) alert("Senha incorreta. Exclusão cancelada.");
         else if(confirm("Tem certeza que deseja excluir este lançamento (FILTRO PRENSA) do banco de dados?")) {
             try{
-                await window.deleteDoc(window.doc(db,"producao_massa",d));
+                await window.deleteDoc(window.doc(db,"producao_massa", docId)); // Usando docId
                 alert("Registro excluído com sucesso!");
                 renderizarHistorico();
             } catch(d) {
@@ -1838,6 +1839,7 @@ tbody tr:not(.linha-detalhes):hover { background-color: var(--primary-light); }
         }
     };
     
+    // Deletar Pesagem (já estava na lista de funções duplicadas)
     async function renderizarHistoricoPesagem(){
         const d=document.getElementById("tabelaPesagemBody");
         d.innerHTML='<tr><td colspan="4">Carregando dados...</td></tr>';
@@ -1902,6 +1904,7 @@ tbody tr:not(.linha-detalhes):hover { background-color: var(--primary-light); }
         }
     };
     
+    // Exportar Excel (Filtro Prensa)
     async function exportarExcel(){
         alert("Preparando o arquivo Excel com dados do Firebase (Filtro Prensa)...");
         const d=document.getElementById("filtroDataInicio").value,t=document.getElementById("filtroDataFim").value,o=document.getElementById("filtroTurno").value;
@@ -1939,6 +1942,49 @@ tbody tr:not(.linha-detalhes):hover { background-color: var(--primary-light); }
             alert("Ocorreu um erro ao preparar o arquivo.");
         }
     };
+    
+    // --- INICIALIZAÇÃO DA PÁGINA ---
+    document.addEventListener('DOMContentLoaded', async () => {
+        const hojeStr = obterDataLocalFormatada();
+        // Adicionado 'dataCadastroOperador' e filtros de moagem à lista de campos de data
+        ['data', 'filtroDataInicio', 'filtroDataFim', 'dataPesagem', 'dashFiltroDataInicio', 'dashFiltroDataFim', 'dataMoagem', 'dataCadastroOperador', 'filtroDataInicioMoagem', 'filtroDataFimMoagem'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.value = hojeStr;
+        });
+        
+        // Listeners Filtro Prensa
+        document.querySelectorAll('.palete-select, .palete-qtd').forEach(el => el.addEventListener('input', calcularPesoTotalPaletes));
+        ['filtroDataInicio', 'filtroDataFim', 'filtroTurno'].forEach(id => document.getElementById(id).addEventListener('change', renderizarHistorico));
+        
+        // Listeners Moagem
+        document.getElementById('qtdCargasMoagem').addEventListener('input', atualizarCamposCargaMoagem);
+        // Listeners para NOVOS FILTROS da Moagem
+        ['filtroDataInicioMoagem', 'filtroDataFimMoagem', 'filtroTurnoMoagem'].forEach(id => document.getElementById(id).addEventListener('change', renderizarHistoricoMoagem));
+        
+        // Listeners Dashboard
+        ['dashFiltroDataInicio', 'dashFiltroDataFim', 'dashFiltroTurno'].forEach(id => document.getElementById(id).addEventListener('change', atualizarDashboard));
+        document.getElementById('filtroTurnoGraficoMes').addEventListener('change', gerarGraficoProducaoMensal);
+        
+        // --- Carregamentos Iniciais ---
+        await carregarConfiguracoes(); // Config Filtro Prensa
+        await carregarConfigPontosMoagem(); // Config Moagem
+        
+        await carregarOpcoesPaletes(); // Dropdown paletes (Filtro Prensa)
+        await carregarOperadoresDropdown(); // Dropdown operadores (Moagem)
+        
+        // Renderizar tabelas/históricos
+        renderizarHistorico();
+        renderizarHistoricoPesagem();
+        renderizarHistoricoMoagem();
+        renderizarHistoricoOperadores();
+        
+        calcularPesoTotalPaletes(); // Calcular peso inicial (Filtro Prensa)
+        
+        // Renderizar Dashboard
+        await atualizarDashboard();
+        await gerarGraficoProducaoMensal();
+    });
+    
     </script>
 </body>
 </html>
