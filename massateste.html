@@ -23,16 +23,18 @@
 /* Remove a borda inferior do estilo moderno para estas tabelas */
 #tabProducao table th, #tabProducao table td,
 #tabPesagem table th, #tabPesagem table td,
-#tabMoagem table th, #tabMoagem table td,
-#tabOperadores table th, #tabOperadores table td { /* <-- ADICIONADO #tabOperadores */
+#tabMoagem table th, #tabMoagem table td, /* Adicionado Moagem */
+#tabOperadores table th, #tabOperadores table td /* Adicionado Operadores */
+{
     border-bottom: none;
 }
 
 /* Aplica o estilo de borda e centralização nas tabelas de histórico e pesagem */
 #tabProducao table th, #tabProducao table td,
 #tabPesagem table th, #tabPesagem table td,
-#tabMoagem table th, #tabMoagem table td,
-#tabOperadores table th, #tabOperadores table td { /* <-- ADICIONADO #tabOperadores */
+#tabMoagem table th, #tabMoagem table td, /* Adicionado Moagem */
+#tabOperadores table th, #tabOperadores table td /* Adicionado Operadores */
+{
     border: 1px solid var(--border-color);
     text-align: center;
     white-space: normal; /* Permite que o texto quebre a linha */
@@ -42,8 +44,9 @@
 /* Estiliza o cabeçalho para ter fundo azul e texto branco */
 #tabProducao table th,
 #tabPesagem table th,
-#tabMoagem table th,
-#tabOperadores table th { /* <-- ADICIONADO #tabOperadores */
+#tabMoagem table th, /* Adicionado Moagem */
+#tabOperadores table th /* Adicionado Operadores */
+{
     background-color: var(--primary);
     color: white;
     font-weight: bold;
@@ -52,16 +55,18 @@
 /* Adiciona o efeito de "zebra" (linhas alternadas) no corpo da tabela */
 #tabProducao tbody tr:nth-child(2n),
 #tabPesagem tbody tr:nth-child(2n),
-#tabMoagem tbody tr:nth-child(2n),
-#tabOperadores tbody tr:nth-child(2n) { /* <-- ADICIONADO #tabOperadores */
+#tabMoagem tbody tr:nth-child(2n), /* Adicionado Moagem */
+#tabOperadores tbody tr:nth-child(2n) /* Adicionado Operadores */
+{
     background-color: var(--bg-color);
 }
 
 /* Mantém o efeito hover, exceto na linha de detalhes */
 #tabProducao tbody tr:not(.linha-detalhes):hover,
 #tabPesagem tbody tr:hover,
-#tabMoagem tbody tr:not(.linha-detalhes):hover,
-#tabOperadores tbody tr:hover { /* <-- ADICIONADO #tabOperadores */
+#tabMoagem tbody tr:not(.linha-detalhes):hover, /* Adicionado Moagem */
+#tabOperadores tbody tr:hover /* Adicionado Operadores */
+{
     background-color: hsl(var(--primary-hue), 80%, 90%);
 }
 
@@ -101,13 +106,7 @@ header {
 
 h1, h2, h3 { margin: 0 0 1rem; }
 h1 { font-size: 1.75rem; }
-h2 { 
-    font-size: 1.5rem; padding-bottom: 0.5rem; 
-    border-bottom: 1px solid var(--border-color);
-    display: flex; /* Para alinhar o botão de config */
-    justify-content: space-between;
-    align-items: center;
-}
+h2 { font-size: 1.5rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border-color); }
 h3 { font-size: 1.1rem; color: var(--text-light); }
 
 .container {
@@ -141,9 +140,9 @@ h3 { font-size: 1.1rem; color: var(--text-light); }
     box-shadow: 0 6px 16px rgba(0,0,0,0.1);
 }
 .tab-nav {
-    display: flex; flex-wrap: wrap; /* Permite quebra de linha em telas pequenas */
-    gap: 1rem; margin-bottom: 2rem;
+    display: flex; gap: 1rem; margin-bottom: 2rem;
     border-bottom: 1px solid var(--border-color);
+    flex-wrap: wrap; /* Permite que as abas quebrem a linha */
 }
 .tab-link {
     color: var(--text-light);
@@ -172,15 +171,13 @@ form {
 /* ============= NOVO: AJUSTE PARA 2 COLUNAS NOS FORMS ============ */
 /* ================================================================ */
 
-  /* #formMassa, #formPesagem, #formOperador com 2 colunas */
-  #formMassa, #formPesagem, #formOperador {
+  #formMassa, #formPesagem, #formMoagem, #formCadastroOperador {
     grid-template-columns: repeat(2, 1fr);
   }
   
-  /* #formMoagem com 3 colunas para melhor distribuição */
-  #formMoagem {
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1.25rem;
+  /* Ajuste específico para 3 colunas no formulário de Moagem (Operador) */
+  #formMoagem .operador-fieldset {
+      grid-template-columns: repeat(3, 1fr);
   }
         
 label {
@@ -243,13 +240,12 @@ tbody tr:not(.linha-detalhes):hover { background-color: var(--primary-light); }
 .efficiency-ok { color: var(--accent); font-weight: bold; }
 .efficiency-bad { color: var(--danger); font-weight: bold; }
 
-/* --- SEÇÃO DE PALETES (Filtro Prensa) --- */
+/* --- SEÇÃO DE PALETES (FILTRO PRENSA) --- */
 .paletes-fieldset {
     grid-column: 1 / -1; border: 1px solid var(--border-color);
     border-radius: 12px; padding: 1.5rem; margin-top: 1rem;
 }
-.paletes-fieldset legend,
-.moagem-fieldset legend { /* <-- Estilo para fieldset moagem */
+.paletes-fieldset legend {
     font-weight: 700; color: var(--primary);
     padding: 0 0.5rem; font-size: 1rem; text-transform: uppercase;
 }
@@ -261,59 +257,89 @@ tbody tr:not(.linha-detalhes):hover { background-color: var(--primary-light); }
     background-color: var(--primary-light); font-weight: bold; color: var(--primary);
 }
 
-/* --- SEÇÃO MOAGEM --- */
+/* --- SEÇÃO DE MOAGEM --- */
 .moagem-fieldset {
-    grid-column: 1 / -1; border: 1px solid var(--border-color);
-    border-radius: 12px; padding: 1.5rem; margin-top: 1rem;
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1.25rem;
-}
-/* Container para cargas dinâmicas */
-#cargasContainerMoagem {
     grid-column: 1 / -1;
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-top: 1rem;
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 1rem;
-    border-top: 1px solid var(--border-color);
-    padding-top: 1rem;
-    margin-top: 0.5rem;
+    gap: 1.5rem;
 }
-.carga-moagem-row {
-    display: grid;
-    grid-template-columns: 100px 1fr;
-    gap: 0.5rem;
+.moagem-fieldset legend {
+    font-weight: 700;
+    color: var(--primary);
+    padding: 0 0.5rem;
+    font-size: 1rem;
+    text-transform: uppercase;
+}
+/* Grid de 3 colunas para campos de sim/não */
+.radio-group-grid {
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+/* Estilo para grupo de rádio (Sim/Não) */
+.radio-group {
+    display: flex;
     align-items: center;
+    gap: 0.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 0.6rem 0.8rem;
+    background-color: var(--bg-color);
 }
-.carga-moagem-row label {
+.radio-group label {
+    margin: 0;
     font-size: 0.9rem;
     font-weight: 500;
     color: var(--text-dark);
-    margin: 0;
     text-transform: none;
-    text-align: right;
 }
-/* Campos condicionais */
-.campo-condicional {
-    display: none; /* Oculto por padrão */
+.radio-group input[type="radio"] {
+    width: auto;
+    margin-right: 0.25rem;
+    accent-color: var(--primary);
 }
-/* Estilo para input "Sim/Não" e campo condicional lado a lado */
-.campo-com-condicional {
+/* Container para campos condicionais (Ex: Quantidade) */
+.conditional-field {
+    display: none; /* Começa escondido */
+    margin-top: 0.75rem;
+    padding-left: 1.5rem; /* Indentação */
+}
+
+/* Campos de Carga Dinâmicos (Moagem) */
+#cargas-dinamicas-container {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px dashed var(--border-color);
+}
+.carga-dinamica-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 0.75rem;
-    align-items: flex-end;
+    align-items: center;
+}
+.carga-dinamica-row label {
+    font-size: 0.9rem;
+    font-weight: 700;
+    margin: 0;
+    color: var(--text-dark);
+    text-transform: none;
 }
 
 
 /* --- DETALHES EXPANSÍVEIS --- */
 .linha-detalhes { display: none; background-color: var(--primary-light); }
 .linha-detalhes td { padding: 1rem 1.5rem; text-align: left !important; }
-.detalhe-grid { 
+.detalhe-grid {
     display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 1rem; 
+    gap: 1rem;
 }
-.detalhe-grid span { 
+.detalhe-grid span {
     font-weight: bold; color: var(--primary);
     display: block; margin-bottom: 0.25rem;
 }
@@ -374,55 +400,41 @@ tbody tr:not(.linha-detalhes):hover { background-color: var(--primary-light); }
 .chart-container h3 { margin-top: 0; text-align: center; }
 
 /* --- MODAL DE CONFIGURAÇÃO --- */
-#openConfigBtn {
-    position: absolute; top: 1.5rem; right: 1.5rem;
+.config-btn { /* Classe genérica para botões de config */
     background: none; border: none; color: var(--text-light); font-size: 1.5rem;
     padding: 0.4rem 0.7rem; cursor: pointer; transition: all 0.2s;
+    position: absolute; top: 1.5rem; right: 1.5rem;
 }
-#openConfigBtn:hover { color: var(--primary); transform: rotate(15deg); }
-
-/* Botão de config da Moagem */
+.config-btn:hover { color: var(--primary); transform: rotate(15deg); }
+/* Botão de config da Moagem fica dentro da aba, relativo a ela */
+#tabMoagem { position: relative; }
 #openConfigMoagemBtn {
-    background: none; border: none; color: var(--text-light); font-size: 1.2rem;
-    padding: 0.2rem 0.5rem; cursor: pointer; transition: all 0.2s;
-    margin-left: auto; /* Joga para a direita */
+     position: absolute; top: 0.5rem; right: 0.5rem;
 }
-#openConfigMoagemBtn:hover { color: var(--primary); transform: rotate(15deg); }
-
 
 .modal-overlay {
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
     background: rgba(0,0,0,0.6); display: none;
     justify-content: center; align-items: center; z-index: 1000;
-    padding: 1rem;
 }
 .modal-content {
     background: white; padding: 2rem; border-radius: 16px;
     width: 90%; max-width: 700px;
-    max-height: 90vh; /* Altura máxima */
-    overflow-y: auto; /* Scroll se conteúdo for maior */
 }
-.modal-content h3 {
-    margin-top: 0;
-    padding-bottom: 1rem;
-    border-bottom: 1px solid var(--border-color);
-}
-/* Grid para modais */
+/* Grid para inputs do modal */
 .config-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     gap: 1.25rem;
+    margin-bottom: 1.5rem;
 }
 .modal-actions {
     display: flex;
-    justify-content: flex-end;
     gap: 0.75rem;
+    justify-content: flex-end;
     margin-top: 1.5rem;
-    padding-top: 1.5rem;
     border-top: 1px solid var(--border-color);
-}
-.modal-actions input[type="password"] {
-    margin-right: auto; /* Empurra senha para esquerda */
+    padding-top: 1.5rem;
 }
 
 
@@ -430,10 +442,17 @@ tbody tr:not(.linha-detalhes):hover { background-color: var(--primary-light); }
 @page { size: landscape; margin: 15mm; }
 @media print {
     body { background: #fff !important; font-size: 10pt; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-    body > header, .nav-container, #openConfigBtn, #openConfigMoagemBtn, .tab-nav, #tabProducao, #tabPesagem, #tabMoagem, #tabOperadores, .dashboard-filters, .expand-btn, .delete-btn, .edit-btn, .excel-btn, .form-actions, #printDashboardBtn { /* <-- ADICIONADO #tabOperadores */
+    /* Esconde tudo que não é o dashboard */
+    body > header, .nav-container, .config-btn, .tab-nav,
+    #tabProducao, #tabPesagem, #tabMoagem, #tabOperadores, /* Esconde outras abas */
+    .dashboard-filters, .expand-btn, .delete-btn, .edit-btn, .excel-btn,
+    .form-actions, #printDashboardBtn,
+    #openConfigBtn, #openConfigMoagemBtn /* Esconde botões de config */
+    {
         display: none !important;
     }
-    .tab-content, #tabDashboard { display: block !important; }
+    
+    .tab-content, #tabDashboard { display: block !important; } /* Garante que o dashboard seja visível */
     .container {
         box-shadow: none !important; border: none !important; padding: 0 !important;
         margin: 0 !important; width: 100% !important; max-width: 100% !important;
@@ -497,19 +516,25 @@ tbody tr:not(.linha-detalhes):hover { background-color: var(--primary-light); }
     </div>
 
     <div class="container">
-        <!-- Botão Config Geral (Filtro Prensa) -->
-        <button id="openConfigBtn" title="Configurações de Pesos e Metas (Filtro Prensa)" onclick="openConfigModal()">⚙️</button>
+        <!-- Botão de Configuração Principal (Filtro Prensa) -->
+        <button id="openConfigBtn" class="config-btn" title="Configurações de Pesos e Metas (Filtro Prensa)" onclick="openConfigModal()">⚙️</button>
         
         <div class="tab-nav">
+            <!-- ABA 1: Filtro Prensa (Antigo Lançamentos) -->
             <button class="tab-link active" onclick="showTab('producao')">Filtro Prensa</button>
+            <!-- ABA 2: Moagem -->
             <button class="tab-link" onclick="showTab('moagem')">Moagem</button>
+            <!-- ABA 3: Pesagem -->
             <button class="tab-link" onclick="showTab('pesagem')">Pesagem</button>
-            <!-- NOVA ABA OPERADORES -->
-            <button class="tab-link" onclick="showTab('operadores')">Operadores</button>
+            <!-- ABA 4: Dashboard -->
             <button class="tab-link" onclick="showTab('dashboard')">Dashboard</button>
+            <!-- ABA 5: Operadores -->
+            <button class="tab-link" onclick="showTab('operadores')">Operadores</button>
         </div>
 
-        <!-- 1. CONTEÚDO FILTRO PRENSA (ANTIGO 'PRODUÇÃO') -->
+        <!-- ================================================================ -->
+        <!-- ============ CONTEÚDO ABA 1: FILTRO PRENSA (PRODUÇÃO) ========== -->
+        <!-- ================================================================ -->
         <div id="tabProducao" class="tab-content active">
             <section>
                 <h2>Lançar Produção (Filtro Prensa)</h2>
@@ -556,7 +581,7 @@ tbody tr:not(.linha-detalhes):hover { background-color: var(--primary-light); }
                 <table>
                     <thead>
                         <tr>
-                            <th></th> <th>Data</th> <th>Turno</th> <th>% FT</th> <th>% Palete</th> <th>Retrabalho (kg)</th>
+                            <th></th> <th>Data</th> <th>Turno</th> <th>% FT</th> <th>% Palete</th> <th>Retrabalho (kg)</th> <th>Ações</th>
                         </tr>
                     </thead>
                     <tbody id="tabelaHistoricoBody"></tbody>
@@ -565,16 +590,16 @@ tbody tr:not(.linha-detalhes):hover { background-color: var(--primary-light); }
         </div>
 
         <!-- ================================================================ -->
-        <!-- =================== 2. CONTEÚDO PARA MOAGEM ==================== -->
+        <!-- ================== CONTEÚDO ABA 2: MOAGEM ================== -->
         <!-- ================================================================ -->
         <div id="tabMoagem" class="tab-content">
+            <!-- Botão de Configuração da Moagem -->
+            <button id="openConfigMoagemBtn" class="config-btn" title="Configurações de Pontuação (Moagem)" onclick="openConfigMoagemModal()">⚙️</button>
+            
             <section>
-                <h2>
-                    Lançar Moagem
-                    <button id="openConfigMoagemBtn" title="Configurar Pontuação da Moagem" onclick="openConfigMoagemModal()">⚙️</button>
-                </h2>
-                <form id="formMoagem">
-                    <!-- Informações Básicas -->
+                <h2>Lançar Atividades (Moagem)</h2>
+                <form id="formMoagem" onsubmit="handleFormMoagemSubmit(event)">
+                    <!-- Campos Iniciais -->
                     <div>
                         <label for="dataMoagem">Data</label>
                         <input type="date" id="dataMoagem" required>
@@ -582,112 +607,148 @@ tbody tr:not(.linha-detalhes):hover { background-color: var(--primary-light); }
                     <div>
                         <label for="turnoMoagem">Turno</label>
                         <select id="turnoMoagem" required>
-                             <option value="">Selecione um turno</option>
-                             <option>Comercial</option>
-                             <option>Turno 1 (6x2)</option> <option>Turno 2 (6x2)</option>
-                             <option>Turno 3 (6x2)</option> <option>Turno 4 (6x2)</option>
-                             <option>Turno 1 (5x2)</option> <option>Turno 2 (5x2)</option>
+                            <option value="">Selecione um turno</option>
+                            <option>Turno 1 (6x2)</option>
+                            <option>Turno 2 (6x2)</option>
+                            <option>Turno 3 (6x2)</option>
+                            <option>Turno 4 (6x2)</option>
                         </select>
                     </div>
-                    <div>
-                        <!-- CAMPO DE TEXTO SUBSTITUÍDO POR SELECT -->
-                        <label for="operadorMoagemSelect">Operador</label>
-                        <select id="operadorMoagemSelect" required>
-                            <option value="">Carregando...</option>
+                    <div class="full-width">
+                        <label for="operadorMoagem">Operador</label>
+                        <select id="operadorMoagem" required>
+                            <option value="">Carregando operadores...</option>
                         </select>
                     </div>
 
-                    <!-- Seção Operador -->
-                    <fieldset class="moagem-fieldset">
+                    <!-- Fieldset Operador -->
+                    <fieldset class="moagem-fieldset operador-fieldset">
                         <legend>Operador</legend>
                         
+                        <!-- Coluna 1 -->
                         <div>
                             <label for="qtdCargasMoagem">Quantidade de Cargas</label>
                             <input type="number" id="qtdCargasMoagem" min="0" value="0" required>
                         </div>
                         <div>
-                            <label for="qtdDescargaMoagem">Quantidade de Descargas</label>
-                            <input type="number" id="qtdDescargaMoagem" min="0" value="0">
+                            <label for="qtdDescarga">Descargas (Qtd)</label>
+                            <input type="number" id="qtdDescarga" min="0" value="0">
                         </div>
                         <div>
-                            <!-- NOVO CAMPO "CARGAS SUBIDAS" -->
-                            <label for="qtdCargasSubidasMoagem">Cargas Subidas (Qtd)</label>
-                            <input type="number" id="qtdCargasSubidasMoagem" min="0" value="0">
+                            <label for="qtdCargasSubidas">Cargas Subidas (Qtd)</label> <!-- NOVO CAMPO -->
+                            <input type="number" id="qtdCargasSubidas" min="0" value="0">
+                        </div>
+                        
+                        <!-- Coluna 2 (Sim/Não) -->
+                        <div>
+                            <label>Guardou Matéria?</label>
+                            <div class="radio-group">
+                                <input type="radio" id="guardouMateriaNao" name="guardouMateria" value="nao" checked onchange="toggleConditionalField('guardouMateria', false)">
+                                <label for="guardouMateriaNao">Não</label>
+                                <input type="radio" id="guardouMateriaSim" name="guardouMateria" value="sim" onchange="toggleConditionalField('guardouMateria', true)">
+                                <label for="guardouMateriaSim">Sim</label>
+                            </div>
+                            <div id="conditional-guardouMateria" class="conditional-field">
+                                <label for="qtdGuardouMateria">Quantas?</label>
+                                <input type="number" id="qtdGuardouMateria" min="0" value="0">
+                            </div>
                         </div>
                         <div>
-                            <label for="arrumouBoxMoagem">Arrumou o Box?</label>
-                            <select id="arrumouBoxMoagem"> <option value="nao">Não</option> <option value="sim">Sim</option> </select>
+                            <label>Subiu Massa?</label>
+                            <div class="radio-group">
+                                <input type="radio" id="subiuMassaNao" name="subiuMassa" value="nao" checked onchange="toggleConditionalField('subiuMassa', false)">
+                                <label for="subiuMassaNao">Não</label>
+                                <input type="radio" id="subiuMassaSim" name="subiuMassa" value="sim" onchange="toggleConditionalField('subiuMassa', true)">
+                                <label for="subiuMassaSim">Sim</label>
+                            </div>
+                            <div id="conditional-subiuMassa" class="conditional-field">
+                                <label for="qtdSubiuMassa">Quantas?</label>
+                                <input type="number" id="qtdSubiuMassa" min="0" value="0">
+                            </div>
                         </div>
                         <div>
-                            <label for="carregouCaminhaoCacoMoagem">Carregou Caminhão Caco?</label>
-                            <select id="carregouCaminhaoCacoMoagem"> <option value="nao">Não</option> <option value="sim">Sim</option> </select>
+                            <label>Virou Caçamba?</label>
+                            <div class="radio-group">
+                                <input type="radio" id="virouCacambaNao" name="virouCacamba" value="nao" checked onchange="toggleConditionalField('virouCacamba', false)">
+                                <label for="virouCacambaNao">Não</label>
+                                <input type="radio" id="virouCacambaSim" name="virouCacamba" value="sim" onchange="toggleConditionalField('virouCacamba', true)">
+                                <label for="virouCacambaSim">Sim</label>
+                            </div>
+                            <div id="conditional-virouCacamba" class="conditional-field">
+                                <label for="qtdVirouCacamba">Quantas?</label>
+                                <input type="number" id="qtdVirouCacamba" min="0" value="0">
+                            </div>
                         </div>
 
-                        <!-- Campos Condicionais -->
-                        <div class="campo-com-condicional">
-                            <label for="guardouMateriaMoagem">Guardou Matéria?</label>
-                            <select id="guardouMateriaMoagem" onchange="toggleCampoCondicional('guardouMateriaMoagem', 'containerQtdGuardouMateria')">
-                                <option value="nao">Não</option> <option value="sim">Sim</option>
-                            </select>
+                        <!-- Coluna 3 (Sim/Não) -->
+                        <div>
+                            <label>Arrumou o Box?</label>
+                            <div class="radio-group">
+                                <input type="radio" id="arrumouBoxNao" name="arrumouBox" value="nao" checked>
+                                <label for="arrumouBoxNao">Não</label>
+                                <input type="radio" id="arrumouBoxSim" name="arrumouBox" value="sim">
+                                <label for="arrumouBoxSim">Sim</label>
+                            </div>
                         </div>
-                        <div id="containerQtdGuardouMateria" class="campo-condicional">
-                            <label for="qtdGuardouMateriaMoagem">Quantas guardou?</label>
-                            <input type="number" id="qtdGuardouMateriaMoagem" min="0" value="0">
+                        <div>
+                            <label>Desceu Caçamba?</label>
+                            <div class="radio-group">
+                                <input type="radio" id="desceuCacambaNao" name="desceuCacamba" value="nao" checked onchange="toggleConditionalField('desceuCacamba', false)">
+                                <label for="desceuCacambaNao">Não</label>
+                                <input type="radio" id="desceuCacambaSim" name="desceuCacamba" value="sim" onchange="toggleConditionalField('desceuCacamba', true)">
+                                <label for="desceuCacambaSim">Sim</label>
+                            </div>
+                             <div id="conditional-desceuCacamba" class="conditional-field">
+                                <label for="qtdDesceuCacamba">Quantas?</label>
+                                <input type="number" id="qtdDesceuCacamba" min="0" value="0">
+                            </div>
                         </div>
-
-                        <div class="campo-com-condicional">
-                            <label for="subiuMassaMoagem">Subiu Massa?</label>
-                            <select id="subiuMassaMoagem" onchange="toggleCampoCondicional('subiuMassaMoagem', 'containerQtdSubiuMassa')">
-                                <option value="nao">Não</option> <option value="sim">Sim</option>
-                            </select>
+                         <div>
+                            <label>Carregou Caco?</label>
+                            <div class="radio-group">
+                                <input type="radio" id="carregouCacoNao" name="carregouCaco" value="nao" checked>
+                                <label for="carregouCacoNao">Não</label>
+                                <input type="radio" id="carregouCacoSim" name="carregouCaco" value="sim">
+                                <label for="carregouCacoSim">Sim</label>
+                            </div>
                         </div>
-                        <div id="containerQtdSubiuMassa" class="campo-condicional">
-                            <label for="qtdSubiuMassaMoagem">Quantas subiu?</label>
-                            <input type="number" id="qtdSubiuMassaMoagem" min="0" value="0">
-                        </div>
-
-                        <div class="campo-com-condicional">
-                            <label for="desceuCacambaMoagem">Desceu Caçamba?</label>
-                            <select id="desceuCacambaMoagem" onchange="toggleCampoCondicional('desceuCacambaMoagem', 'containerQtdDesceuCacamba')">
-                                <option value="nao">Não</option> <option value="sim">Sim</option>
-                            </select>
-                        </div>
-                        <div id="containerQtdDesceuCacamba" class="campo-condicional">
-                            <label for="qtdDesceuCacambaMoagem">Quantas desceu?</label>
-                            <input type="number" id="qtdDesceuCacambaMoagem" min="0" value="0">
-                        </div>
-
-                        <div class="campo-com-condicional">
-                            <label for="virouCacambaMoagem">Virou Caçamba?</label>
-                            <select id="virouCacambaMoagem" onchange="toggleCampoCondicional('virouCacambaMoagem', 'containerQtdVirouCacamba')">
-                                <option value="nao">Não</option> <option value="sim">Sim</option>
-                            </select>
-                        </div>
-                        <div id="containerQtdVirouCacamba" class="campo-condicional">
-                            <label for="qtdVirouCacambaMoagem">Quantas virou?</label>
-                            <input type="number" id="qtdVirouCacambaMoagem" min="0" value="0">
-                        </div>
-
-                        <!-- Container para Cargas Dinâmicas -->
-                        <div id="cargasContainerMoagem" class="full-width">
-                            <!-- Campos de carga serão injetados aqui via JS -->
-                        </div>
+                        
                     </fieldset>
+                    
+                    <!-- Container para Cargas Dinâmicas -->
+                    <div id="cargas-dinamicas-container">
+                        <!-- Campos de Moinho/Peso serão injetados aqui -->
+                    </div>
 
-                    <!-- Seção Auxiliar -->
-                    <fieldset class="moagem-fieldset">
+                    <!-- Fieldset Auxiliar -->
+                    <fieldset class="moagem-fieldset radio-group-grid">
                         <legend>Auxiliar</legend>
                         <div>
-                            <label for="lavouPeneiraMoagem">Lavou a Peneira?</label>
-                            <select id="lavouPeneiraMoagem"> <option value="nao">Não</option> <option value="sim">Sim</option> </select>
+                            <label>Lavou a Peneira?</label>
+                            <div class="radio-group">
+                                <input type="radio" id="lavouPeneiraNao" name="lavouPeneira" value="nao" checked>
+                                <label for="lavouPeneiraNao">Não</label>
+                                <input type="radio" id="lavouPeneiraSim" name="lavouPeneira" value="sim">
+                                <label for="lavouPeneiraSim">Sim</label>
+                            </div>
                         </div>
                         <div>
-                            <label for="limpouMoinhoMoagem">Limpou o Moinho?</label>
-                            <select id="limpouMoinhoMoagem"> <option value="nao">Não</option> <option value="sim">Sim</option> </select>
+                            <label>Limpou o Moinho?</label>
+                            <div class="radio-group">
+                                <input type="radio" id="limpouMoinhoNao" name="limpouMoinho" value="nao" checked>
+                                <label for="limpouMoinhoNao">Não</label>
+                                <input type="radio" id="limpouMoinhoSim" name="limpouMoinho" value="sim">
+                                <label for="limpouMoinhoSim">Sim</label>
+                            </div>
                         </div>
                         <div>
-                            <label for="lavouPeneiraDosadorMoagem">Lavou Peneira e Dosador?</label>
-                            <select id="lavouPeneiraDosadorMoagem"> <option value="nao">Não</option> <option value="sim">Sim</option> </select>
+                            <label>Lavou Peneira/Dosador?</label>
+                            <div class="radio-group">
+                                <input type="radio" id="lavouPeneiraDosadorNao" name="lavouPeneiraDosador" value="nao" checked>
+                                <label for="lavouPeneiraDosadorNao">Não</label>
+                                <input type="radio" id="lavouPeneiraDosadorSim" name="lavouPeneiraDosador" value="sim">
+                                <label for="lavouPeneiraDosadorSim">Sim</label>
+                            </div>
                         </div>
                     </fieldset>
                     
@@ -698,17 +759,18 @@ tbody tr:not(.linha-detalhes):hover { background-color: var(--primary-light); }
                     
                     <div class="form-actions">
                         <button type="button" class="secondary" onclick="limparFormMoagem()">Limpar</button>
-                        <button type="submit">Lançar Moagem</button>
+                        <button type="submit">Lançar Atividade</button>
                     </div>
                 </form>
             </section>
+            
             <section class="history-section">
                 <h2>Histórico de Moagem</h2>
                 <!-- FILTROS ADICIONADOS -->
                 <div class="filters">
                     <div> <label for="filtroDataInicioMoagem">Data Início</label> <input type="date" id="filtroDataInicioMoagem"> </div>
                     <div> <label for="filtroDataFimMoagem">Data Fim</label> <input type="date" id="filtroDataFimMoagem"> </div>
-                    <div> <label for="filtroTurnoMoagem">Turno</label>
+                    <div> <label for="filtroTurnoMoagem">Turno</label> 
                         <select id="filtroTurnoMoagem">
                             <option value="">Todos os Turnos</option>
                             <option>Turno 1 (6x2)</option>
@@ -733,16 +795,15 @@ tbody tr:not(.linha-detalhes):hover { background-color: var(--primary-light); }
                         </tr>
                     </thead>
                     <tbody id="tabelaHistoricoMoagem">
-                         <tr><td colspan="9">Nenhum lançamento de moagem ainda.</td></tr> <!-- COLSPAN ATUALIZADO -->
+                         <tr><td colspan="9">Nenhum lançamento de moagem ainda.</td></tr> <!-- COLSPAN ATUALIZADO (8->9) -->
                     </tbody>
                 </table>
             </section>
         </div>
-        <!-- ================================================================ -->
-        <!-- ================================================================ -->
 
-
-        <!-- 3. CONTEÚDO PESAGEM (Existente) -->
+        <!-- ================================================================ -->
+        <!-- ================== CONTEÚDO ABA 3: PESAGEM ================= -->
+        <!-- ================================================================ -->
         <div id="tabPesagem" class="tab-content">
             <section>
                 <h2>Lançar Peso de Palete/Mesa</h2>
@@ -777,60 +838,12 @@ tbody tr:not(.linha-detalhes):hover { background-color: var(--primary-light); }
                 </table>
             </section>
         </div>
-        
-        <!-- ================================================================ -->
-        <!-- =================== 4. NOVA ABA OPERADORES ===================== -->
-        <!-- ================================================================ -->
-        <div id="tabOperadores" class="tab-content">
-            <section>
-                <h2>Lançar Cadastro de Operador</h2>
-                <form id="formOperador">
-                    <div>
-                        <label for="dataCadastroOperador">Data Cadastro</label>
-                        <input type="date" id="dataCadastroOperador" required>
-                    </div>
-                    <div>
-                        <label for="nomeOperador">Nome do Operador</label>
-                        <input type="text" id="nomeOperador" required placeholder="Nome Completo">
-                    </div>
-                    <div class="full-width">
-                        <label for="turnoOperador">Turno (Moagem)</label>
-                        <select id="turnoOperador" required>
-                             <option value="">Selecione um turno</option>
-                             <option>Turno 1 (6x2)</option> 
-                             <option>Turno 2 (6x2)</option>
-                             <option>Turno 3 (6x2)</option> 
-                             <option>Turno 4 (6x2)</option>
-                        </select>
-                    </div>
-                    <div class="form-actions">
-                        <button type="button" class="secondary" onclick="limparFormOperador()">Limpar</button>
-                        <button type="submit">Cadastrar Operador</button>
-                    </div>
-                </form>
-            </section>
-            <section class="history-section">
-                <h2>Operadores Cadastrados</h2>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Data Cadastro</th>
-                            <th>Nome</th>
-                            <th>Turno</th>
-                            <th>Ações</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tabelaOperadoresBody">
-                        <tr><td colspan="4">Carregando operadores...</td></tr>
-                    </tbody>
-                </table>
-            </section>
-        </div>
 
-
-        <!-- 5. CONTEÚDO DASHBOARD (Existente) -->
+        <!-- ================================================================ -->
+        <!-- ================== CONTEÚDO ABA 4: DASHBOARD ================ -->
+        <!-- ================================================================ -->
         <div id="tabDashboard" class="tab-content">
-            <h2>Dashboard de Produção</h2>
+            <h2>Dashboard de Produção (Filtro Prensa)</h2>
             <div class="dashboard-filters">
                 <div>
                     <label for="dashFiltroDataInicio">Data Início</label>
@@ -880,9 +893,63 @@ tbody tr:not(.linha-detalhes):hover { background-color: var(--primary-light); }
                 </div>
             </div>
         </div>
+        
+        <!-- ================================================================ -->
+        <!-- ================= CONTEÚDO ABA 5: OPERADORES ================= -->
+        <!-- ================================================================ -->
+        <div id="tabOperadores" class="tab-content">
+            <section>
+                <h2>Cadastrar Novo Operador (Moagem)</h2>
+                <form id="formCadastroOperador" onsubmit="handleCadastroOperadorSubmit(event)">
+                    <div>
+                        <label for="dataCadastroOperador">Data de Início</label>
+                        <input type="date" id="dataCadastroOperador" required>
+                    </div>
+                    <div>
+                        <label for="nomeOperador">Nome do Operador</label>
+                        <input type="text" id="nomeOperador" required placeholder="Nome completo">
+                    </div>
+                    <div>
+                        <label for="turnoOperador">Turno</label>
+                        <select id="turnoOperador" required>
+                            <option value="">Selecione o turno</option>
+                            <option>Turno 1 (6x2)</option>
+                            <option>Turno 2 (6x2)</option>
+                            <option>Turno 3 (6x2)</option>
+                            <option>Turno 4 (6x2)</option>
+                        </select>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="secondary" onclick="limparFormOperador()">Limpar</button>
+                        <button type="submit">Cadastrar Operador</button>
+                    </div>
+                </form>
+            </section>
+            
+            <section class="history-section">
+                <h2>Operadores Cadastrados</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Data Início</th>
+                            <th>Nome</th>
+                            <th>Turno</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabelaOperadoresBody">
+                        <tr><td colspan="4">Nenhum operador cadastrado.</td></tr>
+                    </tbody>
+                </table>
+            </section>
+        </div>
     </div>
 
-    <!-- MODAL DE CONFIGURAÇÃO (Filtro Prensa) -->
+    <!-- ================================================================ -->
+    <!-- ======================= MODAIS DE CONFIGURAÇÃO ===================== -->
+    <!-- ================================================================ -->
+    
+    <!-- MODAL 1: Configuração Filtro Prensa -->
     <div id="configModal" class="modal-overlay" onclick="closeConfigModal(event)">
         <div class="modal-content">
             <h3>Configurações de Pesos e Metas (Filtro Prensa)</h3>
@@ -900,50 +967,47 @@ tbody tr:not(.linha-detalhes):hover { background-color: var(--primary-light); }
         </div>
     </div>
     
-    <!-- MODAL PARA PONTOS MOAGEM -->
+    <!-- MODAL 2: Configuração Moagem (Pontuação) -->
     <div id="configMoagemModal" class="modal-overlay" onclick="closeConfigMoagemModal(event)">
         <div class="modal-content">
-            <h3>Configurar Pontuação (Moagem)</h3>
-            
-            <!-- CAMPO DE META ADICIONADO -->
-            <h4>Meta de Pontos</h4>
+            <h3>Configurações de Pontuação (Moagem)</h3>
             <div class="config-grid">
-                 <div> <label for="metaPontosMoagem">Meta de Pontos (por dia)</label> <input type="number" id="metaPontosMoagem" step="1"> </div>
+                <!-- Coluna 1: Pontos por Atividade -->
+                <div> <label for="pontosDescarga">Pontos por Descarga (un)</label> <input type="number" id="pontosDescarga" step="0.1"> </div>
+                <div> <label for="pontosCargasSubidas">Pontos por Carga Subida (un)</label> <input type="number" id="pontosCargasSubidas" step="0.1"> </div>
+                <div> <label for="pontosGuardouMateria">Pontos por Guardou Matéria (un)</label> <input type="number" id="pontosGuardouMateria" step="0.1"> </div>
+                <div> <label for="pontosArrumouBox">Pontos por Arrumou o Box (sim)</label> <input type="number" id="pontosArrumouBox" step="0.1"> </div>
+                <div> <label for="pontosCarregouCaco">Pontos por Carregou Caco (sim)</label> <input type="number" id="pontosCarregouCaco" step="0.1"> </div>
+                <div> <label for="pontosSubiuMassa">Pontos por Subiu Massa (un)</label> <input type="number" id="pontosSubiuMassa" step="0.1"> </div>
+                <div> <label for="pontosDesceuCacamba">Pontos por Desceu Caçamba (un)</label> <input type="number" id="pontosDesceuCacamba" step="0.1"> </div>
+                <div> <label for="pontosVirouCacamba">Pontos por Virou Caçamba (un)</label> <input type="number" id="pontosVirouCacamba" step="0.1"> </div>
+                
+                <!-- Coluna 2: Auxiliar e Cargas -->
+                <div> <label for="pontosLavouPeneira">Pontos (Aux) Lavou Peneira (sim)</label> <input type="number" id="pontosLavouPeneira" step="0.1"> </div>
+                <div> <label for="pontosLimpouMoinho">Pontos (Aux) Limpou Moinho (sim)</label> <input type="number" id="pontosLimpouMoinho" step="0.1"> </div>
+                <div> <label for="pontosLavouPeneiraDosador">Pontos (Aux) Lavou Peneira/Dosador (sim)</label> <input type="number" id="pontosLavouPeneiraDosador" step="0.1"> </div>
+                <hr style="grid-column: 1 / -1; border-color: var(--border-color);">
+                <div>
+                    <!-- LÓGICA ATUALIZADA AQUI -->
+                    <label for="pontosKgMoagem">Pontos a cada 1000 kg</label>
+                    <input type="number" id="pontosKgMoagem" step="0.01">
+                </div>
+                <div>
+                    <label for="metaPontosMoagem">Meta de Pontos (por dia)</label>
+                    <input type="number" id="metaPontosMoagem" step="1">
+                </div>
             </div>
-
-            <h4 style="margin-top: 1.5rem;">Pontos por Produção</h4>
-            <div class="config-grid">
-                 <div> <label for="pontosPorKgMoagem">Pontos por KG (carga)</label> <input type="number" id="pontosPorKgMoagem" step="0.01"> </div>
-            </div>
-
-            <h4 style="margin-top: 1.5rem;">Pontos por Atividade (Operador)</h4>
-            <div class="config-grid">
-                <div> <label for="pontosDescarga">Descarga (por un.)</label> <input type="number" id="pontosDescarga" step="1"> </div>
-                <div> <label for="pontosGuardouMateria">Guardou Matéria (por un.)</label> <input type="number" id="pontosGuardouMateria" step="1"> </div>
-                <div> <label for="pontosArrumouBox">Arrumou Box (fixo)</label> <input type="number" id="pontosArrumouBox" step="1"> </div>
-                <div> <label for="pontosCarregouCaminhaoCaco">Carregou Caco (fixo)</label> <input type="number" id="pontosCarregouCaminhaoCaco" step="1"> </div>
-                <div> <label for="pontosSubiuMassa">Subiu Massa (por un.)</label> <input type="number" id="pontosSubiuMassa" step="1"> </div>
-                <div> <label for="pontosDesceuCacamba">Desceu Caçamba (por un.)</label> <input type="number" id="pontosDesceuCacamba" step="1"> </div>
-                <div> <label for="pontosVirouCacamba">Virou Caçamba (por un.)</label> <input type="number" id="pontosVirouCacamba" step="1"> </div>
-                <!-- PONTO PARA NOVO CAMPO ADICIONADO -->
-                <div> <label for="pontosCargasSubidas">Cargas Subidas (por un.)</label> <input type="number" id="pontosCargasSubidas" step="1"> </div>
-            </div>
-            
-            <h4 style="margin-top: 1.5rem;">Pontos por Atividade (Auxiliar)</h4>
-            <div class="config-grid">
-                 <div> <label for="pontosLavouPeneira">Lavou Peneira (fixo)</label> <input type="number" id="pontosLavouPeneira" step="1"> </div>
-                 <div> <label for="pontosLimpouMoinho">Limpou Moinho (fixo)</label> <input type="number" id="pontosLimpouMoinho" step="1"> </div>
-                 <div> <label for="pontosLavouPeneiraDosador">Lavou Peneira/Dosador (fixo)</label> <input type="number" id="pontosLavouPeneiraDosador" step="1"> </div>
-            </div>
-
             <div class="modal-actions">
-                <input type="password" id="configMoagemSenha" placeholder="Senha para salvar" style="flex-grow: 1;">
+                <input type="password" id="configSenhaMoagem" placeholder="Senha para salvar" style="flex-grow: 1;">
                 <button type="button" class="secondary" onclick="closeConfigMoagemModal(event, true)">Cancelar</button>
-                <button onclick="salvarConfigPontosMoagem()">Salvar Pontos</button>
+                <button onclick="salvarConfigPontosMoagem()">Salvar</button>
             </div>
         </div>
     </div>
-
+    
+    <!-- ================================================================ -->
+    <!-- ======================= SCRIPTS ================================ -->
+    <!-- ================================================================ -->
     
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
@@ -961,11 +1025,15 @@ tbody tr:not(.linha-detalhes):hover { background-color: var(--primary-light); }
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         
+        // --- Expondo funções e coleções globalmente ---
         window.db = db;
+        // Coleções
         window.massaCol = collection(db, "producao_massa");
         window.pesagemCol = collection(db, "pesagem_paletes");
-        window.moagemCol = collection(db, "producao_moagem");
-        window.operadoresCol = collection(db, "operadores_moagem"); // <-- Nova coleção para Operadores
+        window.moagemCol = collection(db, "producao_moagem"); // Nova coleção Moagem
+        window.operadoresCol = collection(db, "operadores_moagem"); // Nova coleção Operadores
+        
+        // Funções do Firestore
         window.addDoc = addDoc;
         window.getDocs = getDocs;
         window.query = query;
@@ -981,45 +1049,75 @@ tbody tr:not(.linha-detalhes):hover { background-color: var(--primary-light); }
     </script>
     
     <script>
+    // --- Configurações Globais (Defaults) ---
+    
     // Config Filtro Prensa
     let appConfig = {
-// ... existing code ... -->
+        pesoFiltro: 4100, pesoPlaca: 39.1,
+        metaKgFT: 12300, metaKgPalete: 12500
     };
-    // Config Moagem (Pontos)
+    let paletesDisponiveis = new Map();
+
+    // Config Moagem (Pontuação)
     let appConfigMoagem = {
-        metaPontosMoagem: 100, // <-- META ADICIONADA
-        pontosPorKgMoagem: 0.01,
+        pontosKgMoagem: 1,
         pontosDescarga: 1,
+        pontosCargasSubidas: 1, // Novo campo
         pontosGuardouMateria: 1,
-        pontosArrumouBox: 5,
-        pontosCarregouCaminhaoCaco: 5,
+        pontosArrumouBox: 1,
+        pontosCarregouCaco: 1,
         pontosSubiuMassa: 1,
         pontosDesceuCacamba: 1,
         pontosVirouCacamba: 1,
-        pontosCargasSubidas: 1, // <-- PONTO PARA NOVO CAMPO
-        pontosLavouPeneira: 3,
-        pontosLimpouMoinho: 3,
-        pontosLavouPeneiraDosador: 3
+        pontosLavouPeneira: 1,
+        pontosLimpouMoinho: 1,
+        pontosLavouPeneiraDosador: 1,
+        metaPontosMoagem: 50 // Nova meta
     };
-    
-    let paletesDisponiveis = new Map();
-// ... existing code ... -->
+
     // ### REGISTRO DO PLUGIN DE RÓTULOS (DATALABELS) ###
     Chart.register(ChartDataLabels);
 
-    // FUNÇÃO GLOBAL DE CLASSE DE EFICIÊNCIA
-    function getEficClass(perc) {
+    // --- Funções Auxiliares ---
+    
+    function showTab(tabName) {
+        // Esconde todos os conteúdos
+        document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+        // Remove 'active' de todos os links
+        document.querySelectorAll('.tab-link').forEach(link => link.classList.remove('active'));
+        
+        // Monta o ID do conteúdo da aba (ex: 'tabProducao', 'tabMoagem')
+        const tabContentId = `tab${tabName.charAt(0).toUpperCase() + tabName.slice(1)}`;
+        const tabContentElement = document.getElementById(tabContentId);
+        
+        // Mostra o conteúdo da aba clicada
+        if (tabContentElement) {
+            tabContentElement.classList.add('active');
+        }
+        
+        // Adiciona 'active' ao link clicado
+        // Precisamos encontrar o botão correto, pois event.target pode não estar disponível se chamado de outro lugar
+        const links = document.querySelectorAll('.tab-link');
+        for (let link of links) {
+            if (link.onclick.toString().includes(`showTab('${tabName}')`)) {
+                link.classList.add('active');
+                break;
+            }
+        }
+        
+        // Controla a visibilidade do botão de config principal (só aparece na aba Filtro Prensa)
+        const configBtnPrincipal = document.getElementById('openConfigBtn');
+        if (configBtnPrincipal) {
+            configBtnPrincipal.style.display = (tabName === 'producao') ? 'block' : 'none';
+        }
+    }
+    
+    // Função global para classes de eficiência
+    const getEficClass = (perc) => {
         if (perc >= 98) return 'efficiency-good';
         if (perc >= 90) return 'efficiency-ok';
         return 'efficiency-bad';
     };
-
-    function showTab(tabName) {
-        document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-        document.querySelectorAll('.tab-link').forEach(link => link.classList.remove('active'));
-        document.getElementById(`tab${tabName.charAt(0).toUpperCase() + tabName.slice(1)}`).classList.add('active');
-        event.target.classList.add('active');
-    }
 
     function obterDataLocalFormatada() {
         const data = new Date();
@@ -1029,7 +1127,7 @@ tbody tr:not(.linha-detalhes):hover { background-color: var(--primary-light); }
         return `${ano}-${mes}-${dia}`;
     }
 
-    // --- MODAL CONFIG FILTRO PRENSA ---
+    // --- MODAL 1: Config Filtro Prensa ---
     function openConfigModal() {
         document.getElementById('pesoFiltro').value = appConfig.pesoFiltro;
         document.getElementById('pesoPlaca').value = appConfig.pesoPlaca;
@@ -1037,13 +1135,12 @@ tbody tr:not(.linha-detalhes):hover { background-color: var(--primary-light); }
         document.getElementById('metaKgPalete').value = appConfig.metaKgPalete;
         document.getElementById('configModal').style.display = 'flex';
     }
-
     function closeConfigModal(event, force = false) {
         if (force || event.target.id === 'configModal') {
             document.getElementById('configModal').style.display = 'none';
+            document.getElementById('configSenha').value = ''; // Limpa senha
         }
     }
-
     async function salvarConfiguracoes() {
         if (document.getElementById('configSenha').value !== 'pb2025') {
             alert('Senha incorreta!'); return;
@@ -1059,78 +1156,27 @@ tbody tr:not(.linha-detalhes):hover { background-color: var(--primary-light); }
             await window.setDoc(configDocRef, newConfig, { merge: true });
             appConfig = newConfig;
             alert('Configurações (Filtro Prensa) salvas com sucesso!');
-            document.getElementById('configSenha').value = '';
-            closeConfigModal({target: {id: 'configModal'}});
-            renderizarHistorico();
+            closeConfigModal({target: {id: 'configModal'}}, true);
+            renderizarHistorico(); // Atualiza histórico para refletir novas metas
         } catch (error) {
             console.error("Erro ao salvar configurações:", error);
             alert("Erro ao salvar configurações.");
         }
     }
-
     async function carregarConfiguracoes() {
         try {
             const configDocRef = window.doc(db, "configuracoes", "massaConfig");
             const docSnap = await window.getDoc(configDocRef);
             if (docSnap.exists()) {
-                appConfig = { ...appConfig, ...docSnap.data() };
+                appConfig = { ...appConfig, ...docSnap.data() }; // Mescla com defaults
             }
         } catch(error) {
             console.error("Erro ao carregar configurações (Filtro Prensa):", error);
         }
     }
 
-    // --- MODAL CONFIG MOAGEM (PONTOS) ---
-    function openConfigMoagemModal() {
-        for (const key in appConfigMoagem) {
-            const el = document.getElementById(key); // IDs devem bater com as chaves
-            if (el) el.value = appConfigMoagem[key];
-        }
-        document.getElementById('configMoagemModal').style.display = 'flex';
-    }
-
-    function closeConfigMoagemModal(event, force = false) {
-        if (force || event.target.id === 'configMoagemModal') {
-            document.getElementById('configMoagemModal').style.display = 'none';
-        }
-    }
-
-    async function salvarConfigPontosMoagem() {
-        if (document.getElementById('configMoagemSenha').value !== 'pb2025') {
-            alert('Senha incorreta!'); return;
-        }
-        const newConfigMoagem = {};
-        for (const key in appConfigMoagem) {
-            const el = document.getElementById(key);
-            if (el) newConfigMoagem[key] = parseFloat(el.value) || 0;
-        }
-        
-        try {
-            const configDocRef = window.doc(db, "configuracoes", "moagemConfig");
-            await window.setDoc(configDocRef, newConfigMoagem, { merge: true });
-            appConfigMoagem = newConfigMoagem;
-            alert('Configuração de Pontos (Moagem) salva com sucesso!');
-            document.getElementById('configMoagemSenha').value = '';
-            closeConfigMoagemModal({target: {id: 'configMoagemModal'}});
-        } catch (error) {
-            console.error("Erro ao salvar config de pontos:", error);
-            alert("Erro ao salvar config de pontos.");
-        }
-    }
-
-    async function carregarConfigPontosMoagem() {
-         try {
-            const configDocRef = window.doc(db, "configuracoes", "moagemConfig");
-            const docSnap = await window.getDoc(configDocRef);
-            if (docSnap.exists()) {
-                appConfigMoagem = { ...appConfigMoagem, ...docSnap.data() };
-            }
-        } catch(error) {
-            console.error("Erro ao carregar config de pontos (Moagem):", error);
-        }
-    }
-
-    // --- LÓGICA FILTRO PRENSA (formMassa) ---
+    // --- LÓGICA ABA 1: Filtro Prensa ---
+    
     async function carregarOpcoesPaletes() {
         try {
             const q = query(window.pesagemCol, orderBy("codigo"));
@@ -1165,7 +1211,7 @@ tbody tr:not(.linha-detalhes):hover { background-color: var(--primary-light); }
             const qtdInput = document.getElementById(`paleteQtd_${i}`);
             const pesoOutput = document.getElementById(`paletePesoTotal_${i}`);
             const selectedOption = select.options[select.selectedIndex];
-            const pesoUnitario = parseFloat(selectedOption.dataset.peso) || 0;
+            const pesoUnitario = parseFloat(selectedOption?.dataset.peso) || 0;
             const quantidade = parseInt(qtdInput.value) || 0;
             const subTotal = pesoUnitario * quantidade;
             pesoOutput.textContent = subTotal.toFixed(2);
@@ -1179,44 +1225,48 @@ tbody tr:not(.linha-detalhes):hover { background-color: var(--primary-light); }
         document.getElementById('data').value = obterDataLocalFormatada();
         calcularPesoTotalPaletes();
     }
-    
-    document.getElementById('formMassa').addEventListener('submit', async function(event) {
-        event.preventDefault();
-        const kgPaleteReal = parseFloat(document.getElementById('kgPalete').value);
-        if (kgPaleteReal <= 0) {
-            alert("O KG Total de Paletes deve ser maior que zero. Lance ao menos um palete.");
-            return;
-        }
-        const qtdFT = parseInt(document.getElementById('qtdFT').value);
-        const qtdPlacas = parseInt(document.getElementById('qtdPlacas').value);
-        const kgCalculado = (qtdFT * appConfig.pesoFiltro) + (qtdPlacas * appConfig.pesoPlaca);
-        const retrabalhoCalculado = kgPaleteReal - kgCalculado;
-        const retrabalhoKg = Math.max(0, retrabalhoCalculado);
-        const novoRegistro = {
-            data: document.getElementById('data').value,
-            turno: document.getElementById('turno').value,
-            qtdFT, qtdPlacas,
-            kgPalete: kgPaleteReal,
-            observacao: document.getElementById('observacao').value,
-            kgCalculado, retrabalhoKg,
-            timestamp: new Date().toISOString(),
-            metaKgFT: appConfig.metaKgFT,
-            metaKgPalete: appConfig.metaKgPalete
-        };
-        try {
-            await window.addDoc(window.massaCol, novoRegistro);
-            alert('Produção (Filtro Prensa) lançada com sucesso! ✅');
-            renderizarHistorico();
-            limparFormMassa();
-        } catch (error) {
-            console.error("Erro ao salvar no Firebase: ", error);
-            alert("Erro ao salvar. Verifique o console. ❌");
-        }
-    });
+
+   document.getElementById('formMassa').addEventListener('submit', async function(event) {
+        event.preventDefault();
+        const kgPaleteReal = parseFloat(document.getElementById('kgPalete').value);
+        if (kgPaleteReal <= 0) {
+            alert("O KG Total de Paletes deve ser maior que zero. Lance ao menos um palete.");
+            return;
+        }
+        const qtdFT = parseInt(document.getElementById('qtdFT').value);
+        const qtdPlacas = parseInt(document.getElementById('qtdPlacas').value);
+        const kgCalculado = (qtdFT * appConfig.pesoFiltro) + (qtdPlacas * appConfig.pesoPlaca);
+        
+        const retrabalhoCalculado = kgPaleteReal - kgCalculado;
+        const retrabalhoKg = Math.max(0, retrabalhoCalculado); // Garante que não seja negativo
+
+        const novoRegistro = {
+            data: document.getElementById('data').value,
+            turno: document.getElementById('turno').value,
+            qtdFT,
+            qtdPlacas,
+            kgPalete: kgPaleteReal,
+            observacao: document.getElementById('observacao').value,
+            kgCalculado,
+            retrabalhoKg, 
+            timestamp: new Date().toISOString(),
+            metaKgFT: appConfig.metaKgFT,
+            metaKgPalete: appConfig.metaKgPalete
+        };
+        try {
+            await window.addDoc(window.massaCol, novoRegistro);
+            alert('Produção (Filtro Prensa) lançada com sucesso! ✅');
+            renderizarHistorico();
+            limparFormMassa();
+        } catch (error) {
+            console.error("Erro ao salvar no Firebase: ", error);
+            alert("Erro ao salvar. Verifique o console. ❌");
+        }
+    });
     
     async function renderizarHistorico() {
         const tbody = document.getElementById('tabelaHistoricoBody');
-        tbody.innerHTML = `<tr><td colspan="6">Carregando...</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="7">Carregando...</td></tr>`;
         const filtroDataInicio = document.getElementById('filtroDataInicio').value;
         const filtroDataFim = document.getElementById('filtroDataFim').value;
         const filtroTurno = document.getElementById('filtroTurno').value;
@@ -1230,7 +1280,7 @@ tbody tr:not(.linha-detalhes):hover { background-color: var(--primary-light); }
             const dadosFiltrados = querySnapshot.docs;
             tbody.innerHTML = '';
             if (dadosFiltrados.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6">Nenhum registro encontrado.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="7">Nenhum registro encontrado.</td></tr>`;
                 return;
             }
             dadosFiltrados.forEach(doc => {
@@ -1240,19 +1290,16 @@ tbody tr:not(.linha-detalhes):hover { background-color: var(--primary-light); }
                 const metaPaleteDoRegistro = reg.metaKgPalete || appConfig.metaKgPalete;
                 const eficFT = (reg.kgCalculado / (metaFTDoRegistro || 1)) * 100;
                 const eficPalete = (reg.kgPalete / (metaPaleteDoRegistro || 1)) * 100;
-                // getEficClass MOVIDO PARA ESCOPO GLOBAL
-                const getEficClassFT = (perc) => {
-                    if (perc >= 98) return 'efficiency-good';
-                    if (perc >= 90) return 'efficiency-ok';
-                    return 'efficiency-bad';
-                };
+                
                 let retrabalhoValor = reg.retrabalhoKg;
                 let retrabalhoClasse = '';
                 if (retrabalhoValor != null) {
                     if (retrabalhoValor > 0) retrabalhoClasse = 'efficiency-good';
                     if (retrabalhoValor < 0) retrabalhoClasse = 'efficiency-bad';
                     retrabalhoValor = `${retrabalhoValor.toFixed(2)}`;
-                } else { retrabalhoValor = 'N/A'; }
+                } else {
+                    retrabalhoValor = 'N/A';
+                }
                 const trPrincipal = document.createElement('tr');
                 trPrincipal.innerHTML = `
     <td><button class="expand-btn" onclick="toggleDetalhes('detalhes-fp-${docId}', this)"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"/></svg></button></td>
@@ -1261,12 +1308,15 @@ tbody tr:not(.linha-detalhes):hover { background-color: var(--primary-light); }
                     <td class="${getEficClass(eficFT)}">${eficFT.toFixed(2)}%</td>
                     <td class="${getEficClass(eficPalete)}">${eficPalete.toFixed(2)}%</td>
                     <td class="${retrabalhoClasse}">${retrabalhoValor}</td>
+                    <td>
+                        <button class="delete-btn" onclick="deletarRegistro('${docId}')">Excluir</button>
+                    </td>
                 `;
                 const trDetalhes = document.createElement('tr');
-                trDetalhes.id = `detalhes-fp-${docId}`; // ID único
+                trDetalhes.id = `detalhes-fp-${docId}`;
                 trDetalhes.className = 'linha-detalhes';
                 trDetalhes.innerHTML = `
-                    <td colspan="6">
+                    <td colspan="7">
                         <div class="detalhe-grid">
                             <div><span>Filtro Prensa (kg):</span> ${reg.kgCalculado.toFixed(2)} kg</div>
                             <div><span>Palete (kg):</span> ${reg.kgPalete.toFixed(2)} kg</div>
@@ -1276,10 +1326,6 @@ tbody tr:not(.linha-detalhes):hover { background-color: var(--primary-light); }
                             <div><span>Meta FT (kg):</span> ${reg.metaKgFT ? reg.metaKgFT.toFixed(2) + ' kg' : 'N/A'}</div>
                             <div><span>Meta Palete (kg):</span> ${reg.metaKgPalete ? reg.metaKgPalete.toFixed(2) + ' kg' : 'N/A'}</div>
                             <div style="grid-column: 1 / -1;"><span>Observação:</span> ${reg.observacao || 'Nenhuma'}</div>
-                            <div>
-                                <span>Ações:</span> 
-                                <button class="delete-btn" onclick="deletarRegistro('${docId}')">Excluir</button>
-                            </div>
                         </div>
                     </td>
                 `;
@@ -1287,177 +1333,266 @@ tbody tr:not(.linha-detalhes):hover { background-color: var(--primary-light); }
                 tbody.appendChild(trDetalhes);
             });
         } catch (error) {
-            console.error("Erro ao buscar dados:", error);
-            tbody.innerHTML = `<tr><td colspan="6">Erro ao carregar dados.</td></tr>`;
+            console.error("Erro ao buscar dados (Filtro Prensa):", error);
+            tbody.innerHTML = `<tr><td colspan="7">Erro ao carregar dados.</td></tr>`;
         }
     }
-    
-    // --- LÓGICA MOAGEM (formMoagem) ---
-    
-    function toggleCampoCondicional(selectId, containerId) {
-        const select = document.getElementById(selectId);
-        const container = document.getElementById(containerId);
-        if (select.value === 'sim') {
-            container.style.display = 'block';
-        } else {
-            container.style.display = 'none';
-            // Limpa o valor do input numérico quando escondido
-            const input = container.querySelector('input[type="number"]');
-            if (input) input.value = '0';
+
+    // --- LÓGICA ABA 2: Moagem ---
+
+    // Lida com os campos Sim/Não que mostram/escondem inputs de quantidade
+    window.toggleConditionalField = function(fieldName, isSim) {
+        const field = document.getElementById(`conditional-${fieldName}`);
+        if (field) {
+            field.style.display = isSim ? 'block' : 'none';
+        }
+        // Se for "Não", zera o valor do input filho
+        if (!isSim) {
+            const input = field.querySelector('input');
+            if (input) input.value = 0;
         }
     }
-    
-    function atualizarCamposCargaMoagem() {
+
+    // Atualiza os campos dinâmicos de carga (moinho/peso)
+    window.atualizarCamposCargaMoagem = function() {
         const qtd = parseInt(document.getElementById('qtdCargasMoagem').value) || 0;
-        const container = document.getElementById('cargasContainerMoagem');
-        container.innerHTML = ''; // Limpa campos antigos
-        
+        const container = document.getElementById('cargas-dinamicas-container');
+        container.innerHTML = ''; // Limpa
+
         if (qtd > 0) {
-             const title = document.createElement('h4');
-             title.textContent = 'Detalhes das Cargas';
-             title.style.gridColumn = '1 / -1';
-             title.style.margin = '0 0 0.5rem 0';
-             container.appendChild(title);
+             container.innerHTML = `<label class="full-width" style="font-weight: 700; color: var(--primary);">Detalhes das Cargas</label>`;
         }
 
         for (let i = 1; i <= qtd; i++) {
-            const row = document.createElement('div');
-            row.className = 'carga-moagem-row';
-            
-            row.innerHTML = `
-                <label for="moinhoCarga_${i}">Carga ${i}</label>
-                <select id="moinhoCarga_${i}" class="moinho-select">
-                    <option value="">Moinho...</option>
-                    <option value="1">Moinho 1</option>
-                    <option value="2">Moinho 2</option>
-                    <option value="3">Moinho 3</option>
-                </select>
-                <label for="pesoCarga_${i}">Peso (kg)</label>
-                <input type="number" id="pesoCarga_${i}" class="peso-carga-input" min="0" placeholder="kg" step="0.1">
+            const div = document.createElement('div');
+            div.className = 'carga-dinamica-row';
+            div.innerHTML = `
+                <div>
+                    <label for="moinho_${i}">Carga ${i} - Moinho</label>
+                    <select id="moinho_${i}" required>
+                        <option value="">Moinho...</option>
+                        <option value="1">Moinho 1</option>
+                        <option value="2">Moinho 2</option>
+                        <option value="3">Moinho 3</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="peso_${i}">Peso (kg)</label>
+                    <input type="number" id="peso_${i}" min="0" step="0.1" required placeholder="Peso ${i}">
+                </div>
             `;
-            // Ajusta o layout da linha de carga
-            row.style.gridTemplateColumns = 'auto auto 1fr';
-            row.style.gap = '0.75rem';
-            row.querySelectorAll('label')[0].style.textAlign = 'left';
-            row.querySelectorAll('label')[1].style.textAlign = 'right';
-
-            container.appendChild(row);
+            container.appendChild(div);
         }
     }
     
+    // Limpa o formulário de Moagem
     function limparFormMoagem() {
         document.getElementById('formMoagem').reset();
         document.getElementById('dataMoagem').value = obterDataLocalFormatada();
-        atualizarCamposCargaMoagem(); // Limpa os campos dinâmicos
-        
         // Esconde todos os campos condicionais
-        document.querySelectorAll('.campo-condicional').forEach(el => el.style.display = 'none');
+        document.querySelectorAll('.conditional-field').forEach(el => el.style.display = 'none');
+        // Limpa os campos de carga dinâmicos
+        document.getElementById('cargas-dinamicas-container').innerHTML = '';
     }
 
-    document.getElementById('formMoagem').addEventListener('submit', async function(event) {
+    // Submit do formulário de Moagem
+    window.handleFormMoagemSubmit = async function(event) {
         event.preventDefault();
-        
-        // 1. Coletar Cargas Dinâmicas
-        const qtdCargas = parseInt(document.getElementById('qtdCargasMoagem').value) || 0;
+
+        // 1. Coletar Dados do Formulário
+        const form = event.target;
+        const data = form.dataMoagem.value;
+        const turno = form.turnoMoagem.value;
+        const operador = form.operadorMoagem.value;
+
+        // a. Cargas Dinâmicas
         let cargas = [];
         let pesoTotalCargas = 0;
+        const qtdCargas = parseInt(form.qtdCargasMoagem.value) || 0;
         for (let i = 1; i <= qtdCargas; i++) {
-            const moinho = document.getElementById(`moinhoCarga_${i}`).value;
-            const peso = parseFloat(document.getElementById(`pesoCarga_${i}`).value) || 0;
-            if (moinho && peso > 0) {
-                cargas.push({ moinho: moinho, peso: peso });
-                pesoTotalCargas += peso;
-            }
+            const moinho = document.getElementById(`moinho_${i}`).value;
+            const peso = parseFloat(document.getElementById(`peso_${i}`).value) || 0;
+            cargas.push({ moinho, peso });
+            pesoTotalCargas += peso;
         }
-        
-        // 2. Coletar Dados Sim/Não e Quantidades
-        const dadosOperador = {
-            qtdDescarga: parseInt(document.getElementById('qtdDescargaMoagem').value) || 0,
-            qtdCargasSubidas: parseInt(document.getElementById('qtdCargasSubidasMoagem').value) || 0, // <-- NOVO CAMPO COLETADO
-            guardouMateria: document.getElementById('guardouMateriaMoagem').value === 'sim',
-            qtdGuardouMateria: parseInt(document.getElementById('qtdGuardouMateriaMoagem').value) || 0,
-            arrumouBox: document.getElementById('arrumouBoxMoagem').value === 'sim',
-            carregouCaminhaoCaco: document.getElementById('carregouCaminhaoCacoMoagem').value === 'sim',
-            subiuMassa: document.getElementById('subiuMassaMoagem').value === 'sim',
-            qtdSubiuMassa: parseInt(document.getElementById('qtdSubiuMassaMoagem').value) || 0,
-            desceuCacamba: document.getElementById('desceuCacambaMoagem').value === 'sim',
-            qtdDesceuCacamba: parseInt(document.getElementById('qtdDesceuCacambaMoagem').value) || 0,
-            virouCacamba: document.getElementById('virouCacambaMoagem').value === 'sim',
-            qtdVirouCacamba: parseInt(document.getElementById('qtdVirouCacambaMoagem').value) || 0,
-        };
-        
-        const dadosAuxiliar = {
-             lavouPeneira: document.getElementById('lavouPeneiraMoagem').value === 'sim',
-             limpouMoinho: document.getElementById('limpouMoinhoMoagem').value === 'sim',
-             lavouPeneiraDosador: document.getElementById('lavouPeneiraDosadorMoagem').value === 'sim',
-        };
 
-        // 3. Calcular Pontos
-        let pontosCargas = pesoTotalCargas * appConfigMoagem.pontosPorKgMoagem;
+        // b. Atividades Operador
+        const qtdDescarga = parseInt(form.qtdDescarga.value) || 0;
+        const qtdCargasSubidas = parseInt(form.qtdCargasSubidas.value) || 0; // Novo
+        const guardouMateria = form.guardouMateria.value === 'sim';
+        const qtdGuardouMateria = guardouMateria ? (parseInt(form.qtdGuardouMateria.value) || 0) : 0;
+        const arrumouBox = form.arrumouBox.value === 'sim';
+        const carregouCaminhaoCaco = form.carregouCaco.value === 'sim'; // Corrigido 'carregouCaco'
+        const subiuMassa = form.subiuMassa.value === 'sim';
+        const qtdSubiuMassa = subiuMassa ? (parseInt(form.qtdSubiuMassa.value) || 0) : 0;
+        const desceuCacamba = form.desceuCacamba.value === 'sim';
+        const qtdDesceuCacamba = desceuCacamba ? (parseInt(form.qtdDesceuCacamba.value) || 0) : 0;
+        const virouCacamba = form.virouCacamba.value === 'sim';
+        const qtdVirouCacamba = virouCacamba ? (parseInt(form.qtdVirouCacamba.value) || 0) : 0;
         
+        // c. Atividades Auxiliar
+        const lavouPeneira = form.lavouPeneira.value === 'sim';
+        const limpouMoinho = form.limpouMoinho.value === 'sim';
+        const lavouPeneiraDosador = form.lavouPeneiraDosador.value === 'sim';
+        
+        // d. Observação
+        const observacao = form.observacaoMoagem.value;
+        
+        // 2. Calcular Pontos
+        // a. Pontos por Carga (Peso) - LÓGICA ATUALIZADA AQUI
+        const pontosCargas = (pesoTotalCargas / 1000) * appConfigMoagem.pontosKgMoagem;
+
+        // b. Pontos por Atividades
         let pontosAtividades = 0;
-        pontosAtividades += dadosOperador.qtdDescarga * appConfigMoagem.pontosDescarga;
-        pontosAtividades += dadosOperador.qtdGuardouMateria * appConfigMoagem.pontosGuardouMateria;
-        pontosAtividades += dadosOperador.arrumouBox ? appConfigMoagem.pontosArrumouBox : 0;
-        pontosAtividades += dadosOperador.carregouCaminhaoCaco ? appConfigMoagem.pontosCarregouCaminhaoCaco : 0;
-        pontosAtividades += dadosOperador.qtdSubiuMassa * appConfigMoagem.pontosSubiuMassa;
-        pontosAtividades += dadosOperador.qtdDesceuCacamba * appConfigMoagem.pontosDesceuCacamba;
-        pontosAtividades += dadosOperador.qtdVirouCacamba * appConfigMoagem.pontosVirouCacamba;
-        pontosAtividades += dadosOperador.qtdCargasSubidas * appConfigMoagem.pontosCargasSubidas; // <-- PONTOS DO NOVO CAMPO
-        
-        pontosAtividades += dadosAuxiliar.lavouPeneira ? appConfigMoagem.pontosLavouPeneira : 0;
-        pontosAtividades += dadosAuxiliar.limpouMoinho ? appConfigMoagem.pontosLimpouMoinho : 0;
-        pontosAtividades += dadosAuxiliar.lavouPeneiraDosador ? appConfigMoagem.pontosLavouPeneiraDosador : 0;
-        
+        pontosAtividades += qtdDescarga * appConfigMoagem.pontosDescarga;
+        pontosAtividades += qtdCargasSubidas * appConfigMoagem.pontosCargasSubidas; // Novo
+        pontosAtividades += qtdGuardouMateria * appConfigMoagem.pontosGuardouMateria;
+        pontosAtividades += qtdSubiuMassa * appConfigMoagem.pontosSubiuMassa;
+        pontosAtividades += qtdDesceuCacamba * appConfigMoagem.pontosDesceuCacamba;
+        pontosAtividades += qtdVirouCacamba * appConfigMoagem.pontosVirouCacamba;
+        if (arrumouBox) pontosAtividades += appConfigMoagem.pontosArrumouBox;
+        if (carregouCaminhaoCaco) pontosAtividades += appConfigMoagem.pontosCarregouCaco;
+        if (lavouPeneira) pontosAtividades += appConfigMoagem.pontosLavouPeneira;
+        if (limpouMoinho) pontosAtividades += appConfigMoagem.pontosLimpouMoinho;
+        if (lavouPeneiraDosador) pontosAtividades += appConfigMoagem.pontosLavouPeneiraDosador;
+
         const pontosTotal = pontosCargas + pontosAtividades;
 
-        // 4. Montar Registro e Salvar
+        // 3. Montar Objeto para Salvar
         const novoRegistroMoagem = {
-            data: document.getElementById('dataMoagem').value,
-            turno: document.getElementById('turnoMoagem').value,
-            operador: document.getElementById('operadorMoagemSelect').value, // <-- CAMPO ATUALIZADO
-            observacao: document.getElementById('observacaoMoagem').value,
-            
-            cargas: cargas, // Array de {moinho, peso}
-            pesoTotalCargas: pesoTotalCargas,
-            
-            ...dadosOperador, // Inclui todos os dados do operador
-            ...dadosAuxiliar, // Inclui todos os dados do auxiliar
-            
-            pontosCargas: pontosCargas,
-            pontosAtividades: pontosAtividades,
-            pontosTotal: pontosTotal,
-            
-            configuracaoPontosUsada: appConfigMoagem, // Salva snapshot da config usada
+            data, turno, operador,
+            cargas, pesoTotalCargas,
+            qtdDescarga, qtdCargasSubidas, // Novo
+            guardouMateria, qtdGuardouMateria,
+            arrumouBox,
+            carregouCaminhaoCaco,
+            subiuMassa, qtdSubiuMassa,
+            desceuCacamba, qtdDesceuCacamba,
+            virouCacamba, qtdVirouCacamba,
+            lavouPeneira, limpouMoinho, lavouPeneiraDosador,
+            observacao,
+            pontosCargas, pontosAtividades, pontosTotal,
+            configuracaoPontosUsada: appConfigMoagem, // Salva a config usada no dia
             timestamp: new Date().toISOString()
         };
 
+        // 4. Salvar no Firebase
         try {
             await window.addDoc(window.moagemCol, novoRegistroMoagem);
-            alert(`Lançamento de Moagem salvo! \nPontos: ${pontosTotal.toFixed(2)} \n(Cargas: ${pontosCargas.toFixed(2)}, Atividades: ${pontosAtividades.toFixed(2)})`);
+            alert('Atividade de Moagem lançada com sucesso! ✅');
             renderizarHistoricoMoagem();
             limparFormMoagem();
         } catch (error) {
-            console.error("Erro ao salvar moagem: ", error);
-            alert("Erro ao salvar lançamento de moagem. ❌");
+            console.error("Erro ao salvar atividade de moagem:", error);
+            alert("Erro ao salvar. Verifique o console. ❌");
         }
-    });
-
+    }
+    
+    // --- MODAL 2: Config Moagem (Pontuação) ---
+    function openConfigMoagemModal() {
+        // Carrega os valores atuais para o modal
+        document.getElementById('pontosKgMoagem').value = appConfigMoagem.pontosKgMoagem;
+        document.getElementById('pontosDescarga').value = appConfigMoagem.pontosDescarga;
+        document.getElementById('pontosCargasSubidas').value = appConfigMoagem.pontosCargasSubidas; // Novo
+        document.getElementById('pontosGuardouMateria').value = appConfigMoagem.pontosGuardouMateria;
+        document.getElementById('pontosArrumouBox').value = appConfigMoagem.pontosArrumouBox;
+        document.getElementById('pontosCarregouCaco').value = appConfigMoagem.pontosCarregouCaco;
+        document.getElementById('pontosSubiuMassa').value = appConfigMoagem.pontosSubiuMassa;
+        document.getElementById('pontosDesceuCacamba').value = appConfigMoagem.pontosDesceuCacamba;
+        document.getElementById('pontosVirouCacamba').value = appConfigMoagem.pontosVirouCacamba;
+        document.getElementById('pontosLavouPeneira').value = appConfigMoagem.pontosLavouPeneira;
+        document.getElementById('pontosLimpouMoinho').value = appConfigMoagem.pontosLimpouMoinho;
+        document.getElementById('pontosLavouPeneiraDosador').value = appConfigMoagem.pontosLavouPeneiraDosador;
+        document.getElementById('metaPontosMoagem').value = appConfigMoagem.metaPontosMoagem; // Meta
+        
+        document.getElementById('configMoagemModal').style.display = 'flex';
+    }
+    function closeConfigMoagemModal(event, force = false) {
+        if (force || event.target.id === 'configMoagemModal') {
+            document.getElementById('configMoagemModal').style.display = 'none';
+            document.getElementById('configSenhaMoagem').value = ''; // Limpa senha
+        }
+    }
+    async function salvarConfigPontosMoagem() {
+        if (document.getElementById('configSenhaMoagem').value !== 'pb2025') {
+            alert('Senha incorreta!'); return;
+        }
+        
+        const newConfig = {
+            pontosKgMoagem: parseFloat(document.getElementById('pontosKgMoagem').value) || 0,
+            pontosDescarga: parseFloat(document.getElementById('pontosDescarga').value) || 0,
+            pontosCargasSubidas: parseFloat(document.getElementById('pontosCargasSubidas').value) || 0, // Novo
+            pontosGuardouMateria: parseFloat(document.getElementById('pontosGuardouMateria').value) || 0,
+            pontosArrumouBox: parseFloat(document.getElementById('pontosArrumouBox').value) || 0,
+            pontosCarregouCaco: parseFloat(document.getElementById('pontosCarregouCaco').value) || 0,
+            pontosSubiuMassa: parseFloat(document.getElementById('pontosSubiuMassa').value) || 0,
+            pontosDesceuCacamba: parseFloat(document.getElementById('pontosDesceuCacamba').value) || 0,
+            pontosVirouCacamba: parseFloat(document.getElementById('pontosVirouCacamba').value) || 0,
+            pontosLavouPeneira: parseFloat(document.getElementById('pontosLavouPeneira').value) || 0,
+            pontosLimpouMoinho: parseFloat(document.getElementById('pontosLimpouMoinho').value) || 0,
+            pontosLavouPeneiraDosador: parseFloat(document.getElementById('pontosLavouPeneiraDosador').value) || 0,
+            metaPontosMoagem: parseFloat(document.getElementById('metaPontosMoagem').value) || 0 // Meta
+        };
+        
+        try {
+            const configDocRef = window.doc(db, "configuracoes", "moagemConfig");
+            await window.setDoc(configDocRef, newConfig, { merge: true });
+            appConfigMoagem = newConfig; // Atualiza a variável global
+            alert('Configurações de Pontuação (Moagem) salvas com sucesso!');
+            closeConfigMoagemModal({target: {id: 'configMoagemModal'}}, true);
+            renderizarHistoricoMoagem(); // Atualiza histórico para refletir novas metas
+        } catch (error) {
+            console.error("Erro ao salvar configurações de pontuação:", error);
+            alert("Erro ao salvar configurações.");
+        }
+    }
+    async function carregarConfigPontosMoagem() {
+        try {
+            const configDocRef = window.doc(db, "configuracoes", "moagemConfig");
+            const docSnap = await window.getDoc(configDocRef);
+            if (docSnap.exists()) {
+                // Mescla o salvo com os defaults, garantindo que novos campos existam
+                appConfigMoagem = { ...appConfigMoagem, ...docSnap.data() };
+            }
+        } catch(error) {
+            console.error("Erro ao carregar configurações de pontuação:", error);
+        }
+    }
+    
+    // Renderizar Histórico de Moagem
     async function renderizarHistoricoMoagem() {
         const tbody = document.getElementById('tabelaHistoricoMoagem');
-        tbody.innerHTML = `<tr><td colspan="8">Carregando...</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="9">Carregando...</td></tr>`; // <!-- COLSPAN ATUALIZADO -->
         try {
-            const q = query(window.moagemCol, orderBy("data", "desc"), orderBy("timestamp", "desc"));
+            // Lógica de filtro (que já existia)
+            const filtroDataInicio = document.getElementById('filtroDataInicioMoagem').value;
+            const filtroDataFim = document.getElementById('filtroDataFimMoagem').value;
+            const filtroTurno = document.getElementById('filtroTurnoMoagem').value;
+            let queryConstraints = [orderBy("data", "desc"), orderBy("timestamp", "desc")];
+            if (filtroDataInicio) queryConstraints.push(where("data", ">=", filtroDataInicio));
+            if (filtroDataFim) queryConstraints.push(where("data", "<=", filtroDataFim));
+            if (filtroTurno) queryConstraints.push(where("turno", "==", filtroTurno));
+
+            const q = query(window.moagemCol, ...queryConstraints); // Aplicando filtros
             const querySnapshot = await getDocs(q);
             tbody.innerHTML = '';
             if (querySnapshot.empty) {
-                 tbody.innerHTML = `<tr><td colspan="8">Nenhum lançamento de moagem ainda.</td></tr>`;
+                 tbody.innerHTML = `<tr><td colspan="9">Nenhum lançamento de moagem encontrado.</td></tr>`; // <!-- COLSPAN ATUALIZADO -->
                  return;
             }
             querySnapshot.forEach(doc => {
                 const reg = doc.data();
                 const docId = doc.id;
                 
+                // --- CÁLCULO % META ---
+                // Pega a meta que estava configurada NO MOMENTO do lançamento
+                const configUsada = reg.configuracaoPontosUsada || appConfigMoagem; // Fallback
+                const metaUsada = configUsada.metaPontosMoagem || appConfigMoagem.metaPontosMoagem;
+                const pontos = reg.pontosTotal || 0;
+                const percMeta = (metaUsada > 0) ? (pontos / metaUsada) * 100 : 0;
+                const metaClass = getEficClass(percMeta); // Reusa a função de classe global
+                // --- FIM CÁLCULO ---
+
                 const trPrincipal = document.createElement('tr');
                 trPrincipal.innerHTML = `
                     <td><button class="expand-btn" onclick="toggleDetalhes('detalhes-moagem-${docId}', this)"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"/></svg></button></td>
@@ -1466,10 +1601,11 @@ tbody tr:not(.linha-detalhes):hover { background-color: var(--primary-light); }
                     <td>${reg.operador}</td>
                     <td>${reg.cargas ? reg.cargas.length : 0}</td>
                     <td>${reg.pesoTotalCargas ? reg.pesoTotalCargas.toFixed(2) : '0.00'} kg</td>
-                    <td style="font-weight: bold; color: var(--primary);">${reg.pontosTotal ? reg.pontosTotal.toFixed(2) : '0.00'}</td>
+                    <td style="font-weight: bold; color: var(--primary);">${pontos.toFixed(2)}</td>
+                    <td class="${metaClass}">${percMeta.toFixed(2)}%</td> <!-- CÉLULA 8: % Meta -->
                     <td>
                         <button class="delete-btn" onclick="deletarRegistroMoagem('${docId}')">Excluir</button>
-                    </td>
+                    </td> <!-- CÉLULA 9: Ações -->
                 `;
                 
                 // --- Detalhes ---
@@ -1488,11 +1624,13 @@ tbody tr:not(.linha-detalhes):hover { background-color: var(--primary-light); }
                 const qtd = (val) => val || 0;
                 
                 trDetalhes.innerHTML = `
-                    <td colspan="8">
+                    <td colspan="9"> <!-- COLSPAN ATUALIZADO -->
                         <div class="detalhe-grid">
                             <div><span>Pontos (Cargas):</span> ${reg.pontosCargas ? reg.pontosCargas.toFixed(2) : '0.00'}</div>
                             <div><span>Pontos (Ativ.):</span> ${reg.pontosAtividades ? reg.pontosAtividades.toFixed(2) : '0.00'}</div>
+                            <div><span>Meta (no dia):</span> ${metaUsada.toFixed(0)} pts</div>
                             <div><span>Descargas:</span> ${qtd(reg.qtdDescarga)}</div>
+                            <div><span>Cargas Subidas:</span> ${qtd(reg.qtdCargasSubidas)}</div> <!-- CAMPO ADICIONADO -->
                             <div><span>Guardou Matéria:</span> ${simNao(reg.guardouMateria)} (${qtd(reg.qtdGuardouMateria)} un)</div>
                             <div><span>Arrumou Box:</span> ${simNao(reg.arrumouBox)}</div>
                             <div><span>Carregou Caco:</span> ${simNao(reg.carregouCaminhaoCaco)}</div>
@@ -1515,28 +1653,27 @@ tbody tr:not(.linha-detalhes):hover { background-color: var(--primary-light); }
             });
         } catch(error) {
              console.error("Erro ao carregar histórico de moagem:", error);
-             tbody.innerHTML = `<tr><td colspan="8">Erro ao carregar dados.</td></tr>`;
+             tbody.innerHTML = `<tr><td colspan="9">Erro ao carregar dados.</td></tr>`; // <!-- COLSPAN ATUALIZADO -->
         }
     }
     
     window.deletarRegistroMoagem = async function(docId) {
         const t=prompt("Para confirmar a exclusão, digite a senha:");
-        if(null!==t&&"pb2025"!==t) {
-            alert("Senha incorreta. Exclusão cancelada.");
-        } else if(confirm("Tem certeza que deseja excluir este lançamento de MOAGEM?")) {
+        if(null!==t&&"pb2025"!==t) alert("Senha incorreta. Exclusão cancelada.");
+        else if(confirm("Tem certeza que deseja excluir este lançamento (MOAGEM) do banco de dados?")) {
             try{
-                await window.deleteDoc(window.doc(db, "producao_moagem", docId));
-                alert("Registro de moagem excluído com sucesso!");
-                renderizarHistoricoMoagem();
+                await window.deleteDoc(window.doc(db,"producao_moagem", docId));
+                alert("Registro excluído com sucesso!");
+                renderizarHistoricoMoagem(); // Atualiza a tabela de moagem
             } catch(d) {
-                console.error("Erro ao deletar do Firebase: ", d);
+                console.error("Erro ao deletar do Firebase: ",d);
                 alert("Erro ao excluir. Verifique o console.");
             }
         }
     };
 
-
-    // --- LÓGICA PESAGEM (formPesagem) ---
+    // --- LÓGICA ABA 3: Pesagem ---
+    
     document.getElementById('formPesagem').addEventListener('submit', async function(event) {
         event.preventDefault();
         const novoRegistro = {
@@ -1561,43 +1698,42 @@ tbody tr:not(.linha-detalhes):hover { background-color: var(--primary-light); }
             alert("Erro ao salvar a pesagem. ❌");
         }
     });
-
-    // --- LÓGICA OPERADORES (formOperador) ---
+    
+    // --- LÓGICA ABA 5: Operadores ---
     
     function limparFormOperador() {
-        document.getElementById('formOperador').reset();
+        document.getElementById('formCadastroOperador').reset();
         document.getElementById('dataCadastroOperador').value = obterDataLocalFormatada();
     }
     
-    document.getElementById('formOperador').addEventListener('submit', async function(event) {
+    // Salvar novo operador
+    window.handleCadastroOperadorSubmit = async function(event) {
         event.preventDefault();
-        const nomeOperador = document.getElementById('nomeOperador').value.trim();
-        const turnoOperador = document.getElementById('turnoOperador').value;
-        
-        if (!nomeOperador || !turnoOperador) {
-            alert("Por favor, preencha o nome e o turno do operador.");
-            return;
-        }
-        
         const novoOperador = {
-            dataCadastro: document.getElementById('dataCadastroOperador').value,
-            nome: nomeOperador,
-            turno: turnoOperador,
+            dataInicio: document.getElementById('dataCadastroOperador').value,
+            nome: document.getElementById('nomeOperador').value.trim(),
+            turno: document.getElementById('turnoOperador').value,
             timestamp: new Date().toISOString()
         };
+        
+        if (!novoOperador.nome || !novoOperador.turno) {
+            alert("Nome e Turno são obrigatórios.");
+            return;
+        }
         
         try {
             await window.addDoc(window.operadoresCol, novoOperador);
             alert('Operador cadastrado com sucesso! ✅');
-            renderizarHistoricoOperadores(); // Atualiza a tabela
-            carregarOperadoresDropdown(); // Atualiza o dropdown da Moagem
+            renderizarHistoricoOperadores();
+            carregarOperadoresDropdown(); // Atualiza o dropdown na aba Moagem
             limparFormOperador();
         } catch (error) {
             console.error("Erro ao cadastrar operador:", error);
-            alert("Erro ao cadastrar operador. ❌");
+            alert("Erro ao salvar. Verifique o console. ❌");
         }
-    });
+    }
     
+    // Carregar operadores na tabela
     async function renderizarHistoricoOperadores() {
         const tbody = document.getElementById('tabelaOperadoresBody');
         tbody.innerHTML = `<tr><td colspan="4">Carregando...</td></tr>`;
@@ -1614,11 +1750,11 @@ tbody tr:not(.linha-detalhes):hover { background-color: var(--primary-light); }
                 const docId = doc.id;
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
-                    <td>${new Date(reg.dataCadastro + 'T03:00:00').toLocaleDateString('pt-BR')}</td>
+                    <td>${new Date(reg.dataInicio + 'T03:00:00').toLocaleDateString('pt-BR')}</td>
                     <td>${reg.nome}</td>
                     <td>${reg.turno}</td>
                     <td>
-                        <button class="delete-btn" onclick="deletarRegistroOperador('${docId}')">Excluir</button>
+                        <button class="delete-btn" onclick="deletarOperador('${docId}')">Excluir</button>
                     </td>
                 `;
                 tbody.appendChild(tr);
@@ -1629,8 +1765,26 @@ tbody tr:not(.linha-detalhes):hover { background-color: var(--primary-light); }
         }
     }
     
+    // Deletar operador
+    window.deletarOperador = async function(docId) {
+        const t=prompt("Para confirmar a exclusão, digite a senha:");
+        if(null!==t&&"pb2025"!==t) alert("Senha incorreta. Exclusão cancelada.");
+        else if(confirm("Tem certeza que deseja excluir este OPERADOR do banco de dados?")) {
+            try{
+                await window.deleteDoc(window.doc(db, "operadores_moagem", docId));
+                alert("Operador excluído com sucesso!");
+                renderizarHistoricoOperadores();
+                carregarOperadoresDropdown(); // Atualiza o dropdown
+            } catch(d) {
+                console.error("Erro ao deletar operador: ",d);
+                alert("Erro ao excluir. Verifique o console.");
+            }
+        }
+    };
+    
+    // Carregar operadores no dropdown da aba Moagem
     async function carregarOperadoresDropdown() {
-        const select = document.getElementById('operadorMoagemSelect');
+        const select = document.getElementById('operadorMoagem');
         select.innerHTML = '<option value="">Carregando...</option>';
         try {
             const q = query(window.operadoresCol, orderBy("nome", "asc"));
@@ -1643,49 +1797,35 @@ tbody tr:not(.linha-detalhes):hover { background-color: var(--primary-light); }
             
             select.innerHTML = '<option value="">Selecione um operador</option>';
             querySnapshot.forEach(doc => {
-                const operador = doc.data();
+                const op = doc.data();
                 const option = document.createElement('option');
-                option.value = operador.nome;
-                option.textContent = operador.nome;
+                option.value = op.nome;
+                option.textContent = `${op.nome} (${op.turno})`;
                 select.appendChild(option);
             });
-        } catch(error) {
-             console.error("Erro ao carregar operadores no dropdown:", error);
-             select.innerHTML = '<option value="">Erro ao carregar</option>';
+        } catch (error) {
+            console.error("Erro ao carregar dropdown de operadores:", error);
+            select.innerHTML = '<option value="">Erro ao carregar</option>';
         }
     }
-    
-    window.deletarRegistroOperador = async function(docId) {
-        const t=prompt("Para confirmar a exclusão, digite a senha:");
-        if(null!==t&&"pb2025"!==t) {
-            alert("Senha incorreta. Exclusão cancelada.");
-        } else if(confirm("Tem certeza que deseja excluir este OPERADOR? Isso não afetará os lançamentos antigos.")) {
-            try{
-                await window.deleteDoc(window.doc(db, "operadores_moagem", docId));
-                alert("Operador excluído com sucesso!");
-                renderizarHistoricoOperadores();
-                carregarOperadoresDropdown();
-            } catch(d) {
-                console.error("Erro ao deletar operador: ", d);
-                alert("Erro ao excluir. Verifique o console.");
-            }
-        }
-    };
 
 
-    // --- LÓGICA DO DASHBOARD ---
+    // --- LÓGICA ABA 4: Dashboard (Filtro Prensa) ---
     let pieChartTurnosInstance, barChartMensalInstance;
 
     async function atualizarDashboard() {
         const dataInicio = document.getElementById('dashFiltroDataInicio').value;
         const dataFim = document.getElementById('dashFiltroDataFim').value;
         const turno = document.getElementById('dashFiltroTurno').value;
-        if (!dataInicio || !dataFim) return;
+        if (!dataInicio || !dataFim) {
+            console.warn("Dashboard: Datas de início e fim são necessárias.");
+            return;
+        }
         ['kpiTotalMeta', 'kpiTotalRealizado', 'kpiEficiencia', 'kpiRetrabalho'].forEach(id => document.getElementById(id).textContent = '...');
         try {
             let qConstraints = [where("data", ">=", dataInicio), where("data", "<=", dataFim)];
             if (turno) qConstraints.push(where("turno", "==", turno));
-            const q = query(window.massaCol, ...qConstraints); // Dashboard ainda usa massaCol
+            const q = query(window.massaCol, ...qConstraints);
             const querySnapshot = await getDocs(q);
             const dados = querySnapshot.docs.map(doc => doc.data());
             calcularKPIs(dados);
@@ -1758,7 +1898,7 @@ tbody tr:not(.linha-detalhes):hover { background-color: var(--primary-light); }
         try {
             let qConstraints = [where("data", ">=", dataInicioStr)];
             if (turnoFiltro) qConstraints.push(where("turno", "==", turnoFiltro));
-            const q = query(window.massaCol, ...qConstraints); // Dashboard ainda usa massaCol
+            const q = query(window.massaCol, ...qConstraints);
             const querySnapshot = await getDocs(q);
             const dados = querySnapshot.docs.map(doc => doc.data());
             const producaoPorMes = {};
@@ -1845,23 +1985,21 @@ tbody tr:not(.linha-detalhes):hover { background-color: var(--primary-light); }
         d.innerHTML='<tr><td colspan="4">Carregando dados...</td></tr>';
         try{
             const t=await window.getDocs(window.query(window.pesagemCol,window.orderBy("codigo")));
-            d.innerHTML="";
-            if(t.empty){
+            if(d.innerHTML="",t.empty){
                 d.innerHTML='<tr><td colspan="4">Nenhum registro de pesagem encontrado.</td></tr>';
                 return;
             }
             t.forEach(t=>{
                 const o=t.data(),e=t.id,n=document.createElement("tr");
                 n.innerHTML=`
-                 <td>${new Date(o.data+"T03:00:00").toLocaleDateString("pt-BR")}</td>
-                 <td>${o.codigo}</td>
-                 <td>${o.peso.toFixed(2)} kg</td>
-                 <td>
-                 <button class="edit-btn" onclick='editarRegistroPesagem("${e}", ${JSON.stringify(o)})'>Editar</button>
-                 <button class="delete-btn" onclick="deletarRegistroPesagem('${e}')">Excluir</button>
-                 </td>
-                 `;
-                 d.appendChild(n);
+ <td>${new Date(o.data+"T03:00:00").toLocaleDateString("pt-BR")}</td>
+ <td>${o.codigo}</td>
+ <td>${o.peso.toFixed(2)} kg</td>
+ <td>
+ <button class="edit-btn" onclick='editarRegistroPesagem("${e}", ${JSON.stringify(o)})'>Editar</button>
+ <button class="delete-btn" onclick="deletarRegistroPesagem('${e}')">Excluir</button>
+ </td>
+ `,d.appendChild(n)
             });
         } catch(t) {
             console.error("Erro ao buscar histórico de pesagem: ",t);
@@ -1871,36 +2009,30 @@ tbody tr:not(.linha-detalhes):hover { background-color: var(--primary-light); }
     
     window.editarRegistroPesagem=async function(d,t){
         const o=prompt("Para editar, por favor, insira a senha:");
-        if("pb2025"!==o) return void alert("Senha incorreta. Operação cancelada.");
-        const e=prompt("Editar Data (AAAA-MM-DD):",t.data); if(null===e)return;
-        const n=prompt("Editar Código:",t.codigo); if(null===n)return;
-        const a=prompt("Editar Peso (kg):",t.peso); if(null===a)return;
+        if("pb2025"!==o)return void alert("Senha incorreta. Operação cancelada.");
+        const e=prompt("Editar Data (AAAA-MM-DD):",t.data);
+        if(null===e)return;
+        const n=prompt("Editar Código:",t.codigo);
+        if(null===n)return;
+        const a=prompt("Editar Peso (kg):",t.peso);
+        if(null===a)return;
         const r={...t,data:e,codigo:n.trim().toUpperCase(),peso:parseFloat(a)};
-        if(isNaN(r.peso)||!r.codigo) return void alert("Dados inválidos. A edição foi cancelada.");
+        if(isNaN(r.peso)||!r.codigo)return void alert("Dados inválidos. A edição foi cancelada.");
         try{
-            await window.setDoc(window.doc(db,"pesagem_paletes",d),r);
-            alert("Registro atualizado com sucesso!");
-            renderizarHistoricoPesagem();
-            carregarOpcoesPaletes();
+            await window.setDoc(window.doc(db,"pesagem_paletes",d),r),alert("Registro atualizado com sucesso!"),renderizarHistoricoPesagem(),carregarOpcoesPaletes()
         } catch(d) {
-            console.error("Erro ao atualizar registro: ",d);
-            alert("Falha ao atualizar o registro.");
+            console.error("Erro ao atualizar registro: ",d),alert("Falha ao atualizar o registro.")
         }
     };
     
     window.deletarRegistroPesagem=async function(d){
         const t=prompt("Para excluir, por favor, insira a senha:");
-        if("pb2025"!==t) return void alert("Senha incorreta. Operação cancelada.");
-        if(confirm("Tem certeza que deseja excluir este registro de pesagem?")) {
-            try{
-                await window.deleteDoc(window.doc(db,"pesagem_paletes",d));
-                alert("Registro excluído com sucesso!");
-                renderizarHistoricoPesagem();
-                carregarOpcoesPaletes();
-            } catch(d) {
-                console.error("Erro ao excluir registro de pesagem:",d);
-                alert("Falha ao excluir o registro.");
-            }
+        if("pb2025"!==t)return void alert("Senha incorreta. Operação cancelada.");
+        if(confirm("Tem certeza que deseja excluir este registro de pesagem?"))
+        try{
+            await window.deleteDoc(window.doc(db,"pesagem_paletes",d)),alert("Registro excluído com sucesso!"),renderizarHistoricoPesagem(),carregarOpcoesPaletes()
+        } catch(d) {
+            console.error("Erro ao excluir registro de pesagem:",d),alert("Falha ao excluir o registro.")
         }
     };
     
@@ -1909,16 +2041,13 @@ tbody tr:not(.linha-detalhes):hover { background-color: var(--primary-light); }
         alert("Preparando o arquivo Excel com dados do Firebase (Filtro Prensa)...");
         const d=document.getElementById("filtroDataInicio").value,t=document.getElementById("filtroDataFim").value,o=document.getElementById("filtroTurno").value;
         let e=[window.orderBy("data","desc"),window.orderBy("timestamp","desc")];
-        d&&e.push(window.where("data",">=",d));
-        t&&e.push(window.where("data","<=",t));
-        o&&e.push(window.where("turno","==",o));
+        d&&e.push(window.where("data",">=",d)),t&&e.push(window.where("data","<=",t)),o&&e.push(window.where("turno","==",o));
         try{
             const d=await window.getDocs(window.query(window.massaCol,...e)),t=d.docs.map(d=>d.data());
             if(0===t.length)return void alert("Nenhum dado encontrado para exportar.");
             const o=t.map(d=>{
                 var t;
-                const o=d.metaKgFT||appConfig.metaKgFT,e=d.metaKgPalete||appConfig.metaKgPalete;
-                const n=(null!==(t=d.retrabalhoKg)?t:d.kgPalete-d.kgCalculado);
+                const o=d.metaKgFT||appConfig.metaKgFT,e=d.metaKgPalete||appConfig.metaKgPalete,n=(null!==(t=d.retrabalhoKg)?t:d.kgPalete-d.kgCalculado);
                 return{
                     'Data':new Date(d.data+"T03:00:00").toLocaleDateString("pt-BR"),
                     'Turno':d.turno,
@@ -1933,13 +2062,11 @@ tbody tr:not(.linha-detalhes):hover { background-color: var(--primary-light); }
                     '% Eficiência Palete':(d.kgPalete/(e||1)*100).toFixed(2)+"%",
                     'Observação':d.observacao
                 }
-            });
-            const n=XLSX.utils.json_to_sheet(o),a=XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(a,n,"Histórico de Massa");
-            XLSX.writeFile(a,`Historico_Massa_${obterDataLocalFormatada()}.xlsx`);
+            }),n=XLSX.utils.json_to_sheet(o),a=XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(a,n,"Histórico de Massa"),XLSX.writeFile(a,`Historico_Massa_${obterDataLocalFormatada()}.xlsx`)
         } catch(d) {
-            console.error("Erro ao exportar dados do Firebase: ",d);
-            alert("Ocorreu um erro ao preparar o arquivo.");
+            console.error("Erro ao exportar dados do Firebase: ",d),
+            alert("Ocorreu um erro ao preparar o arquivo.")
         }
     };
     
@@ -1959,7 +2086,10 @@ tbody tr:not(.linha-detalhes):hover { background-color: var(--primary-light); }
         // Listeners Moagem
         document.getElementById('qtdCargasMoagem').addEventListener('input', atualizarCamposCargaMoagem);
         // Listeners para NOVOS FILTROS da Moagem
-        ['filtroDataInicioMoagem', 'filtroDataFimMoagem', 'filtroTurnoMoagem'].forEach(id => document.getElementById(id).addEventListener('change', renderizarHistoricoMoagem));
+        ['filtroDataInicioMoagem', 'filtroDataFimMoagem', 'filtroTurnoMoagem'].forEach(id => {
+            const el = document.getElementById(id);
+            if(el) el.addEventListener('change', renderizarHistoricoMoagem);
+        });
         
         // Listeners Dashboard
         ['dashFiltroDataInicio', 'dashFiltroDataFim', 'dashFiltroTurno'].forEach(id => document.getElementById(id).addEventListener('change', atualizarDashboard));
@@ -1983,6 +2113,9 @@ tbody tr:not(.linha-detalhes):hover { background-color: var(--primary-light); }
         // Renderizar Dashboard
         await atualizarDashboard();
         await gerarGraficoProducaoMensal();
+        
+        // Mostrar a primeira aba (Filtro Prensa) e esconder o botão de config principal
+        showTab('producao');
     });
     
     </script>
