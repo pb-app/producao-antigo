@@ -8,16 +8,13 @@
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>Acompanhamento de Produção</title>
 
-    <link rel="manifest" href="manifest.json?v=4.0.8" />
+    <link rel="manifest" href="manifest.json?v=4.0.9" />
     
     <meta name="theme-color" content="#0077cc">
     
     <link rel="apple-touch-icon" href="icons/icon-180x180.png?v=2.0.2" />
 
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
-
     <style>/* ================================================================ */
 /* =================== NOVO CSS - LAYOUT MODERNO ================== */
 /* ================================================================ */
@@ -182,7 +179,7 @@ label {
     color: var(--text-light);
     text-transform: uppercase;
 }
-input[type="date"], input[type="text"], input[type="number"], select, textarea {
+input[type="date"], input[type="text"], input[type="number"], input[type="time"], select, textarea {
     width: 100%;
     padding: 0.8rem;
     border: 1px solid var(--border-color);
@@ -191,7 +188,7 @@ input[type="date"], input[type="text"], input[type="number"], select, textarea {
     background-color: var(--bg-color);
     transition: border-color 0.2s, box-shadow 0.2s;
 }
-input[type="date"]:focus, input[type="text"]:focus, input[type="number"]:focus, select:focus, textarea:focus {
+input[type="date"]:focus, input[type="text"]:focus, input[type="number"]:focus, input[type="time"]:focus, select:focus, textarea:focus {
     outline: none;
     border-color: var(--primary);
     background-color: var(--card-bg);
@@ -346,6 +343,57 @@ tbody tr:hover { background-color: var(--primary-light); }
     padding: 0.7rem;
     font-size: 0.95rem;
 }
+
+/* NOVO: Estilos para o cabeçalho do lançamento e o ícone da calculadora */
+.lancamento-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 1rem; /* Adiciona espaço antes do formulário */
+}
+
+.lancamento-header h2 {
+    margin-bottom: 0.5rem; /* Ajusta o margin-bottom do h2 que estava em 1rem */
+    border-bottom: none; /* Remove a borda duplicada */
+}
+
+#btnAbrirCalculadora {
+    background: transparent;
+    border: none;
+    padding: 0.5rem;
+    cursor: pointer;
+}
+
+#btnAbrirCalculadora svg {
+    width: 28px;
+    height: 28px;
+    color: var(--primary);
+    transition: color 0.2s ease;
+}
+
+#btnAbrirCalculadora:hover svg {
+    color: var(--primary-dark);
+}
+
+/* NOVO: Estilo para o campo 'janta' no modal da calculadora */
+.checkbox-janta {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding-top: 1.25rem; /* Dá espaço do campo acima */
+}
+.checkbox-janta input {
+    width: auto;
+    margin: 0;
+}
+.checkbox-janta label {
+    margin: 0;
+    text-transform: none; /* Remove o uppercase */
+    color: var(--text-dark); /* Cor normal, não de label */
+    font-weight: 500;
+    font-size: 1rem;
+}
 /* ================================================================ */
 
         /* ================================================================ */
@@ -395,7 +443,16 @@ tbody tr:hover { background-color: var(--primary-light); }
             <a href="Massa.html">Fábrica de Massa</a>        </div>
 
         <section id="lancamento">
-            <h2>Lançamento de Produção</h2>
+            <div class="lancamento-header">
+                <h2>Lançamento de Produção</h2>
+                <button id="btnAbrirCalculadora" type="button" title="Calculadora de Jornada" onclick="abrirCalculadoraJornada()">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M12 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h8zM4 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H4z"/>
+                        <path d="M4 2.5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-.5.5h-7a.5.5 0 0 1-.5-.5v-2zm0 4a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm0 3a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm3-3a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm0 3a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm3-3a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm0 3a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm3-3a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm0 3a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1z"/>
+                    </svg>
+                </button>
+            </div>
+            
             <form id="formProducao">
                 <div>
                     <label>Data</label>
@@ -616,6 +673,8 @@ tbody tr:hover { background-color: var(--primary-light); }
                 <div class="kpi-card percent"><h3>% Quebras/Total</h3><p id="kpiPercQuebraTotal">N/A</p></div>
             </div>
 
+            </section>
+
             <div class="charts-container">
                 <div>
                     <h3 style="text-align:center;">Produção por Turno no Período (%)</h3>
@@ -670,6 +729,53 @@ tbody tr:hover { background-color: var(--primary-light); }
         </div>
     </div>
 
+</div>
+    </div>
+
+    <div id="modalCalculadoraJornada" class="modal-overlay">
+        <div class="modal-content">
+            <h2>Calculadora de Jornada</h2>
+            <form id="formCalculadoraJornada" onsubmit="calcularJornada(event)" style="grid-template-columns: 1fr 1fr; gap: 1rem 1.5rem;">
+                <div>
+                    <label for="calcHoraInicio">Hora Início</label>
+                    <input type="time" id="calcHoraInicio" required>
+                </div>
+                <div>
+                    <label for="calcHoraFim">Hora Final</label>
+                    <input type="time" id="calcHoraFim" required>
+                </div>
+                
+                <div class="full checkbox-janta" style="grid-column: 1 / -1;">
+                    <input type="checkbox" id="calcJanta">
+                    <label for="calcJanta">Descontar 30 min (Janta)</label>
+                </div>
+
+                <div class="full" style="grid-column: 1 / -1; border-top: 1px solid var(--border-color); padding-top: 1rem;">
+                    <label for="calcTurno">Turno de Referência (Duração Total)</label>
+                    <select id="calcTurno" required>
+                        <option value="">Selecione o turno...</option>
+                        <option value="360">Turno 1 (6x2) - 6h</option>
+                        <option value="360">Turno 2 (6x2) - 6h</option>
+                        <option value="360">Turno 3 (6x2) - 6h</option>
+                        <option value="360">Turno 4 (6x2) - 6h</option>
+                        <option value="480">Turno 1 (5x2) - 8h</option>
+                        <option value="480">Turno 2 (5x2) - 8h</option>
+                        <option value="480">Comercial - 8h</option>
+                    </select>
+                </div>
+                
+                <div class="full" style="grid-column: 1 / -1;">
+                    <label for="calcProdPrevistaTurnoCompleto">Produção Prevista (Turno Completo)</label>
+                    <input type="number" id="calcProdPrevistaTurnoCompleto" min="0" required placeholder="Ex: 1000">
+                </div>
+
+                <div class="full" style="text-align: right; margin-top: 10px; grid-column: 1 / -1;">
+                    <button type="button" class="secondary" onclick="fecharModal('modalCalculadoraJornada')">Cancelar</button>
+                    <button type="submit">Calcular e Inserir</button>
+                </div>
+            </form>
+        </div>
+    </div>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
         import { 
@@ -717,8 +823,7 @@ let ultimoDocumentoVisivel = null;
 let primeiroDocumentoStack = [null];
 let paginaAtual = 1;
 let filtroAtual = null;
-let pieChart = null; 
-let barChart = null; 
+// REMOVIDO: pieChart e barChart
 
 // ======================= FUNÇÃO CORRIGIDA =======================
 /**
@@ -759,7 +864,7 @@ document.addEventListener("DOMContentLoaded", ()=>{
     document.getElementById('formEdicaoProducao').addEventListener('submit', salvarEdicaoProducao);
     document.getElementById('formEdicaoOperador').addEventListener('submit', salvarEdicaoOperador);
 
-    Chart.register(ChartDataLabels);
+    // REMOVIDO: Chart.register(ChartDataLabels);
 });
 
 const maquinasPorSetor = {
@@ -828,6 +933,85 @@ function toggleDetalhes(index) {
 function fecharModal(modalId) {
     document.getElementById(modalId).style.display = 'none';
 }
+
+// ================================================================
+// ================= NOVO: LÓGICA DA CALCULADORA ==================
+// ================================================================
+
+/**
+ * Abre o modal da calculadora de jornada.
+ */
+function abrirCalculadoraJornada() {
+    document.getElementById('modalCalculadoraJornada').style.display = 'flex';
+    // Limpa o formulário da calculadora ao abrir
+    document.getElementById('formCalculadoraJornada').reset();
+}
+
+/**
+ * Calcula a produção proporcional com base no tempo trabalhado.
+ * Chamado pelo 'onsubmit' do formulário da calculadora.
+ */
+function calcularJornada(e) {
+    e.preventDefault(); // Impede o recarregamento da página
+
+    try {
+        const inicio = document.getElementById('calcHoraInicio').value;
+        const fim = document.getElementById('calcHoraFim').value;
+        const janta = document.getElementById('calcJanta').checked;
+        const totalMinutosTurno = parseFloat(document.getElementById('calcTurno').value);
+        const prodPrevistaCompleta = parseFloat(document.getElementById('calcProdPrevistaTurnoCompleto').value);
+
+        if (!inicio || !fim || !totalMinutosTurno || isNaN(prodPrevistaCompleta)) {
+            alert("Por favor, preencha todos os campos da calculadora.");
+            return;
+        }
+
+        // 1. Calcular minutos trabalhados (com virada da meia-noite)
+        const [h1, m1] = inicio.split(':').map(Number);
+        const [h2, m2] = fim.split(':').map(Number);
+        
+        // Criamos datas fictícias para calcular a diferença
+        const dataInicio = new Date(2000, 0, 1, h1, m1);
+        const dataFim = new Date(2000, 0, 1, h2, m2);
+
+        let diffMs = dataFim - dataInicio;
+        
+        // Se a diferença for negativa, significa que "virou a noite"
+        if (diffMs < 0) {
+            diffMs += 24 * 60 * 60 * 1000; // Adiciona 24h em milissegundos
+        }
+        
+        let minutosTrabalhados = diffMs / 60000; // Converte milissegundos para minutos
+
+        // 2. Descontar janta (Ex: 240 minutos)
+        if (janta) {
+            minutosTrabalhados -= 30; // Ex: 210 minutos
+        }
+
+        if (minutosTrabalhados < 0) {
+            minutosTrabalhados = 0;
+        }
+
+        // 3. Calcular produção proporcional
+        let producaoProporcional = 0;
+        if (totalMinutosTurno > 0 && prodPrevistaCompleta > 0) {
+            // (Ex: 210 / 360) * 1000
+            producaoProporcional = (minutosTrabalhados / totalMinutosTurno) * prodPrevistaCompleta;
+        }
+
+        // 4. Adicionar valor ao campo "Produção Prevista" do form principal
+        document.getElementById('prevista').value = Math.round(producaoProporcional);
+        
+        // 5. Fechar modal
+        fecharModal('modalCalculadoraJornada');
+
+    } catch (error) {
+        console.error("Erro ao calcular jornada:", error);
+        alert("Ocorreu um erro ao calcular. Verifique os valores inseridos.");
+    }
+}
+// =================== FIM DA LÓGICA DA CALCULADORA ===================
+
 
 async function abrirModalEdicao(docId) {
     try {
@@ -1352,132 +1536,8 @@ function calcularKPIsEstatistica(dados) {
     document.getElementById('kpiPercQuebraTotal').textContent = percQuebraTotal;
 }
 
-function renderizarGraficoPizzaTurno(dados) {
-    if (pieChart) {
-        pieChart.destroy();
-    }
-
-    const totaisTurno = { '1': 0, '2': 0, '3': 0, '4': 0 };
-    
-    dados.forEach(d => {
-        const turnoStr = d.turno || "";
-        const realizada = parseFloat(d.realizada) || 0;
-        if (turnoStr.includes("Turno 1")) { totaisTurno['1'] += realizada; }
-        else if (turnoStr.includes("Turno 2")) { totaisTurno['2'] += realizada; }
-        else if (turnoStr.includes("Turno 3")) { totaisTurno['3'] += realizada; }
-        else if (turnoStr.includes("Turno 4")) { totaisTurno['4'] += realizada; }
-    });
-    
-    const totalProducaoTurnos = Object.values(totaisTurno).reduce((a, b) => a + b, 0);
-    const ctx = document.getElementById('pieChartTurno').getContext('2d');
-    
-    if (totalProducaoTurnos === 0) {
-      ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-      return;
-    }
-
-    pieChart = new Chart(ctx, {
-        type: 'pie',
-        data: {
-            labels: ['Turno 1', 'Turno 2', 'Turno 3', 'Turno 4'],
-            datasets: [{
-                label: 'Produção Realizada',
-                data: [totaisTurno['1'], totaisTurno['2'], totaisTurno['3'], totaisTurno['4']],
-                backgroundColor: ['#36A2EB', '#FFCE56', '#FF6384', '#4BC0C0'],
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: { position: 'top' },
-                tooltip: { enabled: false },
-                datalabels: {
-                    formatter: (value, ctx) => {
-                        let sum = 0;
-                        let dataArr = ctx.chart.data.datasets[0].data;
-                        dataArr.map(data => { sum += data; });
-                        let percentage = (value*100 / sum).toFixed(2) + "%";
-                        return value > 0 ? percentage : '';
-                    },
-                    color: '#fff',
-                    font: { weight: 'bold', size: 14 }
-                }
-            }
-        }
-    });
-}
-
-function renderizarGraficoBarrasMensal(dados) {
-    if (barChart) {
-        barChart.destroy();
-    }
-
-    const totaisMensais = {};
-    const labelsMeses = [];
-    const hoje = new Date();
-
-    for (let i = 11; i >= 0; i--) {
-        const d = new Date(hoje.getFullYear(), hoje.getMonth() - i, 1);
-        const mesAno = d.toLocaleString('pt-BR', { month: 'short', year: '2-digit' });
-        const chave = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
-        labelsMeses.push({ label: mesAno, chave: chave });
-        totaisMensais[chave] = 0;
-    }
-    
-    dados.forEach(d => {
-        const [ano, mes] = d.data.split('-');
-        const chave = `${ano}-${mes}`;
-        if (totaisMensais.hasOwnProperty(chave)) {
-            totaisMensais[chave] += parseFloat(d.realizada) || 0;
-        }
-    });
-    
-    const dataValues = labelsMeses.map(item => totaisMensais[item.chave]);
-    const labelValues = labelsMeses.map(item => item.label);
-
-    const ctx = document.getElementById('barChartMensal').getContext('2d');
-    barChart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: labelValues,
-            datasets: [{
-                label: 'Produção Realizada',
-                data: dataValues,
-                backgroundColor: 'hsla(var(--primary-hue), 80%, 55%, 0.7)',
-                borderColor: 'hsl(var(--primary-hue), 80%, 55%)',
-                borderWidth: 1,
-                barPercentage: 0.7,
-                categoryPercentage: 0.8
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: { 
-                legend: { display: false },
-                datalabels: {
-                    anchor: 'end',
-                    align: 'top',
-                    color: '#444',
-                    font: { weight: 'bold' },
-                    formatter: (value) => value > 0 ? value.toLocaleString() : null
-                }
-            },
-            scales: { 
-                y: { 
-                    beginAtZero: true,
-                    ticks: {
-                       callback: function(value) {
-                           if (value >= 1000) {
-                               return value / 1000 + 'k';
-                           }
-                           return value;
-                       }
-                    } 
-                } 
-            }
-        }
-    });
-}
+// REMOVIDO: renderizarGraficoPizzaTurno
+// REMOVIDO: renderizarGraficoBarrasMensal
 
 async function atualizarDashboard(){
     if (!producoesCol || !window.getDocs || !window.query) {
@@ -1505,37 +1565,16 @@ async function atualizarDashboard(){
         const dadosGeraisPeriodo = [];
         snapshotPeriodo.forEach(doc => dadosGeraisPeriodo.push(doc.data()));
         
-        const dadosFiltradosGeral = filtrarDadosDashboardLocal(dadosGeraisPeriodo, filtroGeral);
+        const dadosFiltradosGeral = filtrarDadosDashboardLocal(dadosGeraisPeriodo, filtroGo
         
         calcularKPIsEstatistica(dadosFiltradosGeral);
-        renderizarGraficoPizzaTurno(dadosFiltradosGeral);
+        // REMOVIDO: renderizarGraficoPizzaTurno(dadosFiltradosGeral);
 
     } catch (error) {
-        console.error("Erro ao carregar dados para KPIs e Gráfico de Pizza: ", error);
+        console.error("Erro ao carregar dados para KPIs: ", error);
     }
     
-    try {
-        const hoje = new Date();
-        const dozeMesesAtras = new Date(hoje.getFullYear() - 1, hoje.getMonth(), hoje.getDate());
-        const dataInicio12M = obterDataLocalFormatada(dozeMesesAtras);
-
-        const conditions12M = [window.where("data", ">=", dataInicio12M)];
-        if (filtroGeral.setor) {
-            conditions12M.push(window.where("setor", "==", filtroGeral.setor));
-        }
-        
-        const q12M = window.query(producoesCol, ...conditions12M);
-        const snapshot12M = await window.getDocs(q12M);
-
-        const dados12Meses = [];
-        snapshot12M.forEach(doc => dados12Meses.push(doc.data()));
-        
-        const dadosFiltrados12M = filtrarDadosDashboardLocal(dados12Meses, filtroGeral);
-        renderizarGraficoBarrasMensal(dadosFiltrados12M);
-
-    } catch (error) {
-        console.error("Erro ao carregar dados para Gráfico de Barras: ", error);
-    }
+    // REMOVIDO: try...catch para o gráfico de barras de 12 meses
 }
 
 
@@ -1553,6 +1592,10 @@ window.paginaAnterior = paginaAnterior;
 window.abrirModalEdicao = abrirModalEdicao;
 window.abrirModalOperador = abrirModalOperador;
 window.fecharModal = fecharModal;
+
+// NOVO: Expor as funções da calculadora
+window.abrirCalculadoraJornada = abrirCalculadoraJornada;
+window.calcularJornada = calcularJornada;
 </script>
 <script>
 if ("serviceWorker" in navigator) {
@@ -1607,4 +1650,4 @@ window.addEventListener("beforeinstallprompt", (e) => {
       }
     </script>
 </body>
-</html>exportarExcel
+</html>
