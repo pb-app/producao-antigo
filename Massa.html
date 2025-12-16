@@ -896,7 +896,15 @@ tbody tr:not(.linha-detalhes):hover { background-color: var(--primary-light); }
             
             <h4>Pontos por Produção</h4>
             <div class="config-grid">
-                 <div> <label for="pontosPorKgMoagem">Pontos por KG (carga)</label> <input type="number" id="pontosPorKgMoagem" step="0.01"> </div>
+                 <div> 
+                     <label for="pontosPorKgMoagem">Pontos por KG (Carga Feita)</label> 
+                     <input type="number" id="pontosPorKgMoagem" step="0.001"> 
+                 </div>
+                 
+                 <div> 
+                     <label for="pontosPorKgMoagemSubida">Pontos por KG (Subida)</label> 
+                     <input type="number" id="pontosPorKgMoagemSubida" step="0.001"> 
+                 </div>
             </div>
 
             <h4 style="margin-top: 1.5rem;">Pontos por Atividade (Operador)</h4>
@@ -970,6 +978,7 @@ tbody tr:not(.linha-detalhes):hover { background-color: var(--primary-light); }
     // Config Moagem (Pontos)
     let appConfigMoagem = {
         pontosPorKgMoagem: 0.01,
+        pontosPorKgMoagemSubida: 0.01,
         pontosDescarga: 1,
         pontosGuardouMateria: 1,
         pontosArrumouBox: 5,
@@ -1427,6 +1436,35 @@ tbody tr:not(.linha-detalhes):hover { background-color: var(--primary-light); }
         // 4. Calcular Pontos (Soma Feitas + Subidas para o cálculo de pontos)
         const pesoTotalGeral = pesoTotalCargas + pesoTotalCargasSubidas;
         let pontosCargas = pesoTotalGeral * appConfigMoagem.pontosPorKgMoagem;
+        
+        let pontosAtividades = 0;
+        pontosAtividades += dadosOperador.qtdDescarga * appConfigMoagem.pontosDescarga;
+        pontosAtividades += dadosOperador.qtdGuardouMateria * appConfigMoagem.pontosGuardouMateria;
+        pontosAtividades += dadosOperador.arrumouBox ? appConfigMoagem.pontosArrumouBox : 0;
+        pontosAtividades += dadosOperador.carregouCaminhaoCaco ? appConfigMoagem.pontosCarregouCaminhaoCaco : 0;
+        pontosAtividades += dadosOperador.qtdSubiuMassa * appConfigMoagem.pontosSubiuMassa;
+        pontosAtividades += dadosOperador.qtdDesceuCacamba * appConfigMoagem.pontosDesceuCacamba;
+        pontosAtividades += dadosOperador.qtdVirouCacamba * appConfigMoagem.pontosVirouCacamba;
+        
+        pontosAtividades += dadosAuxiliar.lavouPeneira ? appConfigMoagem.pontosLavouPeneira : 0;
+        pontosAtividades += dadosAuxiliar.limpouMoinho ? appConfigMoagem.pontosLimpouMoinho : 0;
+        pontosAtividades += dadosAuxiliar.lavouPeneiraDosador ? appConfigMoagem.pontosLavouPeneiraDosador : 0;
+        
+        const pontosTotal = pontosCargas + pontosAtividades;
+
+        // 4. Calcular Pontos (ATUALIZADO: Feitas vs Subidas com pesos diferentes)
+        
+        // Verifica se existe a configuração nova, senão usa 0
+        const fatorSubida = (appConfigMoagem.pontosPorKgMoagemSubida !== undefined) 
+                            ? appConfigMoagem.pontosPorKgMoagemSubida 
+                            : 0; 
+
+        // Calcula os pontos separadamente
+        const pontosPorCargasFeitas = pesoTotalCargas * appConfigMoagem.pontosPorKgMoagem;
+        const pontosPorCargasSubidas = pesoTotalCargasSubidas * fatorSubida;
+        
+        // Soma tudo no "pontosCargas"
+        let pontosCargas = pontosPorCargasFeitas + pontosPorCargasSubidas;
         
         let pontosAtividades = 0;
         pontosAtividades += dadosOperador.qtdDescarga * appConfigMoagem.pontosDescarga;
