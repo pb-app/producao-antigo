@@ -1264,8 +1264,11 @@ tbody tr:not(.linha-detalhes):hover { background-color: var(--primary-light); }
         }
     }
     
-    // --- LÓGICA MOAGEM (formMoagem) ---
-    
+    // =========================================================================
+    // ================== LÓGICA CORRIGIDA DA MOAGEM ===========================
+    // =========================================================================
+
+    // --- Funções Auxiliares de Interface ---
     function toggleCampoCondicional(selectId, containerId) {
         const select = document.getElementById(selectId);
         const container = document.getElementById(containerId);
@@ -1278,15 +1281,16 @@ tbody tr:not(.linha-detalhes):hover { background-color: var(--primary-light); }
             if (input) input.value = '0';
         }
     }
-    
+
+    // --- Gerar Campos de Cargas FEITAS ---
     function atualizarCamposCargaMoagem() {
         const qtd = parseInt(document.getElementById('qtdCargasMoagem').value) || 0;
         const container = document.getElementById('cargasContainerMoagem');
-        container.innerHTML = ''; // Limpa campos antigos
+        container.innerHTML = ''; 
         
         if (qtd > 0) {
              const title = document.createElement('h4');
-             title.textContent = 'Detalhes das Cargas';
+             title.textContent = 'Detalhes das Cargas Feitas';
              title.style.gridColumn = '1 / -1';
              title.style.margin = '0 0 0.5rem 0';
              container.appendChild(title);
@@ -1295,99 +1299,111 @@ tbody tr:not(.linha-detalhes):hover { background-color: var(--primary-light); }
         for (let i = 1; i <= qtd; i++) {
             const row = document.createElement('div');
             row.className = 'carga-moagem-row';
-            
             row.innerHTML = `
-                <label for="moinhoCarga_${i}">Carga ${i}</label>
+                <label>Carga ${i}</label>
                 <select id="moinhoCarga_${i}" class="moinho-select">
                     <option value="">Moinho...</option>
                     <option value="1">Moinho 1</option>
                     <option value="2">Moinho 2</option>
                     <option value="3">Moinho 3</option>
                 </select>
-                <label for="pesoCarga_${i}">Peso (kg)</label>
+                <label>Peso (kg)</label>
                 <input type="number" id="pesoCarga_${i}" class="peso-carga-input" min="0" placeholder="kg" step="0.1">
             `;
-            // Ajusta o layout da linha de carga
+            // Estilização inline para garantir o layout
             row.style.gridTemplateColumns = 'auto auto 1fr';
             row.style.gap = '0.75rem';
             row.querySelectorAll('label')[0].style.textAlign = 'left';
             row.querySelectorAll('label')[1].style.textAlign = 'right';
-
             container.appendChild(row);
         }
     }
 
-        // --- FUNÇÃO NOVA: Gera campos para CARGAS SUBIDAS ---
+    // --- Gerar Campos de Cargas SUBIDAS ---
     function atualizarCamposCargasSubidas() {
         const qtd = parseInt(document.getElementById('qtdCargasSubidas').value) || 0;
         const container = document.getElementById('cargasSubidasContainerMoagem');
-        container.innerHTML = ''; // Limpa campos antigos
+        container.innerHTML = ''; 
         
         if (qtd > 0) {
              const title = document.createElement('h4');
              title.textContent = 'Detalhes das Cargas SUBIDAS';
              title.style.gridColumn = '1 / -1';
              title.style.margin = '1rem 0 0.5rem 0';
-             title.style.color = 'var(--accent)'; // Cor diferente para destacar
+             title.style.color = 'var(--accent)';
              container.appendChild(title);
         }
 
         for (let i = 1; i <= qtd; i++) {
             const row = document.createElement('div');
             row.className = 'carga-moagem-row';
-            
-            // Note os IDs diferentes: moinhoCargaSubida_X e pesoCargaSubida_X
             row.innerHTML = `
-                <label for="moinhoCargaSubida_${i}">Subida ${i}</label>
+                <label>Subida ${i}</label>
                 <select id="moinhoCargaSubida_${i}" class="moinho-select">
                     <option value="">Moinho...</option>
                     <option value="1">Moinho 1</option>
                     <option value="2">Moinho 2</option>
                     <option value="3">Moinho 3</option>
                 </select>
-                <label for="pesoCargaSubida_${i}">Peso (kg)</label>
+                <label>Peso (kg)</label>
                 <input type="number" id="pesoCargaSubida_${i}" class="peso-carga-input" min="0" placeholder="kg" step="0.1">
             `;
-            
             row.style.gridTemplateColumns = 'auto auto 1fr';
             row.style.gap = '0.75rem';
             row.querySelectorAll('label')[0].style.textAlign = 'left';
             row.querySelectorAll('label')[1].style.textAlign = 'right';
-
             container.appendChild(row);
         }
     }
 
-    // --- ATUALIZAR LISTENERS ---
-    // Coloque isso dentro do 'DOMContentLoaded' junto com os outros listeners
-    // document.getElementById('qtdCargasSubidas').addEventListener('input', atualizarCamposCargasSubidas);
-    
     function limparFormMoagem() {
         document.getElementById('formMoagem').reset();
         document.getElementById('dataMoagem').value = obterDataLocalFormatada();
-        
-        atualizarCamposCargaMoagem();     // Limpa container Feitas
-        atualizarCamposCargasSubidas();   // Limpa container Subidas (NOVO)
-        
+        atualizarCamposCargaMoagem();     
+        atualizarCamposCargasSubidas();   
         document.querySelectorAll('.campo-condicional').forEach(el => el.style.display = 'none');
     }
+
+    // --- SALVAR MOAGEM (CORRIGIDO: APENAS UM LISTENER) ---
+    // Remova qualquer outro 'addEventListener' duplicado para 'formMoagem' no seu código
     document.getElementById('formMoagem').addEventListener('submit', async function(event) {
         event.preventDefault();
         
-        // 1. Coletar Cargas Dinâmicas
+        // 1. Coletar Cargas FEITAS
         const qtdCargas = parseInt(document.getElementById('qtdCargasMoagem').value) || 0;
         let cargas = [];
         let pesoTotalCargas = 0;
         for (let i = 1; i <= qtdCargas; i++) {
-            const moinho = document.getElementById(`moinhoCarga_${i}`).value;
-            const peso = parseFloat(document.getElementById(`pesoCarga_${i}`).value) || 0;
-            if (moinho && peso > 0) {
-                cargas.push({ moinho: moinho, peso: peso });
-                pesoTotalCargas += peso;
+            const moinhoEl = document.getElementById(`moinhoCarga_${i}`);
+            const pesoEl = document.getElementById(`pesoCarga_${i}`);
+            if (moinhoEl && pesoEl) {
+                const moinho = moinhoEl.value;
+                const peso = parseFloat(pesoEl.value) || 0;
+                if (moinho && peso > 0) {
+                    cargas.push({ moinho: moinho, peso: peso });
+                    pesoTotalCargas += peso;
+                }
+            }
+        }
+
+        // 2. Coletar Cargas SUBIDAS
+        const qtdCargasSubidas = parseInt(document.getElementById('qtdCargasSubidas').value) || 0;
+        let cargasSubidas = [];
+        let pesoTotalCargasSubidas = 0;
+        for (let i = 1; i <= qtdCargasSubidas; i++) {
+            const moinhoEl = document.getElementById(`moinhoCargaSubida_${i}`);
+            const pesoEl = document.getElementById(`pesoCargaSubida_${i}`);
+            if (moinhoEl && pesoEl) {
+                const moinho = moinhoEl.value;
+                const peso = parseFloat(pesoEl.value) || 0;
+                if (moinho && peso > 0) {
+                    cargasSubidas.push({ moinho: moinho, peso: peso });
+                    pesoTotalCargasSubidas += peso;
+                }
             }
         }
         
-        // 2. Coletar Dados Sim/Não e Quantidades
+        // 3. Coletar Dados Operacionais
         const dadosOperador = {
             qtdDescarga: parseInt(document.getElementById('qtdDescargaMoagem').value) || 0,
             guardouMateria: document.getElementById('guardouMateriaMoagem').value === 'sim',
@@ -1408,8 +1424,9 @@ tbody tr:not(.linha-detalhes):hover { background-color: var(--primary-light); }
              lavouPeneiraDosador: document.getElementById('lavouPeneiraDosadorMoagem').value === 'sim',
         };
 
-        // 3. Calcular Pontos
-        let pontosCargas = pesoTotalCargas * appConfigMoagem.pontosPorKgMoagem;
+        // 4. Calcular Pontos (Soma Feitas + Subidas para o cálculo de pontos)
+        const pesoTotalGeral = pesoTotalCargas + pesoTotalCargasSubidas;
+        let pontosCargas = pesoTotalGeral * appConfigMoagem.pontosPorKgMoagem;
         
         let pontosAtividades = 0;
         pontosAtividades += dadosOperador.qtdDescarga * appConfigMoagem.pontosDescarga;
@@ -1426,30 +1443,33 @@ tbody tr:not(.linha-detalhes):hover { background-color: var(--primary-light); }
         
         const pontosTotal = pontosCargas + pontosAtividades;
 
-        // 4. Montar Registro e Salvar
+        // 5. Montar Objeto
         const novoRegistroMoagem = {
             data: document.getElementById('dataMoagem').value,
             turno: document.getElementById('turnoMoagem').value,
-            operador: document.getElementById('operadorMoagemSelect').value, // <-- CAMPO ATUALIZADO
+            operador: document.getElementById('operadorMoagemSelect').value,
             observacao: document.getElementById('observacaoMoagem').value,
             
-            cargas: cargas, // Array de {moinho, peso}
-            pesoTotalCargas: pesoTotalCargas,
+            cargas: cargas, 
+            pesoTotalCargas: pesoTotalCargas, // Peso Feitas
             
-            ...dadosOperador, // Inclui todos os dados do operador
-            ...dadosAuxiliar, // Inclui todos os dados do auxiliar
+            cargasSubidas: cargasSubidas, 
+            pesoTotalCargasSubidas: pesoTotalCargasSubidas, // Peso Subidas
+
+            ...dadosOperador,
+            ...dadosAuxiliar,
             
-            pontosCargas: pontosCargas,
+            pontosCargas: pontosCargas, 
             pontosAtividades: pontosAtividades,
             pontosTotal: pontosTotal,
             
-            configuracaoPontosUsada: appConfigMoagem, // Salva snapshot da config usada
+            configuracaoPontosUsada: appConfigMoagem,
             timestamp: new Date().toISOString()
         };
 
         try {
             await window.addDoc(window.moagemCol, novoRegistroMoagem);
-            alert(`Lançamento de Moagem salvo! \nPontos: ${pontosTotal.toFixed(2)} \n(Cargas: ${pontosCargas.toFixed(2)}, Atividades: ${pontosAtividades.toFixed(2)})`);
+            alert(`Lançamento salvo! \nPontos: ${pontosTotal.toFixed(2)}`);
             renderizarHistoricoMoagem();
             limparFormMoagem();
         } catch (error) {
@@ -1458,6 +1478,7 @@ tbody tr:not(.linha-detalhes):hover { background-color: var(--primary-light); }
         }
     });
 
+    // --- RENDERIZAR HISTÓRICO (CORRIGIDO: VISUALIZAÇÃO) ---
     async function renderizarHistoricoMoagem() {
         const tbody = document.getElementById('tabelaHistoricoMoagem');
         tbody.innerHTML = `<tr><td colspan="8">Carregando...</td></tr>`;
@@ -1473,12 +1494,15 @@ tbody tr:not(.linha-detalhes):hover { background-color: var(--primary-light); }
                 const reg = doc.data();
                 const docId = doc.id;
                 
-                // Cálculos visuais
+                // Dados para exibição
                 const qtdFeitas = reg.cargas ? reg.cargas.length : 0;
                 const qtdSubidas = reg.cargasSubidas ? reg.cargasSubidas.length : 0;
-                const pesoFeitas = reg.pesoTotalCargas || 0;
+                
+                // CORREÇÃO 2: Mostrar APENAS peso de cargas feitas na tabela principal
+                const pesoFeitas = reg.pesoTotalCargas || 0; 
+                
+                // Variáveis para as cargas subidas (apenas para detalhes)
                 const pesoSubidas = reg.pesoTotalCargasSubidas || 0;
-                const pesoTotalGeral = pesoFeitas + pesoSubidas;
 
                 const trPrincipal = document.createElement('tr');
                 trPrincipal.innerHTML = `
@@ -1487,25 +1511,17 @@ tbody tr:not(.linha-detalhes):hover { background-color: var(--primary-light); }
                     <td>${reg.turno}</td>
                     <td>${reg.operador}</td>
                     <td>F: ${qtdFeitas} | S: ${qtdSubidas}</td>
-                    <td>${pesoTotalGeral.toFixed(2)} kg</td>
-                    <td style="font-weight: bold; color: var(--primary);">${reg.pontosTotal ? reg.pontosTotal.toFixed(2) : '0.00'}</td>
+                    <td>${pesoFeitas.toFixed(2)} kg</td> <td style="font-weight: bold; color: var(--primary);">${reg.pontosTotal ? reg.pontosTotal.toFixed(2) : '0.00'}</td>
                     <td>
                         <button class="delete-btn" onclick="deletarRegistroMoagem('${docId}')">Excluir</button>
                     </td>
                 `;
                 
-                // --- Detalhes ---
-                const trDetalhes = document.createElement('tr');
-                trDetalhes.id = `detalhes-moagem-${docId}`;
-                trDetalhes.className = 'linha-detalhes';
-                
-                // Formatar Cargas FEITAS
+                // Formatação Listas
                 let cargasHtml = 'Nenhuma';
                 if (reg.cargas && reg.cargas.length > 0) {
                     cargasHtml = reg.cargas.map(c => `M${c.moinho}: ${c.peso}kg`).join(' | ');
                 }
-
-                // Formatar Cargas SUBIDAS (NOVO)
                 let cargasSubidasHtml = 'Nenhuma';
                 if (reg.cargasSubidas && reg.cargasSubidas.length > 0) {
                     cargasSubidasHtml = reg.cargasSubidas.map(c => `M${c.moinho}: ${c.peso}kg`).join(' | ');
@@ -1514,13 +1530,23 @@ tbody tr:not(.linha-detalhes):hover { background-color: var(--primary-light); }
                 const simNao = (val) => val ? 'Sim' : 'Não';
                 const qtd = (val) => val || 0;
                 
+                // CORREÇÃO 1: Adicionando os campos que faltavam (Subiu Massa, Caçambas)
+                const trDetalhes = document.createElement('tr');
+                trDetalhes.id = `detalhes-moagem-${docId}`;
+                trDetalhes.className = 'linha-detalhes';
+                
                 trDetalhes.innerHTML = `
                     <td colspan="8">
                         <div class="detalhe-grid">
                             <div><span>Pontos (Peso Total):</span> ${reg.pontosCargas ? reg.pontosCargas.toFixed(2) : '0.00'}</div>
                             <div><span>Pontos (Ativ.):</span> ${reg.pontosAtividades ? reg.pontosAtividades.toFixed(2) : '0.00'}</div>
+                            
                             <div><span>Descargas:</span> ${qtd(reg.qtdDescarga)}</div>
+                            <div><span>Subiu Massa:</span> ${simNao(reg.subiuMassa)} (${qtd(reg.qtdSubiuMassa)} un)</div>
+                            <div><span>Desceu Caçamba:</span> ${simNao(reg.desceuCacamba)} (${qtd(reg.qtdDesceuCacamba)} un)</div>
+                            <div><span>Virou Caçamba:</span> ${simNao(reg.virouCacamba)} (${qtd(reg.qtdVirouCacamba)} un)</div>
                             <div><span>Guardou Matéria:</span> ${simNao(reg.guardouMateria)} (${qtd(reg.qtdGuardouMateria)} un)</div>
+                            
                             <div><span>Arrumou Box:</span> ${simNao(reg.arrumouBox)}</div>
                             <div><span>Carregou Caco:</span> ${simNao(reg.carregouCaminhaoCaco)}</div>
                         </div>
@@ -1540,6 +1566,10 @@ tbody tr:not(.linha-detalhes):hover { background-color: var(--primary-light); }
              tbody.innerHTML = `<tr><td colspan="8">Erro ao carregar dados.</td></tr>`;
         }
     }
+    
+    // =========================================================================
+    // ================== FIM DA LÓGICA CORRIGIDA ==============================
+    // =========================================================================
     
     window.deletarRegistroMoagem = async function(docId) {
         const t=prompt("Para confirmar a exclusão, digite a senha:");
