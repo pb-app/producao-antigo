@@ -2,8 +2,8 @@
 <html lang="pt-BR">
 <head>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>Lançamento - Fábrica de Massa</title>
@@ -16,7 +16,7 @@
 /* =========== LAYOUT MODERNO PARA A FÁBRICA DE MASSA =========== */
 /* ================================================================ */
 
-        /* ================================================================ */
+/* ================================================================ */
 /* =========== ESTILO PLANILHA PARA TABELAS DA PÁGINA =========== */
 /* ================================================================ */
 
@@ -24,49 +24,49 @@
 #tabProducao table th, #tabProducao table td,
 #tabPesagem table th, #tabPesagem table td,
 #tabMoagem table th, #tabMoagem table td,
-#tabOperadores table th, #tabOperadores table td { /* <-- ADICIONADO #tabOperadores */
+#tabOperadores table th, #tabOperadores table td { 
     border-bottom: none;
 }
 
-/* Aplica o estilo de borda e centralização nas tabelas de histórico e pesagem */
+/* Aplica o estilo de borda e centralização nas tabelas */
 #tabProducao table th, #tabProducao table td,
 #tabPesagem table th, #tabPesagem table td,
 #tabMoagem table th, #tabMoagem table td,
-#tabOperadores table th, #tabOperadores table td { /* <-- ADICIONADO #tabOperadores */
+#tabOperadores table th, #tabOperadores table td { 
     border: 1px solid var(--border-color);
     text-align: center;
-    white-space: normal; /* Permite que o texto quebre a linha */
+    white-space: normal;
     padding: 0.5rem;
 }
 
-/* Estiliza o cabeçalho para ter fundo azul e texto branco */
+/* Estiliza o cabeçalho */
 #tabProducao table th,
 #tabPesagem table th,
 #tabMoagem table th,
-#tabOperadores table th { /* <-- ADICIONADO #tabOperadores */
+#tabOperadores table th { 
     background-color: var(--primary);
     color: white;
     font-weight: bold;
 }
 
-/* Adiciona o efeito de "zebra" (linhas alternadas) no corpo da tabela */
+/* Efeito zebra */
 #tabProducao tbody tr:nth-child(2n),
 #tabPesagem tbody tr:nth-child(2n),
 #tabMoagem tbody tr:nth-child(2n),
-#tabOperadores tbody tr:nth-child(2n) { /* <-- ADICIONADO #tabOperadores */
+#tabOperadores tbody tr:nth-child(2n) { 
     background-color: var(--bg-color);
 }
 
-/* Mantém o efeito hover, exceto na linha de detalhes */
+/* Hover */
 #tabProducao tbody tr:not(.linha-detalhes):hover,
 #tabPesagem tbody tr:hover,
 #tabMoagem tbody tr:not(.linha-detalhes):hover,
-#tabOperadores tbody tr:hover { /* <-- ADICIONADO #tabOperadores */
+#tabOperadores tbody tr:hover { 
     background-color: hsl(var(--primary-hue), 80%, 90%);
 }
 
 :root {
-    --primary-hue: 210; /* Tom de azul */
+    --primary-hue: 210;
     --primary: hsl(var(--primary-hue), 80%, 55%);
     --primary-light: hsl(var(--primary-hue), 80%, 97%);
     --primary-dark: hsl(var(--primary-hue), 80%, 45%);
@@ -84,7 +84,7 @@
 * { box-sizing: border-box; }
 
 body {
-    font-family: 'Inter', sans-serif; /* <-- NOVA FONTE */
+    font-family: 'Inter', sans-serif;
     margin: 0;
     background: var(--bg-color);
     color: var(--text-dark);
@@ -104,7 +104,7 @@ h1 { font-size: 1.75rem; }
 h2 { 
     font-size: 1.5rem; padding-bottom: 0.5rem; 
     border-bottom: 1px solid var(--border-color);
-    display: flex; /* Para alinhar o botão de config */
+    display: flex;
     justify-content: space-between;
     align-items: center;
 }
@@ -120,7 +120,7 @@ h3 { font-size: 1.1rem; color: var(--text-light); }
     position: relative;
 }
 
-/* --- NAVEGAÇÃO SUPERIOR E ABAS --- */
+/* --- NAVEGAÇÃO --- */
 .nav-container {
     max-width: 1100px; margin: 1rem auto; padding: 0 2rem;
 }
@@ -141,7 +141,7 @@ h3 { font-size: 1.1rem; color: var(--text-light); }
     box-shadow: 0 6px 16px rgba(0,0,0,0.1);
 }
 .tab-nav {
-    display: flex; flex-wrap: wrap; /* Permite quebra de linha em telas pequenas */
+    display: flex; flex-wrap: wrap;
     gap: 1rem; margin-bottom: 2rem;
     border-bottom: 1px solid var(--border-color);
 }
@@ -162,26 +162,19 @@ h3 { font-size: 1.1rem; color: var(--text-light); }
 .tab-content { display: none; }
 .tab-content.active { display: block; }
 
-/* --- FORMULÁRIOS E BOTÕES --- */
+/* --- FORMULÁRIOS --- */
 form {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     gap: 1.5rem;
 }
-/* ================================================================ */
-/* ============= NOVO: AJUSTE PARA 2 COLUNAS NOS FORMS ============ */
-/* ================================================================ */
-
-  /* #formMassa, #formPesagem, #formOperador com 2 colunas */
-  #formMassa, #formPesagem, #formOperador {
+#formMassa, #formPesagem, #formOperador {
     grid-template-columns: repeat(2, 1fr);
-  }
-  
-  /* #formMoagem com 3 colunas para melhor distribuição */
-  #formMoagem {
+}
+#formMoagem {
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 1.25rem;
-  }
+}
         
 label {
     font-size: 0.8rem; font-weight: 700; margin-bottom: 0.5rem;
@@ -216,8 +209,8 @@ button:hover {
 button:active { transform: translateY(0); }
 button.secondary { background: #e0e6ef; color: var(--text-dark); }
 button.secondary:hover { background: #cfd8e3; }
-button.delete-btn { background: var(--danger); }
-button.edit-btn { background: var(--accent); margin-right: 5px; }
+button.delete-btn { background: var(--danger); padding: 0.3rem 0.8rem; font-size: 0.75rem;}
+button.edit-btn { background: var(--accent); margin-right: 5px; padding: 0.3rem 0.8rem; font-size: 0.75rem;}
 button.excel-btn { background: var(--success); }
 
 /* --- TABELAS --- */
@@ -243,13 +236,13 @@ tbody tr:not(.linha-detalhes):hover { background-color: var(--primary-light); }
 .efficiency-ok { color: var(--accent); font-weight: bold; }
 .efficiency-bad { color: var(--danger); font-weight: bold; }
 
-/* --- SEÇÃO DE PALETES (Filtro Prensa) --- */
+/* --- SEÇÃO DE PALETES --- */
 .paletes-fieldset {
     grid-column: 1 / -1; border: 1px solid var(--border-color);
     border-radius: 12px; padding: 1.5rem; margin-top: 1rem;
 }
 .paletes-fieldset legend,
-.moagem-fieldset legend { /* <-- Estilo para fieldset moagem */
+.moagem-fieldset legend {
     font-weight: 700; color: var(--primary);
     padding: 0 0.5rem; font-size: 1rem; text-transform: uppercase;
 }
@@ -269,8 +262,7 @@ tbody tr:not(.linha-detalhes):hover { background-color: var(--primary-light); }
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 1.25rem;
 }
-/* Container para cargas dinâmicas */
-#cargasContainerMoagem {
+#cargasContainerMoagem, #cargasSubidasContainerMoagem {
     grid-column: 1 / -1;
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -286,62 +278,38 @@ tbody tr:not(.linha-detalhes):hover { background-color: var(--primary-light); }
     align-items: center;
 }
 .carga-moagem-row label {
-    font-size: 0.9rem;
-    font-weight: 500;
-    color: var(--text-dark);
-    margin: 0;
-    text-transform: none;
-    text-align: right;
+    font-size: 0.9rem; font-weight: 500;
+    color: var(--text-dark); margin: 0;
+    text-transform: none; text-align: right;
 }
-/* Campos condicionais */
-.campo-condicional {
-    display: none; /* Oculto por padrão */
-}
-/* Estilo para input "Sim/Não" e campo condicional lado a lado */
+.campo-condicional { display: none; }
 .campo-com-condicional {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0.75rem;
-    align-items: flex-end;
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 0.75rem; align-items: flex-end;
 }
-
 
 /* --- DETALHES EXPANSÍVEIS --- */
 .linha-detalhes { display: none; background-color: var(--primary-light); }
 .linha-detalhes td { padding: 1rem 1.5rem; text-align: left !important; }
-.detalhe-grid { 
+.detalhe-grid { 
     display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 1rem; 
+    gap: 1rem; 
 }
-.detalhe-grid span { 
+.detalhe-grid span { 
     font-weight: bold; color: var(--primary);
     display: block; margin-bottom: 0.25rem;
 }
-/* --- NOVO ESTILO PARA O BOTÃO EXPANDIR --- */
 .expand-btn {
-    background: transparent;
-    border: none;
-    padding: 4px;
-    cursor: pointer;
-    display: flex; /* Essencial para alinhar o ícone SVG */
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto; /* Centraliza o botão na célula da tabela */
-    transition: transform 0.2s ease-in-out; /* Animação de rotação */
+    background: transparent; border: none; padding: 4px;
+    cursor: pointer; display: flex; align-items: center;
+    justify-content: center; margin: 0 auto;
+    transition: transform 0.2s ease-in-out;
 }
-.expand-btn svg {
-    width: 14px; /* Tamanho do ícone (você pode diminuir aqui se quiser) */
-    height: 14px;
-    color: var(--text-light); /* Cor padrão do ícone */
-}
-.expand-btn:hover svg {
-    color: var(--primary); /* Cor do ícone ao passar o mouse */
-}
-.expand-btn.open {
-    transform: rotate(90deg); /* Gira o ícone 90 graus quando a classe 'open' é adicionada */
-}
+.expand-btn svg { width: 14px; height: 14px; color: var(--text-light); }
+.expand-btn:hover svg { color: var(--primary); }
+.expand-btn.open { transform: rotate(90deg); }
 
-/* --- DASHBOARD E GRÁFICOS --- */
+/* --- DASHBOARD --- */
 .kpi-grid {
     display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 1.25rem; margin-bottom: 2.5rem;
@@ -373,22 +341,14 @@ tbody tr:not(.linha-detalhes):hover { background-color: var(--primary-light); }
 }
 .chart-container h3 { margin-top: 0; text-align: center; }
 
-/* --- MODAL DE CONFIGURAÇÃO --- */
-#openConfigBtn {
-    position: absolute; top: 1.5rem; right: 1.5rem;
-    background: none; border: none; color: var(--text-light); font-size: 1.5rem;
-    padding: 0.4rem 0.7rem; cursor: pointer; transition: all 0.2s;
+/* --- MODAIS --- */
+#openConfigBtn, #openConfigMoagemBtn {
+    background: none; border: none; color: var(--text-light);
+    font-size: 1.5rem; cursor: pointer; transition: all 0.2s;
 }
-#openConfigBtn:hover { color: var(--primary); transform: rotate(15deg); }
-
-/* Botão de config da Moagem */
-#openConfigMoagemBtn {
-    background: none; border: none; color: var(--text-light); font-size: 1.2rem;
-    padding: 0.2rem 0.5rem; cursor: pointer; transition: all 0.2s;
-    margin-left: auto; /* Joga para a direita */
-}
-#openConfigMoagemBtn:hover { color: var(--primary); transform: rotate(15deg); }
-
+#openConfigBtn { position: absolute; top: 1.5rem; right: 1.5rem; padding: 0.4rem 0.7rem; }
+#openConfigMoagemBtn { font-size: 1.2rem; padding: 0.2rem 0.5rem; margin-left: auto; }
+#openConfigBtn:hover, #openConfigMoagemBtn:hover { color: var(--primary); transform: rotate(15deg); }
 
 .modal-overlay {
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -399,38 +359,25 @@ tbody tr:not(.linha-detalhes):hover { background-color: var(--primary-light); }
 .modal-content {
     background: white; padding: 2rem; border-radius: 16px;
     width: 90%; max-width: 700px;
-    max-height: 90vh; /* Altura máxima */
-    overflow-y: auto; /* Scroll se conteúdo for maior */
+    max-height: 90vh; overflow-y: auto;
 }
-.modal-content h3 {
-    margin-top: 0;
-    padding-bottom: 1rem;
-    border-bottom: 1px solid var(--border-color);
-}
-/* Grid para modais */
+.modal-content h3 { margin-top: 0; padding-bottom: 1rem; border-bottom: 1px solid var(--border-color); }
 .config-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 1.25rem;
 }
 .modal-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 0.75rem;
-    margin-top: 1.5rem;
-    padding-top: 1.5rem;
+    display: flex; justify-content: flex-end; gap: 0.75rem;
+    margin-top: 1.5rem; padding-top: 1.5rem;
     border-top: 1px solid var(--border-color);
 }
-.modal-actions input[type="password"] {
-    margin-right: auto; /* Empurra senha para esquerda */
-}
+.modal-actions input[type="password"] { margin-right: auto; }
 
-
-/* --- Estilos de Impressão (Mantidos) --- */
+/* --- PRINT --- */
 @page { size: landscape; margin: 15mm; }
 @media print {
     body { background: #fff !important; font-size: 10pt; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-    body > header, .nav-container, #openConfigBtn, #openConfigMoagemBtn, .tab-nav, #tabProducao, #tabPesagem, #tabMoagem, #tabOperadores, .dashboard-filters, .expand-btn, .delete-btn, .edit-btn, .excel-btn, .form-actions, #printDashboardBtn { /* <-- ADICIONADO #tabOperadores */
+    body > header, .nav-container, #openConfigBtn, #openConfigMoagemBtn, .tab-nav, #tabProducao, #tabPesagem, #tabMoagem, #tabOperadores, .dashboard-filters, .expand-btn, .delete-btn, .edit-btn, .excel-btn, .form-actions, #printDashboardBtn { 
         display: none !important;
     }
     .tab-content, #tabDashboard { display: block !important; }
@@ -452,40 +399,7 @@ tbody tr:not(.linha-detalhes):hover { background-color: var(--primary-light); }
     .chart-container { padding: 1rem; page-break-inside: avoid; box-shadow: none !important; border: 1px solid var(--border-color) !important;}
     .chart-container h3 { font-size: 1rem; margin-bottom: 0.5rem; }
 }
-        /* ================================================================ */
-/* ============== REDUÇÃO DE TAMANHO BOTÕES DE AÇÃO =============== */
-/* ================================================================ */
-
-/* Alvo: Botões de Editar e Excluir */
-.edit-btn, .delete-btn {
-    padding: 0.3rem 0.8rem; /* Padding vertical e horizontal reduzido */
-    font-size: 0.75rem;     /* Tamanho da fonte um pouco menor */
-}
-
-/* --- NOVO ESTILO PARA O BOTÃO EXPANDIR --- */
-.expand-btn {
-    background: transparent;
-    border: none;
-    padding: 4px;
-    cursor: pointer;
-    display: flex; /* Essencial para alinhar o ícone SVG */
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto; /* Centraliza o botão na célula da tabela */
-    transition: transform 0.2s ease-in-out; /* Animação de rotação */
-}
-.expand-btn svg {
-    width: 14px; /* Tamanho do ícone (você pode diminuir aqui se quiser) */
-    height: 14px;
-    color: var(--text-light); /* Cor padrão do ícone */
-}
-.expand-btn:hover svg {
-    color: var(--primary); /* Cor do ícone ao passar o mouse */
-}
-.expand-btn.open {
-    transform: rotate(90deg); /* Gira o ícone 90 graus quando a classe 'open' é adicionada */
-}
-</style>
+    </style>
 </head>
 <body>
     <header>
@@ -497,19 +411,16 @@ tbody tr:not(.linha-detalhes):hover { background-color: var(--primary-light); }
     </div>
 
     <div class="container">
-        <!-- Botão Config Geral (Filtro Prensa) -->
         <button id="openConfigBtn" title="Configurações de Pesos e Metas (Filtro Prensa)" onclick="openConfigModal()">⚙️</button>
         
         <div class="tab-nav">
             <button class="tab-link active" onclick="showTab('producao')">Filtro Prensa</button>
             <button class="tab-link" onclick="showTab('moagem')">Moagem</button>
             <button class="tab-link" onclick="showTab('pesagem')">Pesagem</button>
-            <!-- NOVA ABA OPERADORES -->
             <button class="tab-link" onclick="showTab('operadores')">Operadores</button>
             <button class="tab-link" onclick="showTab('dashboard')">Dashboard</button>
         </div>
 
-        <!-- 1. CONTEÚDO FILTRO PRENSA (ANTIGO 'PRODUÇÃO') -->
         <div id="tabProducao" class="tab-content active">
             <section>
                 <h2>Lançar Produção (Filtro Prensa)</h2>
@@ -564,9 +475,6 @@ tbody tr:not(.linha-detalhes):hover { background-color: var(--primary-light); }
             </section>
         </div>
 
-        <!-- ================================================================ -->
-        <!-- =================== 2. CONTEÚDO PARA MOAGEM ==================== -->
-        <!-- ================================================================ -->
         <div id="tabMoagem" class="tab-content">
             <section>
                 <h2>
@@ -574,7 +482,6 @@ tbody tr:not(.linha-detalhes):hover { background-color: var(--primary-light); }
                     <button id="openConfigMoagemBtn" title="Configurar Pontuação da Moagem" onclick="openConfigMoagemModal()">⚙️</button>
                 </h2>
                 <form id="formMoagem">
-                    <!-- Informações Básicas -->
                     <div>
                         <label for="dataMoagem">Data</label>
                         <input type="date" id="dataMoagem" required>
@@ -590,94 +497,86 @@ tbody tr:not(.linha-detalhes):hover { background-color: var(--primary-light); }
                         </select>
                     </div>
                     <div>
-                        <!-- CAMPO DE TEXTO SUBSTITUÍDO POR SELECT -->
                         <label for="operadorMoagemSelect">Operador</label>
                         <select id="operadorMoagemSelect" required>
                             <option value="">Carregando...</option>
                         </select>
                     </div>
 
-                    <!-- Seção Operador -->
                     <fieldset class="moagem-fieldset">
-    <legend>Operador</legend>
-    
-    <div>
-        <label for="qtdCargasMoagem">Cargas Feitas</label>
-        <input type="number" id="qtdCargasMoagem" min="0" value="0" required>
-    </div>
+                        <legend>Operador</legend>
+                        
+                        <div>
+                            <label for="qtdCargasMoagem">Cargas Feitas</label>
+                            <input type="number" id="qtdCargasMoagem" min="0" value="0" required>
+                        </div>
+                        <div>
+                            <label for="qtdCargasSubidas">Cargas Subidas</label>
+                            <input type="number" id="qtdCargasSubidas" min="0" value="0">
+                        </div>
 
-    <div>
-        <label for="qtdCargasSubidas">Cargas Subidas</label>
-        <input type="number" id="qtdCargasSubidas" min="0" value="0">
-    </div>
+                        <div>
+                            <label for="qtdDescargaMoagem">Quantidade de Descargas</label>
+                            <input type="number" id="qtdDescargaMoagem" min="0" value="0">
+                        </div>
+                        <div>
+                            <label for="arrumouBoxMoagem">Arrumou o Box?</label>
+                            <select id="arrumouBoxMoagem"> <option value="nao">Não</option> <option value="sim">Sim</option> </select>
+                        </div>
+                        <div>
+                            <label for="carregouCaminhaoCacoMoagem">Carregou Caminhão Caco?</label>
+                            <select id="carregouCaminhaoCacoMoagem"> <option value="nao">Não</option> <option value="sim">Sim</option> </select>
+                        </div>
 
-    <div>
-        <label for="qtdDescargaMoagem">Quantidade de Descargas</label>
-        <input type="number" id="qtdDescargaMoagem" min="0" value="0">
-    </div>
-    <div>
-        <label for="arrumouBoxMoagem">Arrumou o Box?</label>
-        <select id="arrumouBoxMoagem"> <option value="nao">Não</option> <option value="sim">Sim</option> </select>
-    </div>
-    
-    <div>
-        <label for="carregouCaminhaoCacoMoagem">Carregou Caminhão Caco?</label>
-        <select id="carregouCaminhaoCacoMoagem"> <option value="nao">Não</option> <option value="sim">Sim</option> </select>
-    </div>
+                        <div class="campo-com-condicional">
+                            <label for="guardouMateriaMoagem">Guardou Matéria?</label>
+                            <select id="guardouMateriaMoagem" onchange="toggleCampoCondicional('guardouMateriaMoagem', 'containerQtdGuardouMateria')">
+                                <option value="nao">Não</option> <option value="sim">Sim</option>
+                            </select>
+                        </div>
+                        <div id="containerQtdGuardouMateria" class="campo-condicional">
+                            <label for="qtdGuardouMateriaMoagem">Quantas guardou?</label>
+                            <input type="number" id="qtdGuardouMateriaMoagem" min="0" value="0">
+                        </div>
 
-    <div class="campo-com-condicional">
-        <label for="guardouMateriaMoagem">Guardou Matéria?</label>
-        <select id="guardouMateriaMoagem" onchange="toggleCampoCondicional('guardouMateriaMoagem', 'containerQtdGuardouMateria')">
-            <option value="nao">Não</option> <option value="sim">Sim</option>
-        </select>
-    </div>
-    <div id="containerQtdGuardouMateria" class="campo-condicional">
-        <label for="qtdGuardouMateriaMoagem">Quantas guardou?</label>
-        <input type="number" id="qtdGuardouMateriaMoagem" min="0" value="0">
-    </div>
+                        <div class="campo-com-condicional">
+                            <label for="subiuMassaMoagem">Subiu Massa?</label>
+                            <select id="subiuMassaMoagem" onchange="toggleCampoCondicional('subiuMassaMoagem', 'containerQtdSubiuMassa')">
+                                <option value="nao">Não</option> <option value="sim">Sim</option>
+                            </select>
+                        </div>
+                        <div id="containerQtdSubiuMassa" class="campo-condicional">
+                            <label for="qtdSubiuMassaMoagem">Quantas subiu?</label>
+                            <input type="number" id="qtdSubiuMassaMoagem" min="0" value="0">
+                        </div>
 
-    <div class="campo-com-condicional">
-        <label for="subiuMassaMoagem">Subiu Massa?</label>
-        <select id="subiuMassaMoagem" onchange="toggleCampoCondicional('subiuMassaMoagem', 'containerQtdSubiuMassa')">
-            <option value="nao">Não</option> <option value="sim">Sim</option>
-        </select>
-    </div>
-    <div id="containerQtdSubiuMassa" class="campo-condicional">
-        <label for="qtdSubiuMassaMoagem">Quantas subiu?</label>
-        <input type="number" id="qtdSubiuMassaMoagem" min="0" value="0">
-    </div>
+                        <div class="campo-com-condicional">
+                            <label for="desceuCacambaMoagem">Desceu Caçamba?</label>
+                            <select id="desceuCacambaMoagem" onchange="toggleCampoCondicional('desceuCacambaMoagem', 'containerQtdDesceuCacamba')">
+                                <option value="nao">Não</option> <option value="sim">Sim</option>
+                            </select>
+                        </div>
+                        <div id="containerQtdDesceuCacamba" class="campo-condicional">
+                            <label for="qtdDesceuCacambaMoagem">Quantas desceu?</label>
+                            <input type="number" id="qtdDesceuCacambaMoagem" min="0" value="0">
+                        </div>
 
-    <div class="campo-com-condicional">
-        <label for="desceuCacambaMoagem">Desceu Caçamba?</label>
-        <select id="desceuCacambaMoagem" onchange="toggleCampoCondicional('desceuCacambaMoagem', 'containerQtdDesceuCacamba')">
-            <option value="nao">Não</option> <option value="sim">Sim</option>
-        </select>
-    </div>
-    <div id="containerQtdDesceuCacamba" class="campo-condicional">
-        <label for="qtdDesceuCacambaMoagem">Quantas desceu?</label>
-        <input type="number" id="qtdDesceuCacambaMoagem" min="0" value="0">
-    </div>
+                        <div class="campo-com-condicional">
+                            <label for="virouCacambaMoagem">Virou Caçamba?</label>
+                            <select id="virouCacambaMoagem" onchange="toggleCampoCondicional('virouCacambaMoagem', 'containerQtdVirouCacamba')">
+                                <option value="nao">Não</option> <option value="sim">Sim</option>
+                            </select>
+                        </div>
+                        <div id="containerQtdVirouCacamba" class="campo-condicional">
+                            <label for="qtdVirouCacambaMoagem">Quantas virou?</label>
+                            <input type="number" id="qtdVirouCacambaMoagem" min="0" value="0">
+                        </div>
 
-    <div class="campo-com-condicional">
-        <label for="virouCacambaMoagem">Virou Caçamba?</label>
-        <select id="virouCacambaMoagem" onchange="toggleCampoCondicional('virouCacambaMoagem', 'containerQtdVirouCacamba')">
-            <option value="nao">Não</option> <option value="sim">Sim</option>
-        </select>
-    </div>
-    <div id="containerQtdVirouCacamba" class="campo-condicional">
-        <label for="qtdVirouCacambaMoagem">Quantas virou?</label>
-        <input type="number" id="qtdVirouCacambaMoagem" min="0" value="0">
-    </div>
+                        <div id="cargasContainerMoagem" class="full-width"></div>
+                        <div id="cargasSubidasContainerMoagem" class="full-width"></div>
 
-    <div id="cargasContainerMoagem" class="full-width">
-        </div>
+                    </fieldset>
 
-    <div id="cargasSubidasContainerMoagem" class="full-width">
-        </div>
-
-</fieldset>
-
-                    <!-- Seção Auxiliar -->
                     <fieldset class="moagem-fieldset">
                         <legend>Auxiliar</legend>
                         <div>
@@ -707,17 +606,15 @@ tbody tr:not(.linha-detalhes):hover { background-color: var(--primary-light); }
             </section>
             <section class="history-section">
                 <h2>Histórico de Moagem</h2>
-                <!-- Adicionar filtros se necessário -->
                 <table>
                     <thead>
                         <tr>
-                            <th></th> <!-- Para expandir -->
+                            <th></th>
                             <th>Data</th>
                             <th>Turno</th>
                             <th>Operador</th>
                             <th>Cargas (Qtd)</th>
-                            <th>Peso Total (kg)</th>
-                            <th>Pontos</th>
+                            <th>Peso Carga (kg)</th> <th>Pontos</th>
                             <th>Ações</th>
                         </tr>
                     </thead>
@@ -727,11 +624,7 @@ tbody tr:not(.linha-detalhes):hover { background-color: var(--primary-light); }
                 </table>
             </section>
         </div>
-        <!-- ================================================================ -->
-        <!-- ================================================================ -->
 
-
-        <!-- 3. CONTEÚDO PESAGEM (Existente) -->
         <div id="tabPesagem" class="tab-content">
             <section>
                 <h2>Lançar Peso de Palete/Mesa</h2>
@@ -767,9 +660,6 @@ tbody tr:not(.linha-detalhes):hover { background-color: var(--primary-light); }
             </section>
         </div>
         
-        <!-- ================================================================ -->
-        <!-- =================== 4. NOVA ABA OPERADORES ===================== -->
-        <!-- ================================================================ -->
         <div id="tabOperadores" class="tab-content">
             <section>
                 <h2>Lançar Cadastro de Operador</h2>
@@ -816,8 +706,6 @@ tbody tr:not(.linha-detalhes):hover { background-color: var(--primary-light); }
             </section>
         </div>
 
-
-        <!-- 5. CONTEÚDO DASHBOARD (Existente) -->
         <div id="tabDashboard" class="tab-content">
             <h2>Dashboard de Produção</h2>
             <div class="dashboard-filters">
@@ -871,7 +759,6 @@ tbody tr:not(.linha-detalhes):hover { background-color: var(--primary-light); }
         </div>
     </div>
 
-    <!-- MODAL DE CONFIGURAÇÃO (Filtro Prensa) -->
     <div id="configModal" class="modal-overlay" onclick="closeConfigModal(event)">
         <div class="modal-content">
             <h3>Configurações de Pesos e Metas (Filtro Prensa)</h3>
@@ -889,7 +776,6 @@ tbody tr:not(.linha-detalhes):hover { background-color: var(--primary-light); }
         </div>
     </div>
     
-    <!-- MODAL PARA PONTOS MOAGEM -->
     <div id="configMoagemModal" class="modal-overlay" onclick="closeConfigMoagemModal(event)">
         <div class="modal-content">
             <h3>Configurar Pontuação (Moagem)</h3>
@@ -954,7 +840,7 @@ tbody tr:not(.linha-detalhes):hover { background-color: var(--primary-light); }
         window.massaCol = collection(db, "producao_massa");
         window.pesagemCol = collection(db, "pesagem_paletes");
         window.moagemCol = collection(db, "producao_moagem");
-        window.operadoresCol = collection(db, "operadores_moagem"); // <-- Nova coleção para Operadores
+        window.operadoresCol = collection(db, "operadores_moagem");
         window.addDoc = addDoc;
         window.getDocs = getDocs;
         window.query = query;
@@ -975,10 +861,12 @@ tbody tr:not(.linha-detalhes):hover { background-color: var(--primary-light); }
         pesoFiltro: 4100, pesoPlaca: 39.1,
         metaKgFT: 12300, metaKgPalete: 12500
     };
+    
     // Config Moagem (Pontos)
     let appConfigMoagem = {
         pontosPorKgMoagem: 0.01,
-        pontosPorKgMoagemSubida: 0.01,
+        pontosPorKgMoagemSubida: 0.005, // Novo campo
+        
         pontosDescarga: 1,
         pontosGuardouMateria: 1,
         pontosArrumouBox: 5,
@@ -1163,38 +1051,38 @@ tbody tr:not(.linha-detalhes):hover { background-color: var(--primary-light); }
     }
     
     document.getElementById('formMassa').addEventListener('submit', async function(event) {
-        event.preventDefault();
-        const kgPaleteReal = parseFloat(document.getElementById('kgPalete').value);
-        if (kgPaleteReal <= 0) {
-            alert("O KG Total de Paletes deve ser maior que zero. Lance ao menos um palete.");
-            return;
-        }
-        const qtdFT = parseInt(document.getElementById('qtdFT').value);
-        const qtdPlacas = parseInt(document.getElementById('qtdPlacas').value);
-        const kgCalculado = (qtdFT * appConfig.pesoFiltro) + (qtdPlacas * appConfig.pesoPlaca);
-        const retrabalhoCalculado = kgPaleteReal - kgCalculado;
-        const retrabalhoKg = Math.max(0, retrabalhoCalculado);
-        const novoRegistro = {
-            data: document.getElementById('data').value,
-            turno: document.getElementById('turno').value,
-            qtdFT, qtdPlacas,
-            kgPalete: kgPaleteReal,
-            observacao: document.getElementById('observacao').value,
-            kgCalculado, retrabalhoKg,
-            timestamp: new Date().toISOString(),
-            metaKgFT: appConfig.metaKgFT,
-            metaKgPalete: appConfig.metaKgPalete
-        };
-        try {
-            await window.addDoc(window.massaCol, novoRegistro);
-            alert('Produção (Filtro Prensa) lançada com sucesso! ✅');
-            renderizarHistorico();
-            limparFormMassa();
-        } catch (error) {
-            console.error("Erro ao salvar no Firebase: ", error);
-            alert("Erro ao salvar. Verifique o console. ❌");
-        }
-    });
+        event.preventDefault();
+        const kgPaleteReal = parseFloat(document.getElementById('kgPalete').value);
+        if (kgPaleteReal <= 0) {
+            alert("O KG Total de Paletes deve ser maior que zero. Lance ao menos um palete.");
+            return;
+        }
+        const qtdFT = parseInt(document.getElementById('qtdFT').value);
+        const qtdPlacas = parseInt(document.getElementById('qtdPlacas').value);
+        const kgCalculado = (qtdFT * appConfig.pesoFiltro) + (qtdPlacas * appConfig.pesoPlaca);
+        const retrabalhoCalculado = kgPaleteReal - kgCalculado;
+        const retrabalhoKg = Math.max(0, retrabalhoCalculado);
+        const novoRegistro = {
+            data: document.getElementById('data').value,
+            turno: document.getElementById('turno').value,
+            qtdFT, qtdPlacas,
+            kgPalete: kgPaleteReal,
+            observacao: document.getElementById('observacao').value,
+            kgCalculado, retrabalhoKg,
+            timestamp: new Date().toISOString(),
+            metaKgFT: appConfig.metaKgFT,
+            metaKgPalete: appConfig.metaKgPalete
+        };
+        try {
+            await window.addDoc(window.massaCol, novoRegistro);
+            alert('Produção (Filtro Prensa) lançada com sucesso! ✅');
+            renderizarHistorico();
+            limparFormMassa();
+        } catch (error) {
+            console.error("Erro ao salvar no Firebase: ", error);
+            alert("Erro ao salvar. Verifique o console. ❌");
+        }
+    });
     
     async function renderizarHistorico() {
         const tbody = document.getElementById('tabelaHistoricoBody');
@@ -1373,9 +1261,13 @@ tbody tr:not(.linha-detalhes):hover { background-color: var(--primary-light); }
         document.querySelectorAll('.campo-condicional').forEach(el => el.style.display = 'none');
     }
 
-    // --- SALVAR MOAGEM (CORRIGIDO: APENAS UM LISTENER) ---
-    // Remova qualquer outro 'addEventListener' duplicado para 'formMoagem' no seu código
-    document.getElementById('formMoagem').addEventListener('submit', async function(event) {
+    // --- SALVAR MOAGEM (CORRIGIDO: APENAS UM LISTENER e PESOS SEPARADOS) ---
+    // Usamos cloneNode para remover listeners antigos e evitar duplicação
+    const formMoagem = document.getElementById('formMoagem');
+    const novoFormMoagem = formMoagem.cloneNode(true);
+    formMoagem.parentNode.replaceChild(novoFormMoagem, formMoagem);
+
+    novoFormMoagem.addEventListener('submit', async function(event) {
         event.preventDefault();
         
         // 1. Coletar Cargas FEITAS
@@ -1433,33 +1325,12 @@ tbody tr:not(.linha-detalhes):hover { background-color: var(--primary-light); }
              lavouPeneiraDosador: document.getElementById('lavouPeneiraDosadorMoagem').value === 'sim',
         };
 
-        // 4. Calcular Pontos (Soma Feitas + Subidas para o cálculo de pontos)
-        const pesoTotalGeral = pesoTotalCargas + pesoTotalCargasSubidas;
-        let pontosCargas = pesoTotalGeral * appConfigMoagem.pontosPorKgMoagem;
-        
-        let pontosAtividades = 0;
-        pontosAtividades += dadosOperador.qtdDescarga * appConfigMoagem.pontosDescarga;
-        pontosAtividades += dadosOperador.qtdGuardouMateria * appConfigMoagem.pontosGuardouMateria;
-        pontosAtividades += dadosOperador.arrumouBox ? appConfigMoagem.pontosArrumouBox : 0;
-        pontosAtividades += dadosOperador.carregouCaminhaoCaco ? appConfigMoagem.pontosCarregouCaminhaoCaco : 0;
-        pontosAtividades += dadosOperador.qtdSubiuMassa * appConfigMoagem.pontosSubiuMassa;
-        pontosAtividades += dadosOperador.qtdDesceuCacamba * appConfigMoagem.pontosDesceuCacamba;
-        pontosAtividades += dadosOperador.qtdVirouCacamba * appConfigMoagem.pontosVirouCacamba;
-        
-        pontosAtividades += dadosAuxiliar.lavouPeneira ? appConfigMoagem.pontosLavouPeneira : 0;
-        pontosAtividades += dadosAuxiliar.limpouMoinho ? appConfigMoagem.pontosLimpouMoinho : 0;
-        pontosAtividades += dadosAuxiliar.lavouPeneiraDosador ? appConfigMoagem.pontosLavouPeneiraDosador : 0;
-        
-        const pontosTotal = pontosCargas + pontosAtividades;
-
-        // 4. Calcular Pontos (ATUALIZADO: Feitas vs Subidas com pesos diferentes)
-        
-        // Verifica se existe a configuração nova, senão usa 0
+        // 4. Calcular Pontos (CORRIGIDO: Feitas vs Subidas com pesos diferentes)
         const fatorSubida = (appConfigMoagem.pontosPorKgMoagemSubida !== undefined) 
                             ? appConfigMoagem.pontosPorKgMoagemSubida 
                             : 0; 
 
-        // Calcula os pontos separadamente
+        // Calcula separado
         const pontosPorCargasFeitas = pesoTotalCargas * appConfigMoagem.pontosPorKgMoagem;
         const pontosPorCargasSubidas = pesoTotalCargasSubidas * fatorSubida;
         
@@ -1625,123 +1496,6 @@ tbody tr:not(.linha-detalhes):hover { background-color: var(--primary-light); }
         }
     };
 
-
-    // --- LÓGICA PESAGEM (formPesagem) ---
-    document.getElementById('formMoagem').addEventListener('submit', async function(event) {
-        event.preventDefault();
-        
-        // 1. Coletar Cargas FEITAS
-        const qtdCargas = parseInt(document.getElementById('qtdCargasMoagem').value) || 0;
-        let cargas = [];
-        let pesoTotalCargas = 0;
-        for (let i = 1; i <= qtdCargas; i++) {
-            const moinhoEl = document.getElementById(`moinhoCarga_${i}`);
-            const pesoEl = document.getElementById(`pesoCarga_${i}`);
-            
-            // Verificação de segurança se o elemento existe
-            if (moinhoEl && pesoEl) {
-                const moinho = moinhoEl.value;
-                const peso = parseFloat(pesoEl.value) || 0;
-                if (moinho && peso > 0) {
-                    cargas.push({ moinho: moinho, peso: peso });
-                    pesoTotalCargas += peso;
-                }
-            }
-        }
-
-        // 2. Coletar Cargas SUBIDAS (NOVO)
-        const qtdCargasSubidas = parseInt(document.getElementById('qtdCargasSubidas').value) || 0;
-        let cargasSubidas = [];
-        let pesoTotalCargasSubidas = 0;
-        for (let i = 1; i <= qtdCargasSubidas; i++) {
-            const moinhoEl = document.getElementById(`moinhoCargaSubida_${i}`);
-            const pesoEl = document.getElementById(`pesoCargaSubida_${i}`);
-            
-            if (moinhoEl && pesoEl) {
-                const moinho = moinhoEl.value;
-                const peso = parseFloat(pesoEl.value) || 0;
-                if (moinho && peso > 0) {
-                    cargasSubidas.push({ moinho: moinho, peso: peso });
-                    pesoTotalCargasSubidas += peso;
-                }
-            }
-        }
-        
-        // 3. Coletar Dados Sim/Não (Mantido igual)
-        const dadosOperador = {
-            qtdDescarga: parseInt(document.getElementById('qtdDescargaMoagem').value) || 0,
-            guardouMateria: document.getElementById('guardouMateriaMoagem').value === 'sim',
-            qtdGuardouMateria: parseInt(document.getElementById('qtdGuardouMateriaMoagem').value) || 0,
-            arrumouBox: document.getElementById('arrumouBoxMoagem').value === 'sim',
-            carregouCaminhaoCaco: document.getElementById('carregouCaminhaoCacoMoagem').value === 'sim',
-            subiuMassa: document.getElementById('subiuMassaMoagem').value === 'sim',
-            qtdSubiuMassa: parseInt(document.getElementById('qtdSubiuMassaMoagem').value) || 0,
-            desceuCacamba: document.getElementById('desceuCacambaMoagem').value === 'sim',
-            qtdDesceuCacamba: parseInt(document.getElementById('qtdDesceuCacambaMoagem').value) || 0,
-            virouCacamba: document.getElementById('virouCacambaMoagem').value === 'sim',
-            qtdVirouCacamba: parseInt(document.getElementById('qtdVirouCacambaMoagem').value) || 0,
-        };
-        
-        const dadosAuxiliar = {
-             lavouPeneira: document.getElementById('lavouPeneiraMoagem').value === 'sim',
-             limpouMoinho: document.getElementById('limpouMoinhoMoagem').value === 'sim',
-             lavouPeneiraDosador: document.getElementById('lavouPeneiraDosadorMoagem').value === 'sim',
-        };
-
-        // 4. Calcular Pontos (ATUALIZADO PARA SOMAR FEITAS + SUBIDAS)
-        // Soma o peso das Feitas + Subidas e multiplica pelo fator
-        const pesoTotalGeral = pesoTotalCargas + pesoTotalCargasSubidas;
-        let pontosCargas = pesoTotalGeral * appConfigMoagem.pontosPorKgMoagem;
-        
-        let pontosAtividades = 0;
-        pontosAtividades += dadosOperador.qtdDescarga * appConfigMoagem.pontosDescarga;
-        pontosAtividades += dadosOperador.qtdGuardouMateria * appConfigMoagem.pontosGuardouMateria;
-        pontosAtividades += dadosOperador.arrumouBox ? appConfigMoagem.pontosArrumouBox : 0;
-        pontosAtividades += dadosOperador.carregouCaminhaoCaco ? appConfigMoagem.pontosCarregouCaminhaoCaco : 0;
-        pontosAtividades += dadosOperador.qtdSubiuMassa * appConfigMoagem.pontosSubiuMassa;
-        pontosAtividades += dadosOperador.qtdDesceuCacamba * appConfigMoagem.pontosDesceuCacamba;
-        pontosAtividades += dadosOperador.qtdVirouCacamba * appConfigMoagem.pontosVirouCacamba;
-        
-        pontosAtividades += dadosAuxiliar.lavouPeneira ? appConfigMoagem.pontosLavouPeneira : 0;
-        pontosAtividades += dadosAuxiliar.limpouMoinho ? appConfigMoagem.pontosLimpouMoinho : 0;
-        pontosAtividades += dadosAuxiliar.lavouPeneiraDosador ? appConfigMoagem.pontosLavouPeneiraDosador : 0;
-        
-        const pontosTotal = pontosCargas + pontosAtividades;
-
-        // 5. Montar Registro e Salvar
-        const novoRegistroMoagem = {
-            data: document.getElementById('dataMoagem').value,
-            turno: document.getElementById('turnoMoagem').value,
-            operador: document.getElementById('operadorMoagemSelect').value,
-            observacao: document.getElementById('observacaoMoagem').value,
-            
-            cargas: cargas, // Cargas Feitas
-            pesoTotalCargas: pesoTotalCargas,
-            
-            cargasSubidas: cargasSubidas, // NOVO: Cargas Subidas
-            pesoTotalCargasSubidas: pesoTotalCargasSubidas, // NOVO: Peso Subidas
-
-            ...dadosOperador,
-            ...dadosAuxiliar,
-            
-            pontosCargas: pontosCargas, // Inclui pontos de ambas
-            pontosAtividades: pontosAtividades,
-            pontosTotal: pontosTotal,
-            
-            configuracaoPontosUsada: appConfigMoagem,
-            timestamp: new Date().toISOString()
-        };
-
-        try {
-            await window.addDoc(window.moagemCol, novoRegistroMoagem);
-            alert(`Lançamento salvo! \nPontos: ${pontosTotal.toFixed(2)} \n(Peso Total: ${pesoTotalGeral.toFixed(2)}kg)`);
-            renderizarHistoricoMoagem();
-            limparFormMoagem();
-        } catch (error) {
-            console.error("Erro ao salvar moagem: ", error);
-            alert("Erro ao salvar lançamento de moagem. ❌");
-        }
-    });
 
     // --- LÓGICA OPERADORES (formOperador) ---
     
@@ -1988,7 +1742,6 @@ tbody tr:not(.linha-detalhes):hover { background-color: var(--primary-light); }
     
     document.addEventListener('DOMContentLoaded', async () => {
         const hojeStr = obterDataLocalFormatada();
-        // Adicionado 'dataCadastroOperador' à lista de campos de data
         ['data', 'filtroDataInicio', 'filtroDataFim', 'dataPesagem', 'dashFiltroDataInicio', 'dashFiltroDataFim', 'dataMoagem', 'dataCadastroOperador'].forEach(id => {
             const el = document.getElementById(id);
             if (el) el.value = hojeStr;
@@ -2000,8 +1753,6 @@ tbody tr:not(.linha-detalhes):hover { background-color: var(--primary-light); }
         
         // Listeners Moagem
         document.getElementById('qtdCargasMoagem').addEventListener('input', atualizarCamposCargaMoagem);
-        
-        // --- ADICIONE ESTA LINHA ---
         document.getElementById('qtdCargasSubidas').addEventListener('input', atualizarCamposCargasSubidas);
         
         // Listeners Dashboard
@@ -2014,12 +1765,12 @@ tbody tr:not(.linha-detalhes):hover { background-color: var(--primary-light); }
         
         // Carregar Dados Iniciais
         await carregarOpcoesPaletes();
-        await carregarOperadoresDropdown(); // <-- Carrega operadores no dropdown
+        await carregarOperadoresDropdown();
         
         renderizarHistorico();
         renderizarHistoricoPesagem();
         renderizarHistoricoMoagem(); 
-        renderizarHistoricoOperadores(); // <-- Renderiza tabela de operadores
+        renderizarHistoricoOperadores();
         
         calcularPesoTotalPaletes();
         limparFormMoagem(); 
@@ -2030,12 +1781,9 @@ tbody tr:not(.linha-detalhes):hover { background-color: var(--primary-light); }
     });
 
     // --- Funções Globais (Detalhes, Excluir) ---
-    
-    // Função genérica para expandir/recolher
     window.toggleDetalhes = function(detalhesId, botao) {
         const detalhesRow = document.getElementById(detalhesId);
         const btn = botao.closest('.expand-btn');
-        
         if (detalhesRow.style.display === "table-row") {
             detalhesRow.style.display = "none";
             btn.classList.remove('open');
